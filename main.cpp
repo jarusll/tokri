@@ -73,33 +73,55 @@ public:
 
     FStoListProxy(QObject *parent = nullptr):QAbstractProxyModel(parent) { }
 
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const {
-        return QModelIndex();
-        // return QAbstractProxyModel::mapFromSource(sourceIndex);
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override {
+        if (!sourceIndex.isValid())
+            return QModelIndex();
+
+        auto it = mSourceToProxyHash.find(QPersistentModelIndex(sourceIndex));
+        if (it == mSourceToProxyHash.end())
+            return QModelIndex();
+
+        int proxyRow = it.value();
+        int proxyColumn = sourceIndex.column();
+
+        return createIndex(proxyRow, proxyColumn);
     }
 
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const {
-        return QModelIndex();
-        // return QAbstractProxyModel::mapToSource(proxyIndex);
+
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const override {
+        if (!proxyIndex.isValid()){
+            return QModelIndex();
+        }
+
+        int proxyRow = proxyIndex.row();
+        auto srcIndex = mSourceIndexes.at(proxyRow);
+        return sourceModel()->index(
+            srcIndex.row(),
+            proxyIndex.column(),
+            proxyIndex.parent()
+            );
     }
 
-    QModelIndex parent(const QModelIndex &child) const {
+    QModelIndex parent(const QModelIndex &child) const override {
         return QModelIndex();
     }
 
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const {
-        return QModelIndex();
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
+        if (parent.isValid()){
+            return QModelIndex();
+        }
+        return createIndex(row, column);
     }
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const {
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override {
         if (parent.isValid()){
             return 0;
         }
 
-        return mVectorIndexes.length();
+        return mSourceIndexes.length();
     }
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const {
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override {
         if (parent.isValid()){
             return 1;
         }
@@ -108,29 +130,33 @@ public:
     }
 
     void buildIndex(const QString &directory){
-        qDebug() << "Directory " << directory;
+        // qDebug() << "Directory " << directory;
         auto *fsm = qobject_cast<QFileSystemModel*>(sourceModel());
         if (!fsm){
             return;
         }
 
         beginResetModel();
-        mVectorIndexes.clear();
+        mSourceIndexes.clear();
+        mSourceToProxyHash.clear();
 
         QModelIndex directoryIndex = fsm->index(directory, 0);
         int rowCount = fsm->rowCount(directoryIndex);
         for (int r = 0; r < rowCount; r++){
-            QModelIndex index = sourceModel()->index(r, 0, directoryIndex);
-            mVectorIndexes.append(QPersistentModelIndex(index));
+            QModelIndex sourceIndex = sourceModel()->index(r, 0, directoryIndex);
+            mSourceIndexes.append(QPersistentModelIndex(sourceIndex));
+
+            mSourceToProxyHash.insert(sourceIndex, r);
         }
 
-        qDebug() << "Probe " << fsm;
-        qDebug() << "RowCount " << fsm->rowCount(directoryIndex);
+        // qDebug() << "Probe " << fsm;
+        // qDebug() << "RowCount " << fsm->rowCount(directoryIndex);
 
         endResetModel();
     }
 private:
-    QVector<QPersistentModelIndex> mVectorIndexes;
+    QVector<QPersistentModelIndex> mSourceIndexes;
+    QHash<QPersistentModelIndex, int> mSourceToProxyHash;
 };
 
 class Names {
@@ -192,7 +218,7 @@ int main(int argc, char *argv[])
         &QFileSystemModel::directoryLoaded,
         fsToList,
         &FStoListProxy::buildIndex
-    );
+        );
     fsToList->setSourceModel(fsModel);
     w.show();
     return a.exec();
