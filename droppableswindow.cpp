@@ -12,3 +12,8 @@ DroppablesWindow::~DroppablesWindow()
 {
     delete ui;
 }
+
+QListView* DroppablesWindow::listView()
+{
+    return ui->listView;
+}

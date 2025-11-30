@@ -1,6 +1,7 @@
 #ifndef DROPPABLESWINDOW_H
 #define DROPPABLESWINDOW_H
 
+#include <QListView>
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -16,6 +17,7 @@ class DroppablesWindow : public QMainWindow
 public:
     DroppablesWindow(QWidget *parent = nullptr);
     ~DroppablesWindow();
+    QListView* listView();
 
 private:
     Ui::DroppablesWindow *ui;
