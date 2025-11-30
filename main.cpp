@@ -98,7 +98,7 @@ public:
         return sourceModel()->index(
             srcIndex.row(),
             proxyIndex.column(),
-            proxyIndex.parent()
+            srcIndex.parent()
             );
     }
 
@@ -123,10 +123,21 @@ public:
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const override {
         if (parent.isValid()){
-            return 1;
+            return 0;
         }
 
-        return 0;
+        return 1;
+    }
+
+    QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const override {
+        if (!proxyIndex.isValid()){
+            return QVariant();
+        }
+        QModelIndex srcIndex = mapToSource(proxyIndex);
+        if (!srcIndex.isValid()){
+            return QVariant();
+        }
+        return sourceModel()->data(srcIndex, role);
     }
 
     void buildIndex(const QString &directory){
@@ -220,6 +231,7 @@ int main(int argc, char *argv[])
         &FStoListProxy::buildIndex
         );
     fsToList->setSourceModel(fsModel);
+    w.listView()->setModel(fsToList);
     w.show();
     return a.exec();
 }
