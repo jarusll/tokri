@@ -71,7 +71,7 @@ class FStoListProxy: public QAbstractProxyModel {
 
 public:
 
-    FStoListProxy(QObject *parent = nullptr):QAbstractProxyModel(parent) { }
+    FStoListProxy(QObject *parent = nullptr):rebuilds(0), QAbstractProxyModel(parent) { }
 
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override {
         if (!sourceIndex.isValid())
@@ -164,10 +164,13 @@ public:
         // qDebug() << "RowCount " << fsm->rowCount(directoryIndex);
 
         endResetModel();
+        rebuilds++;
+        qDebug() << rebuilds;
     }
 private:
     QVector<QPersistentModelIndex> mSourceIndexes;
     QHash<QPersistentModelIndex, int> mSourceToProxyHash;
+    qint32 rebuilds;
 };
 
 class Names {
@@ -232,6 +235,9 @@ int main(int argc, char *argv[])
         );
     fsToList->setSourceModel(fsModel);
     w.listView()->setModel(fsToList);
+
+    w.setAcceptDrops(true);
+
     w.show();
     return a.exec();
 }
