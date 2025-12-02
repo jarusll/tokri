@@ -6,6 +6,8 @@ DroppablesWindow::DroppablesWindow(QWidget *parent)
     , ui(new Ui::DroppablesWindow)
 {
     ui->setupUi(this);
+
+    setAcceptDrops(true);
 }
 
 DroppablesWindow::~DroppablesWindow()

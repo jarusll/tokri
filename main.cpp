@@ -240,8 +240,6 @@ int main(int argc, char *argv[])
     w.listView()->setRootIndex(rootIndex);
     w.listView()->setResizeMode(QListView::Adjust);
 
-    w.setAcceptDrops(true);
-
     w.show();
     return a.exec();
 }
