@@ -15,10 +15,11 @@ DroppablesWindow::~DroppablesWindow()
     delete ui;
 }
 
-QListView* DroppablesWindow::listView()
+Ui::DroppablesWindow *DroppablesWindow::uiHandle()
 {
-    return ui->listView;
+    return ui;
 }
+
 // void DroppablesWindow::dragEnterEvent(QDragEnterEvent *event)
 // {
 //     if (event->mimeData()->hasText() || event->mimeData()->hasUrls()){

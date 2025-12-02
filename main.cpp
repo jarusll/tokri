@@ -1,4 +1,6 @@
 #include "droppableswindow.h"
+#include "ui_droppableswindow.h"
+
 
 #include <QAbstractProxyModel>
 #include <QApplication>
@@ -11,6 +13,7 @@
 #include <QQueue>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <QAbstractItemView>
 
 enum class FileType {
     Audio,
@@ -236,10 +239,13 @@ int main(int argc, char *argv[])
     //     &FStoListProxy::buildIndex
     //     );
     // fsToList->setSourceModel(fsModel);
-    w.listView()->setModel(fsModel);
-    w.listView()->setRootIndex(rootIndex);
-    w.listView()->setResizeMode(QListView::Adjust);
+    w.uiHandle()->listView->setModel(fsModel);
+    w.uiHandle()->listView->setRootIndex(rootIndex);
+    w.uiHandle()->listView->setResizeMode(QListView::Adjust);
 
+    w.uiHandle()->listView->setDragEnabled(true);
+    w.uiHandle()->listView->setAcceptDrops(true);
+    w.uiHandle()->listView->setDragDropMode(QAbstractItemView::DragDrop);
     w.show();
     return a.exec();
 }

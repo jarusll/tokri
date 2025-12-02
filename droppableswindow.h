@@ -3,6 +3,9 @@
 
 #include <QListView>
 #include <QMainWindow>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QMimeData>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,7 +20,7 @@ class DroppablesWindow : public QMainWindow
 public:
     DroppablesWindow(QWidget *parent = nullptr);
     ~DroppablesWindow();
-    QListView* listView();
+    Ui::DroppablesWindow* uiHandle();
 
     // void dragEnterEvent(QDragEnterEvent *event);
     // void dragMoveEvent(QDragMoveEvent *event);
