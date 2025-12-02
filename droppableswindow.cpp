@@ -7,7 +7,7 @@ DroppablesWindow::DroppablesWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setAcceptDrops(true);
+    // setAcceptDrops(true);
 }
 
 DroppablesWindow::~DroppablesWindow()
@@ -19,3 +19,17 @@ QListView* DroppablesWindow::listView()
 {
     return ui->listView;
 }
+// void DroppablesWindow::dragEnterEvent(QDragEnterEvent *event)
+// {
+//     if (event->mimeData()->hasText() || event->mimeData()->hasUrls()){
+//         event->acceptProposedAction();
+//     }
+// }
+
+// void DroppablesWindow::dragMoveEvent(QDragMoveEvent *event)
+// {
+//     if (event->mimeData()->hasText() || event->mimeData()->hasUrls()){
+//         event->acceptProposedAction();
+//         qDebug() << event->mimeData()->text() << event->mimeData()->urls();
+//     }
+// }

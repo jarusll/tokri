@@ -19,6 +19,8 @@ public:
     ~DroppablesWindow();
     QListView* listView();
 
+    // void dragEnterEvent(QDragEnterEvent *event);
+    // void dragMoveEvent(QDragMoveEvent *event);
 private:
     Ui::DroppablesWindow *ui;
 };
