@@ -224,11 +224,16 @@ public:
     }
 };
 
+Qt::ItemFlags QFileSystemModel::flags(const QModelIndex &index) const{
+    return QAbstractItemModel::flags(index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     DroppablesWindow w;
     QFileSystemModel *fsModel = new QFileSystemModel(&w);
+    fsModel->setReadOnly(false);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
     w.uiHandle()->listView->setModel(fsModel);
