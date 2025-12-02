@@ -175,13 +175,13 @@ private:
     qint32 rebuilds;
 };
 
-class Names {
+class StandardNames {
 public:
-    enum Name {
+    enum Names {
         Directory,
     };
 
-    static QString get(Name name){
+    static QString get(Names name){
         switch (name){
         case Directory:
             return "Wallet";
@@ -204,7 +204,7 @@ public:
             auto homePath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
             auto home = QDir(homePath);
             // FIXME - If I dont exist, create me
-            home.cd(Names::get(Names::Directory));
+            home.cd(StandardNames::get(StandardNames::Directory));
             return home.absolutePath();
         }
         default:
