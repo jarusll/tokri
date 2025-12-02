@@ -231,14 +231,6 @@ int main(int argc, char *argv[])
     QFileSystemModel *fsModel = new QFileSystemModel(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
-    // FStoListProxy *fsToList = new FStoListProxy(&w);
-    // QObject::connect(
-    //     fsModel,
-    //     &QFileSystemModel::directoryLoaded,
-    //     fsToList,
-    //     &FStoListProxy::buildIndex
-    //     );
-    // fsToList->setSourceModel(fsModel);
     w.uiHandle()->listView->setModel(fsModel);
     w.uiHandle()->listView->setRootIndex(rootIndex);
     w.uiHandle()->listView->setResizeMode(QListView::Adjust);
