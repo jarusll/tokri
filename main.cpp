@@ -226,20 +226,20 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection
     );
 
-    DirectoryCopyWorker::connect(
-        worker,
-        &DirectoryCopyWorker::copying,
-        &w,
-        [&w](const QString &path){
-            w.status("Copying " + path, 1000);
-        }
-    );
-    DirectoryCopyWorker::connect(
-        worker,
-        &DirectoryCopyWorker::copied,
-        &w,
-        &DroppablesWindow::statusClear
-    );
+    // DirectoryCopyWorker::connect(
+    //     worker,
+    //     &DirectoryCopyWorker::copying,
+    //     &w,
+    //     [&w](const QString &path){
+    //         w.status("Copying " + path, 1000);
+    //     }
+    // );
+    // DirectoryCopyWorker::connect(
+    //     worker,
+    //     &DirectoryCopyWorker::copied,
+    //     &w,
+    //     &DroppablesWindow::statusClear
+    // );
 
     th->start();
 
