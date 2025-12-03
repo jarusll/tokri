@@ -16,6 +16,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -33,6 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         settings.h settings.cpp
         textfile.h textfile.cpp
         filenameprovider.h filenameprovider.cpp
+        directorycopyworker.h directorycopyworker.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -54,6 +56,7 @@ else()
 endif()
 
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)

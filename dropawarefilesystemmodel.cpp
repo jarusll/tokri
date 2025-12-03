@@ -4,15 +4,10 @@ DropAwareFileSystemModel::DropAwareFileSystemModel(QObject *parent)
     : QFileSystemModel{parent}
 {}
 
-
-
 Qt::ItemFlags DropAwareFileSystemModel::flags(const QModelIndex &index) const  {
     Qt::ItemFlags f = QFileSystemModel::flags(index);
     return f | Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
 }
-
-
-
 
 bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
                                                Qt::DropAction action,
@@ -21,23 +16,28 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
     Q_UNUSED(row);
     Q_UNUSED(column);
     Q_UNUSED(parent);
+
+    // TODO wtf is this?
     if (action == Qt::IgnoreAction)
         return true;
 
     if (data->hasUrls()){
-        qDebug() << "Dropping urls" << data->urls();
         return true;
     } else if (data->hasText()){
-        qDebug() << "Dropping text" << data->text();
         return true;
     }
+    // FIXME
     // else if (data->hasImage()){
     //     qDebug() << "Dropping Image" << data->imageData();
     //     return true;
     // }
-    else {
-        return false;
-    }
+    return QFileSystemModel::canDropMimeData(
+        data,
+        action,
+        row,
+        column,
+        parent
+    );
 }
 
 bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
@@ -48,19 +48,76 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
     Q_UNUSED(column);
     Q_UNUSED(parent);
 
+
     if (data->hasUrls()) {
-        emit dropped(data);
-        return true;
+        bool handled = false;
+        QList<QUrl> fsUrls;
+        QList<QUrl> directoryUrls;
+
+        for (const auto &url: data->urls()){
+            if (url.isLocalFile()){
+                QFileInfo fileInfo(url.toLocalFile());
+                if (fileInfo.isFile()){
+                    // qDebug() << "Dropped File" << fileInfo;
+                    // emit droppedFile(fileInfo.filePath());
+                    fsUrls << url;
+                } else {
+                    // qDebug() << "Dropped Directory" << fileInfo;
+                    directoryUrls << url;
+                }
+            } else {
+                qDebug() << "Url" << url.url();
+                emit droppedText(url.toString());
+                handled = true;
+            }
+        }
+        // emit dropped(data);
+        // qDebug() << "Dirs" << directoryUrls;
+        // qDebug() << "Files" << fsUrls;
+        if (fsUrls.length() > 0){
+            QMimeData *filesData = new QMimeData;
+            filesData->setUrls(fsUrls);
+            qDebug() << "Files" << fsUrls;
+            bool baseHandled = QFileSystemModel::dropMimeData(
+                filesData,
+                action,
+                row,
+                column,
+                parent
+            );
+            handled = baseHandled | handled;
+        }
+
+        if (directoryUrls.length() > 0){
+            // QStringList directories;
+            for (const auto &dir: directoryUrls){
+                emit droppedDirectory(dir.toLocalFile());
+                // directories << dir.toLocalFile();
+            }
+            // emit droppedDirectory(directories);
+            handled = true;
+            qDebug() << "Directories" << directoryUrls;
+        }
+
+        return handled;
     }
 
     if (data->hasText()) {
-        emit dropped(data);
+        emit droppedText(data->text());
+        qDebug() << "Text" << data->text();
         return true;
     }
 
+    // FIXME
     // if (data->hasImage()) {
     //     emit dropped(data);
     //     return true;
     // }
-    return false;
+    return QFileSystemModel::dropMimeData(
+        data,
+        action,
+        row,
+        column,
+        parent
+    );
 }

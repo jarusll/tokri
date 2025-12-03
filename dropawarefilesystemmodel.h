@@ -21,7 +21,8 @@ public:
                       int row, int column,
                       const QModelIndex &parent) override;
 signals:
-    void dropped(const QMimeData *drop);
+    void droppedText(const QString &text);
+    void droppedDirectory(const QString &directory);
 };
 
 #endif // DROPAWAREFILESYSTEMMODEL_H

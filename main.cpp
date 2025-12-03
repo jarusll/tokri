@@ -1,3 +1,4 @@
+#include "directorycopyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
 #include "droppableswindow.h"
@@ -16,6 +17,7 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QAbstractItemView>
+#include <QThread>
 
 enum class FileType {
     Audio,
@@ -189,13 +191,13 @@ int main(int argc, char *argv[])
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     DropHandler *dropHandler = new DropHandler(&w);
-
-    QObject::connect(
+    DropAwareFileSystemModel::connect(
         fsModel,
-        &DropAwareFileSystemModel::dropped,
+        &DropAwareFileSystemModel::droppedText,
         dropHandler,
-        &DropHandler::drop
+        &DropHandler::dropText
     );
+
     fsModel->setReadOnly(false);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
@@ -210,6 +212,21 @@ int main(int argc, char *argv[])
     w.uiHandle()->listView->setDefaultDropAction(Qt::CopyAction);
 
     w.show();
+
+    QThread* th = new QThread;
+    DirectoryCopyWorker *worker = new DirectoryCopyWorker;
+    worker->moveToThread(th);
+
+    DirectoryCopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
+    DirectoryCopyWorker::connect(
+        fsModel,
+        &DropAwareFileSystemModel::droppedDirectory,
+        worker,
+        &DirectoryCopyWorker::copy,
+        Qt::QueuedConnection
+    );
+
+    th->start();
 
     return a.exec();
 }

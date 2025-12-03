@@ -11,7 +11,8 @@ class DropHandler : public QObject
     Q_OBJECT
 public:
     explicit DropHandler(QObject *parent = nullptr);
-    bool drop(const QMimeData *data);
+    bool dropText(const QString &text);
+    bool dropDirectory(const QString &directory);
 
 signals:
 };
