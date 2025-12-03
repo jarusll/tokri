@@ -225,7 +225,7 @@ public:
 };
 
 Qt::ItemFlags QFileSystemModel::flags(const QModelIndex &index) const{
-    return QAbstractItemModel::flags(index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    return QAbstractItemModel::flags(index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
 }
 
 class DropAwareFileSystemModel : public QFileSystemModel {
@@ -243,13 +243,16 @@ int main(int argc, char *argv[])
     fsModel->setReadOnly(false);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
+
     w.uiHandle()->listView->setModel(fsModel);
     w.uiHandle()->listView->setRootIndex(rootIndex);
     w.uiHandle()->listView->setResizeMode(QListView::Adjust);
-
+    w.uiHandle()->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     w.uiHandle()->listView->setDragEnabled(true);
     w.uiHandle()->listView->setAcceptDrops(true);
     w.uiHandle()->listView->setDragDropMode(QAbstractItemView::DragDrop);
+
     w.show();
+
     return a.exec();
 }
