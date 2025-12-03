@@ -1,7 +1,6 @@
 #include "droppableswindow.h"
 #include "ui_droppableswindow.h"
 
-
 #include <QAbstractProxyModel>
 #include <QApplication>
 #include <QDateTime>
@@ -19,8 +18,7 @@ enum class FileType {
     Audio,
     Image,
     Video,
-    // FIXME: No explicit mime types available for this
-    Document,
+    Document, // FIXME: No explicit mime types available for this
     Text,
     Other
 };
