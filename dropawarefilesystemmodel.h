@@ -1,0 +1,27 @@
+#ifndef DROPAWAREFILESYSTEMMODEL_H
+#define DROPAWAREFILESYSTEMMODEL_H
+
+#include <QFileSystemModel>
+#include <QMimeData>
+#include <QUrl>
+
+class DropAwareFileSystemModel : public QFileSystemModel
+{
+    Q_OBJECT
+public:
+    explicit DropAwareFileSystemModel(QObject *parent = nullptr);
+
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    bool canDropMimeData(const QMimeData *data,
+                         Qt::DropAction action,
+                         int row, int column,
+                         const QModelIndex &parent) const override;
+    bool dropMimeData(const QMimeData *data,
+                      Qt::DropAction action,
+                      int row, int column,
+                      const QModelIndex &parent) override;
+signals:
+    void dropped(const QMimeData *drop);
+};
+
+#endif // DROPAWAREFILESYSTEMMODEL_H

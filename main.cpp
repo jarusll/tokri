@@ -1,3 +1,4 @@
+#include "dropawarefilesystemmodel.h"
 #include "droppableswindow.h"
 #include "ui_droppableswindow.h"
 
@@ -222,15 +223,6 @@ public:
     }
 };
 
-Qt::ItemFlags QFileSystemModel::flags(const QModelIndex &index) const{
-    return QAbstractItemModel::flags(index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
-}
-
-class DropAwareFileSystemModel : public QFileSystemModel {
-public:
-    DropAwareFileSystemModel(QObject *parent): QFileSystemModel(parent) {}
-};
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -249,6 +241,7 @@ int main(int argc, char *argv[])
     w.uiHandle()->listView->setDragEnabled(true);
     w.uiHandle()->listView->setAcceptDrops(true);
     w.uiHandle()->listView->setDragDropMode(QAbstractItemView::DragDrop);
+    w.uiHandle()->listView->setDefaultDropAction(Qt::CopyAction);
 
     w.show();
 
