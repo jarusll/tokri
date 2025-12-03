@@ -13,6 +13,9 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -28,6 +31,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         dropawarefilesystemmodel.h dropawarefilesystemmodel.cpp
         drophandler.h drophandler.cpp
         settings.h settings.cpp
+        textfile.h textfile.cpp
+        filenameprovider.h filenameprovider.cpp
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Droppables APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -48,6 +54,9 @@ else()
 endif()
 
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
