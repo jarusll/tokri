@@ -35,6 +35,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         textfile.h textfile.cpp
         filenameprovider.h filenameprovider.cpp
         directorycopyworker.h directorycopyworker.cpp
+        README.md
 
     )
 # Define target properties for Android with Qt 6 as:
