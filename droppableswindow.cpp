@@ -20,6 +20,16 @@ Ui::DroppablesWindow *DroppablesWindow::uiHandle()
     return ui;
 }
 
+void DroppablesWindow::status(const QString &message, int timeout = 5000)
+{
+    ui->statusbar->showMessage(message, timeout);
+}
+
+void DroppablesWindow::statusClear()
+{
+    ui->statusbar->clearMessage();
+}
+
 // void DroppablesWindow::dragEnterEvent(QDragEnterEvent *event)
 // {
 //     if (event->mimeData()->hasText() || event->mimeData()->hasUrls()){

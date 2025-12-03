@@ -21,6 +21,8 @@ public:
     DroppablesWindow(QWidget *parent = nullptr);
     ~DroppablesWindow();
     Ui::DroppablesWindow* uiHandle();
+    void status(const QString &message, int timeout);
+    void statusClear();
 
     // void dragEnterEvent(QDragEnterEvent *event);
     // void dragMoveEvent(QDragMoveEvent *event);

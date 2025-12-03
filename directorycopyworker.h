@@ -14,7 +14,8 @@ public:
     void copy(const QString &directory);
 
 signals:
-    void finished(bool status);
+    void copying(const QString &directory);
+    void copied(const QString &directory);
 };
 
 #endif // DIRECTORYCOPYWORKER_H

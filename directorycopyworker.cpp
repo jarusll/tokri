@@ -17,6 +17,7 @@ void DirectoryCopyWorker::copy(const QString &src)
                     QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot,
                     QDirIterator::Subdirectories);
 
+    emit copying(src);
     while (it.hasNext()) {
         it.next();
         QString rel = QDir(src).relativeFilePath(it.filePath());
@@ -27,10 +28,10 @@ void DirectoryCopyWorker::copy(const QString &src)
         } else {
             QDir().mkpath(QFileInfo(out).path());
             if (!QFile::copy(it.filePath(), out)){
-                emit finished(false);
+                // FIXME
                 return;
             }
         }
     }
-    emit finished(true);
+    emit copied(src);
 }
