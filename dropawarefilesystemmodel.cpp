@@ -30,10 +30,12 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
     } else if (data->hasText()){
         qDebug() << "Dropping text" << data->text();
         return true;
-    } else if (data->hasImage()){
-        qDebug() << "Dropping Image" << data->imageData();
-        return true;
-    } else {
+    }
+    // else if (data->hasImage()){
+    //     qDebug() << "Dropping Image" << data->imageData();
+    //     return true;
+    // }
+    else {
         return false;
     }
 }
@@ -56,9 +58,9 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
         return true;
     }
 
-    if (data->hasImage()) {
-        emit dropped(data);
-        return true;
-    }
+    // if (data->hasImage()) {
+    //     emit dropped(data);
+    //     return true;
+    // }
     return false;
 }

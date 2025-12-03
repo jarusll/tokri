@@ -1,5 +1,7 @@
 #include "dropawarefilesystemmodel.h"
+#include "drophandler.h"
 #include "droppableswindow.h"
+#include "settings.h"
 #include "ui_droppableswindow.h"
 
 #include <QAbstractProxyModel>
@@ -177,51 +179,7 @@ private:
     qint32 rebuilds;
 };
 
-class StandardNames {
-public:
-    enum Names {
-        Directory,
-    };
 
-    static QString get(Names name){
-        switch (name){
-        case Directory:
-            return "Wallet";
-        default:
-            return "";
-        }
-    }
-};
-
-class StandardPaths {
-public:
-    enum Path {
-        RootPath,
-    };
-
-    static QString location(Path path){
-        switch(path){
-        case RootPath:
-        {
-            auto homePath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-            auto home = QDir(homePath);
-            // FIXME - If I dont exist, create me
-            home.cd(StandardNames::get(StandardNames::Directory));
-            return home.absolutePath();
-        }
-        default:
-            return "";
-        }
-    }
-};
-
-
-class Settings {
-public:
-    static QString get(StandardPaths::Path path){
-        return StandardPaths::location(StandardPaths::RootPath);
-    }
-};
 
 int main(int argc, char *argv[])
 {
@@ -229,7 +187,15 @@ int main(int argc, char *argv[])
 
     DroppablesWindow w;
 
-    QFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
+    DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
+    DropHandler *dropHandler = new DropHandler(&w);
+
+    QObject::connect(
+        fsModel,
+        &DropAwareFileSystemModel::dropped,
+        dropHandler,
+        &DropHandler::drop
+    );
     fsModel->setReadOnly(false);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
