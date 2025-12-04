@@ -11,7 +11,7 @@ void DirectoryCopyWorker::copyDirectory(const QString &src)
     qDebug() << "Copying Directory" << src;
 
     QString dst = FileNameProvider::nameFromPath(src);
-    QDir().mkpath(dst);
+    QDir().mkpath(dst); // FIXME emit mkdirFail
 
     QDirIterator it(src,
                     QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot,
@@ -27,7 +27,7 @@ void DirectoryCopyWorker::copyDirectory(const QString &src)
         } else {
             QDir().mkpath(QFileInfo(out).path());
             if (!QFile::copy(it.filePath(), out)){
-                // FIXME
+                // FIXME emit copyFail
                 return;
             }
         }
@@ -38,7 +38,7 @@ void DirectoryCopyWorker::copyFile(const QString &filePath)
 {
     QFile file(filePath);
     file.copy(FileNameProvider::nameFromPath(filePath));
-    // FIXME when it errors out
+    // FIXME emit copyFail
 }
 
 
