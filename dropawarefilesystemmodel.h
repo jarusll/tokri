@@ -22,6 +22,7 @@ public:
                       int row, int column,
                       const QModelIndex &parent) override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QMimeData* mimeData(const QModelIndexList &indexes) const override;
 
 signals:
     void droppedText(const QString &text);

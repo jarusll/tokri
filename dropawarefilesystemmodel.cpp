@@ -133,7 +133,7 @@ QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) cons
         return QFileSystemModel::data(index, role);
     }
     if (role == Qt::ToolTipRole){
-        const auto path = index.data(QFileSystemModel::Roles::FilePathRole).value<QString>();
+        const auto path = filePath(index);
         QMimeDatabase mimeDb;
         auto mime = mimeDb.mimeTypeForFile(path);
         if (mime.inherits("text/plain")){
@@ -163,4 +163,26 @@ QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) cons
     }
 
     return QFileSystemModel::data(index, role);
+}
+
+QMimeData* DropAwareFileSystemModel::mimeData(const QModelIndexList &indexes) const
+{
+    QMimeData *mime = QFileSystemModel::mimeData(indexes);
+    if (!mime)
+        mime = new QMimeData;
+
+    // FIXME multiple txt drags will be treated as files, do something?
+    if (indexes.length() == 1){
+        const QModelIndex idx = indexes.first();
+        const QString path = filePath(idx);
+        QMimeDatabase mimeDb;
+        if (mimeDb.mimeTypeForFile(path).inherits("text/plain")){
+            QFile f(path);
+            if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QByteArray bytes = f.readAll();
+                mime->setData("text/plain", bytes);
+            }
+        }
+    }
+    return mime;
 }
