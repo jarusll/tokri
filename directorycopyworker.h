@@ -15,8 +15,6 @@ public:
     void copyFile(const QString &filePath);
 
 signals:
-    void copying(const QString &directory);
-    void copied(const QString &directory);
 };
 
 #endif // DIRECTORYCOPYWORKER_H
