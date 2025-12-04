@@ -24,31 +24,25 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     DroppablesWindow w;
-    w.setWindowFlags(w.windowFlags() | Qt::WindowStaysOnTopHint);
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
+    fsModel->setReadOnly(false);
+
     DropHandler *dropHandler = new DropHandler(&w);
+    QString rootPath = Settings::get(StandardPaths::RootPath);
+    QModelIndex rootIndex = fsModel->setRootPath(rootPath);
+
+    w.uiHandle()->listView->setModel(fsModel);
+    w.uiHandle()->listView->setRootIndex(rootIndex);
+
+    w.show();
+
     DropAwareFileSystemModel::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedText,
         dropHandler,
         &DropHandler::dropText
     );
-
-    fsModel->setReadOnly(false);
-    QString rootPath = Settings::get(StandardPaths::RootPath);
-    QModelIndex rootIndex = fsModel->setRootPath(rootPath);
-
-    w.uiHandle()->listView->setModel(fsModel);
-    w.uiHandle()->listView->setRootIndex(rootIndex);
-    w.uiHandle()->listView->setResizeMode(QListView::Adjust);
-    w.uiHandle()->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    w.uiHandle()->listView->setDragEnabled(true);
-    w.uiHandle()->listView->setAcceptDrops(true);
-    w.uiHandle()->listView->setDragDropMode(QAbstractItemView::DragDrop);
-    w.uiHandle()->listView->setDefaultDropAction(Qt::CopyAction);
-
-    w.show();
 
     QThread* th = new QThread;
     DirectoryCopyWorker *worker = new DirectoryCopyWorker;
@@ -59,24 +53,16 @@ int main(int argc, char *argv[])
         fsModel,
         &DropAwareFileSystemModel::droppedDirectory,
         worker,
-        &DirectoryCopyWorker::copy,
+        &DirectoryCopyWorker::copyDirectory,
         Qt::QueuedConnection
     );
-
-    // DirectoryCopyWorker::connect(
-    //     worker,
-    //     &DirectoryCopyWorker::copying,
-    //     &w,
-    //     [&w](const QString &path){
-    //         w.status("Copying " + path, 1000);
-    //     }
-    // );
-    // DirectoryCopyWorker::connect(
-    //     worker,
-    //     &DirectoryCopyWorker::copied,
-    //     &w,
-    //     &DroppablesWindow::statusClear
-    // );
+    DirectoryCopyWorker::connect(
+        fsModel,
+        &DropAwareFileSystemModel::droppedFile,
+        worker,
+        &DirectoryCopyWorker::copyFile,
+        Qt::QueuedConnection
+    );
 
     th->start();
 

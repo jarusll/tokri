@@ -57,6 +57,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
         QList<QUrl> fsUrls;
         QList<QUrl> directoryUrls;
 
+        // FIXME cleanup
         for (const auto &url: data->urls()){
             if (url.isLocalFile()){
                 QFileInfo fileInfo(url.toLocalFile());
@@ -78,19 +79,19 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
         // emit dropped(data);
         // qDebug() << "Dirs" << directoryUrls;
         // qDebug() << "Files" << fsUrls;
-        if (fsUrls.length() > 0){
-            QMimeData *filesData = new QMimeData;
-            filesData->setUrls(fsUrls);
-            qDebug() << "Files" << fsUrls;
-            bool baseHandled = QFileSystemModel::dropMimeData(
-                filesData,
-                action,
-                row,
-                column,
-                parent
-            );
-            handled = baseHandled | handled;
-        }
+        // if (fsUrls.length() > 0){
+        //     QMimeData *filesData = new QMimeData;
+        //     filesData->setUrls(fsUrls);
+        //     qDebug() << "Files" << fsUrls;
+        //     bool baseHandled = QFileSystemModel::dropMimeData(
+        //         filesData,
+        //         action,
+        //         row,
+        //         column,
+        //         parent
+        //     );
+        //     handled = baseHandled | handled;
+        // }
 
         if (directoryUrls.length() > 0){
             // QStringList directories;

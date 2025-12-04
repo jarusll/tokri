@@ -6,7 +6,7 @@ DirectoryCopyWorker::DirectoryCopyWorker(QObject *parent)
     : QObject{parent}
 {}
 
-void DirectoryCopyWorker::copy(const QString &src)
+void DirectoryCopyWorker::copyDirectory(const QString &src)
 {
     qDebug() << "Copying Directory" << src;
 
@@ -35,3 +35,12 @@ void DirectoryCopyWorker::copy(const QString &src)
     }
     emit copied(src);
 }
+
+void DirectoryCopyWorker::copyFile(const QString &filePath)
+{
+    QFile file(filePath);
+    file.copy(FileNameProvider::nameFromPath(filePath));
+    // FIXME when it errors out
+}
+
+

@@ -11,7 +11,8 @@ class DirectoryCopyWorker : public QObject
     Q_OBJECT
 public:
     explicit DirectoryCopyWorker(QObject *parent = nullptr);
-    void copy(const QString &directory);
+    void copyDirectory(const QString &directory);
+    void copyFile(const QString &filePath);
 
 signals:
     void copying(const QString &directory);

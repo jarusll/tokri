@@ -7,7 +7,14 @@ DroppablesWindow::DroppablesWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // setAcceptDrops(true);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+
+    ui->listView->setResizeMode(QListView::Adjust);
+    ui->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->listView->setDragEnabled(true);
+    ui->listView->setAcceptDrops(true);
+    ui->listView->setDragDropMode(QAbstractItemView::DragDrop);
+    ui->listView->setDefaultDropAction(Qt::CopyAction);
 }
 
 DroppablesWindow::~DroppablesWindow()
