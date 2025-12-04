@@ -19,62 +19,6 @@
 #include <QAbstractItemView>
 #include <QThread>
 
-enum class FileType {
-    Audio,
-    Image,
-    Video,
-    Document, // FIXME: No explicit mime types available for this
-    Text,
-    Other
-};
-
-enum class EntryType {
-    Directory,
-    File
-};
-
-// All prefix types in Qt
-// video
-// message
-// x-content
-// chemical
-// multipart
-// model
-// application
-// font
-// text
-// image
-// x-epoc
-// inode
-// audio
-// FIXME - what about directory?
-FileType qtMimeToFileType(const QMimeType &mt){
-    QString mimeString = mt.name();
-    QList<QString> mimeSplit = mimeString.split("/");
-    QString mimePrefix = mimeSplit.at(0);
-    if (mimePrefix == "audio"){
-        return FileType::Audio;
-    }
-    if (mimePrefix == "video"){
-        return FileType::Video;
-    }
-    if (mimePrefix == "image"){
-        return FileType::Image;
-    }
-    if (mimePrefix == "text"){
-        return FileType::Text;
-    }
-    return FileType::Other;
-}
-
-struct Entry {
-    EntryType entryType;
-    FileType fileType;
-    QString path; // QFileInfo#filePath
-    QString name; // QFileInfo#fileName
-    QDateTime created; // QFileInfo#birthTime
-};
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
