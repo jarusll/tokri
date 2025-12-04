@@ -1,4 +1,4 @@
-#include "directorycopyworker.h"
+#include "copyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
 #include "droppableswindow.h"
@@ -45,22 +45,22 @@ int main(int argc, char *argv[])
     );
 
     QThread* th = new QThread;
-    DirectoryCopyWorker *worker = new DirectoryCopyWorker;
+    CopyWorker *worker = new CopyWorker;
     worker->moveToThread(th);
 
-    DirectoryCopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
-    DirectoryCopyWorker::connect(
+    CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
+    CopyWorker::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedDirectory,
         worker,
-        &DirectoryCopyWorker::copyDirectory,
+        &CopyWorker::copyDirectory,
         Qt::QueuedConnection
     );
-    DirectoryCopyWorker::connect(
+    CopyWorker::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedFile,
         worker,
-        &DirectoryCopyWorker::copyFile,
+        &CopyWorker::copyFile,
         Qt::QueuedConnection
     );
 

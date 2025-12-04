@@ -1,12 +1,12 @@
-#include "directorycopyworker.h"
+#include "copyworker.h"
 
 #include "filenameprovider.h"
 
-DirectoryCopyWorker::DirectoryCopyWorker(QObject *parent)
+CopyWorker::CopyWorker(QObject *parent)
     : QObject{parent}
 {}
 
-void DirectoryCopyWorker::copyDirectory(const QString &src)
+void CopyWorker::copyDirectory(const QString &src)
 {
     qDebug() << "Copying Directory" << src;
 
@@ -34,7 +34,7 @@ void DirectoryCopyWorker::copyDirectory(const QString &src)
     }
 }
 
-void DirectoryCopyWorker::copyFile(const QString &filePath)
+void CopyWorker::copyFile(const QString &filePath)
 {
     QFile file(filePath);
     file.copy(FileNameProvider::nameFromPath(filePath));

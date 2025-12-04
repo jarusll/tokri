@@ -1,20 +1,20 @@
-#ifndef DIRECTORYCOPYWORKER_H
-#define DIRECTORYCOPYWORKER_H
+#ifndef COPYWORKER_H
+#define COPYWORKER_H
 
 #include <QObject>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 
-class DirectoryCopyWorker : public QObject
+class CopyWorker : public QObject
 {
     Q_OBJECT
 public:
-    explicit DirectoryCopyWorker(QObject *parent = nullptr);
+    explicit CopyWorker(QObject *parent = nullptr);
     void copyDirectory(const QString &directory);
     void copyFile(const QString &filePath);
 
 signals:
 };
 
-#endif // DIRECTORYCOPYWORKER_H
+#endif // COPYWORKER_H
