@@ -4,6 +4,7 @@
 #include <QFileSystemModel>
 #include <QMimeData>
 #include <QUrl>
+#include <QMimeDatabase>
 
 class DropAwareFileSystemModel : public QFileSystemModel
 {
@@ -20,6 +21,8 @@ public:
                       Qt::DropAction action,
                       int row, int column,
                       const QModelIndex &parent) override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
 signals:
     void droppedText(const QString &text);
     void droppedDirectory(const QString &directory);

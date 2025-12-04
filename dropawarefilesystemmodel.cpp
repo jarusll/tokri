@@ -1,5 +1,6 @@
 #include "dropawarefilesystemmodel.h"
 
+
 DropAwareFileSystemModel::DropAwareFileSystemModel(QObject *parent)
     : QFileSystemModel{parent}
 {}
@@ -120,4 +121,31 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
         column,
         parent
     );
+}
+
+QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid()){
+        return QFileSystemModel::data(index, role);
+    }
+    if (role == Qt::ToolTipRole){
+        const auto path = index.data(QFileSystemModel::Roles::FilePathRole).value<QString>();
+        QMimeDatabase mimeDb;
+        auto mime = mimeDb.mimeTypeForFile(path);
+        if (mime.inherits("text/plain")){
+            QFile file(path);
+            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+                QVariant();
+
+            QByteArray buf = file.read(1024);
+            if (file.bytesAvailable() > 1024){
+                buf.append("...");
+            }
+            return QString::fromUtf8(buf);
+        } else {
+            return QFileSystemModel::data(index, role);
+        }
+    }
+
+    return QFileSystemModel::data(index, role);
 }
