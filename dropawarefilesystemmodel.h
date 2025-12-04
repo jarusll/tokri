@@ -25,6 +25,7 @@ public:
 
 signals:
     void droppedText(const QString &text);
+    void droppedFile(const QString &file);
     void droppedDirectory(const QString &directory);
 };
 

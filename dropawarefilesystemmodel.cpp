@@ -1,5 +1,7 @@
 #include "dropawarefilesystemmodel.h"
 
+#include <QBuffer>
+
 
 DropAwareFileSystemModel::DropAwareFileSystemModel(QObject *parent)
     : QFileSystemModel{parent}
@@ -62,6 +64,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
                     // qDebug() << "Dropped File" << fileInfo;
                     // emit droppedFile(fileInfo.filePath());
                     fsUrls << url;
+                    emit droppedFile(url.toLocalFile());
                 } else {
                     // qDebug() << "Dropped Directory" << fileInfo;
                     directoryUrls << url;
@@ -103,6 +106,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
         return handled;
     }
 
+    // DECISION - not to save html for now
     if (data->hasText()) {
         emit droppedText(data->text());
         qDebug() << "Text" << data->text();
