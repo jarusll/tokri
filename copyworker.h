@@ -15,6 +15,9 @@ public:
     void copyFile(const QString &filePath);
 
 signals:
+private:
+    void makePathFailed(QString);
+    void copyFailed(QString);
 };
 
 #endif // COPYWORKER_H

@@ -11,7 +11,10 @@ void CopyWorker::copyDirectory(const QString &src)
     qDebug() << "Copying Directory" << src;
 
     QString dst = FileNameProvider::nameFromPath(src);
-    QDir().mkpath(dst); // FIXME emit mkdirFail
+    bool makePath = QDir().mkpath(dst);
+    if (makePath == false){
+        emit makePathFailed(dst);
+    }
 
     QDirIterator it(src,
                     QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot,
@@ -27,7 +30,7 @@ void CopyWorker::copyDirectory(const QString &src)
         } else {
             QDir().mkpath(QFileInfo(out).path());
             if (!QFile::copy(it.filePath(), out)){
-                // FIXME emit copyFail
+                emit copyFailed(out);
                 return;
             }
         }
@@ -37,8 +40,10 @@ void CopyWorker::copyDirectory(const QString &src)
 void CopyWorker::copyFile(const QString &filePath)
 {
     QFile file(filePath);
-    file.copy(FileNameProvider::nameFromPath(filePath));
-    // FIXME emit copyFail
+    bool copied = file.copy(FileNameProvider::nameFromPath(filePath));
+    if (copied == false){
+        emit copyFailed(filePath);
+    }
 }
 
 
