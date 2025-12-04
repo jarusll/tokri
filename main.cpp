@@ -75,119 +75,12 @@ struct Entry {
     QDateTime created; // QFileInfo#birthTime
 };
 
-class FStoListProxy: public QAbstractProxyModel {
-
-public:
-
-    FStoListProxy(QObject *parent = nullptr):rebuilds(0), QAbstractProxyModel(parent) { }
-
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override {
-        if (!sourceIndex.isValid())
-            return QModelIndex();
-
-        auto it = mSourceToProxyHash.find(QPersistentModelIndex(sourceIndex));
-        if (it == mSourceToProxyHash.end())
-            return QModelIndex();
-
-        int proxyRow = it.value();
-        int proxyColumn = sourceIndex.column();
-
-        return createIndex(proxyRow, proxyColumn);
-    }
-
-
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const override {
-        if (!proxyIndex.isValid()){
-            return QModelIndex();
-        }
-
-        int proxyRow = proxyIndex.row();
-        auto srcIndex = mSourceIndexes.at(proxyRow);
-        return sourceModel()->index(
-            srcIndex.row(),
-            proxyIndex.column(),
-            srcIndex.parent()
-            );
-    }
-
-    QModelIndex parent(const QModelIndex &child) const override {
-        return QModelIndex();
-    }
-
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
-        if (parent.isValid()){
-            return QModelIndex();
-        }
-        return createIndex(row, column);
-    }
-
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override {
-        if (parent.isValid()){
-            return 0;
-        }
-
-        return mSourceIndexes.length();
-    }
-
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override {
-        if (parent.isValid()){
-            return 0;
-        }
-
-        return 1;
-    }
-
-    QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const override {
-        if (!proxyIndex.isValid()){
-            return QVariant();
-        }
-        QModelIndex srcIndex = mapToSource(proxyIndex);
-        if (!srcIndex.isValid()){
-            return QVariant();
-        }
-        return sourceModel()->data(srcIndex, role);
-    }
-
-    void buildIndex(const QString &directory){
-        // qDebug() << "Directory " << directory;
-        auto *fsm = qobject_cast<QFileSystemModel*>(sourceModel());
-        if (!fsm){
-            return;
-        }
-
-        beginResetModel();
-        mSourceIndexes.clear();
-        mSourceToProxyHash.clear();
-
-        QModelIndex directoryIndex = fsm->index(directory, 0);
-        int rowCount = fsm->rowCount(directoryIndex);
-        for (int r = 0; r < rowCount; r++){
-            QModelIndex sourceIndex = sourceModel()->index(r, 0, directoryIndex);
-            mSourceIndexes.append(QPersistentModelIndex(sourceIndex));
-
-            mSourceToProxyHash.insert(sourceIndex, r);
-        }
-
-        // qDebug() << "Probe " << fsm;
-        // qDebug() << "RowCount " << fsm->rowCount(directoryIndex);
-
-        endResetModel();
-        rebuilds++;
-        qDebug() << rebuilds;
-    }
-private:
-    QVector<QPersistentModelIndex> mSourceIndexes;
-    QHash<QPersistentModelIndex, int> mSourceToProxyHash;
-    qint32 rebuilds;
-};
-
-
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     DroppablesWindow w;
+    w.setWindowFlags(w.windowFlags() | Qt::WindowStaysOnTopHint);
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     DropHandler *dropHandler = new DropHandler(&w);
