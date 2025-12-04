@@ -26,17 +26,13 @@ int main(int argc, char *argv[])
     DroppablesWindow w;
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
-    fsModel->setReadOnly(false);
-
-    DropHandler *dropHandler = new DropHandler(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
-
     w.uiHandle()->listView->setModel(fsModel);
     w.uiHandle()->listView->setRootIndex(rootIndex);
 
-    w.show();
 
+    DropHandler *dropHandler = new DropHandler(&w);
     DropAwareFileSystemModel::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedText,
@@ -46,9 +42,7 @@ int main(int argc, char *argv[])
 
     QThread* th = new QThread;
     CopyWorker *worker = new CopyWorker;
-    worker->moveToThread(th);
 
-    CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
     CopyWorker::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedDirectory,
@@ -64,7 +58,11 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection
     );
 
+    CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
+
+    worker->moveToThread(th);
     th->start();
 
+    w.show();
     return a.exec();
 }

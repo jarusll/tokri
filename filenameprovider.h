@@ -16,6 +16,7 @@ public:
     static QString nameFromText(const QString &text){
         QString rootPath = Settings::get(StandardPaths::RootPath);
         QString fileNameBase = text.left(100);
+        // FIXME this should be declared once
         static const QRegularExpression invalidFileNameChars(
             R"([^A-Za-z0-9_.-])"
         );
@@ -29,6 +30,7 @@ public:
         QString baseName = dir.dirName();
         QString rootPath = Settings::get(StandardPaths::RootPath);
         QString fileNameBase = baseName;
+        // FIXME this should be declared once
         static const QRegularExpression invalidFileNameChars(
             R"([^A-Za-z0-9_.-])"
         );

@@ -5,7 +5,9 @@
 
 DropAwareFileSystemModel::DropAwareFileSystemModel(QObject *parent)
     : QFileSystemModel{parent}
-{}
+{
+    setReadOnly(false);
+}
 
 Qt::ItemFlags DropAwareFileSystemModel::flags(const QModelIndex &index) const  {
     Qt::ItemFlags f = QFileSystemModel::flags(index);

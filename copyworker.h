@@ -11,11 +11,11 @@ class CopyWorker : public QObject
     Q_OBJECT
 public:
     explicit CopyWorker(QObject *parent = nullptr);
+
     void copyDirectory(const QString &directory);
     void copyFile(const QString &filePath);
 
 signals:
-private:
     void makePathFailed(QString);
     void copyFailed(QString);
 };
