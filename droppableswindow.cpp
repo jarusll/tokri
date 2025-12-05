@@ -16,6 +16,7 @@ DroppablesWindow::DroppablesWindow(QWidget *parent)
     ui->listView->setDragDropMode(QAbstractItemView::DragDrop);
     ui->listView->setDefaultDropAction(Qt::CopyAction);
 
+    // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
 }
 
