@@ -36,6 +36,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         filenameprovider.h filenameprovider.cpp
         copyworker.h copyworker.cpp
         README.md
+        sortfilterproxy.h sortfilterproxy.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
