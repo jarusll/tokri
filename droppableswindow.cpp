@@ -15,6 +15,8 @@ DroppablesWindow::DroppablesWindow(QWidget *parent)
     ui->listView->setAcceptDrops(true);
     ui->listView->setDragDropMode(QAbstractItemView::DragDrop);
     ui->listView->setDefaultDropAction(Qt::CopyAction);
+
+    ui->searchBar->setVisible(false);
 }
 
 DroppablesWindow::~DroppablesWindow()
