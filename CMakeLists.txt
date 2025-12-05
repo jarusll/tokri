@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
+include(FetchContent)
+
 project(Droppables VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
@@ -89,3 +91,9 @@ install(TARGETS Droppables
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Droppables)
 endif()
+
+FetchContent_Declare(rapidfuzz
+  GIT_REPOSITORY https://github.com/rapidfuzz/rapidfuzz-cpp.git
+  GIT_TAG main)
+FetchContent_MakeAvailable(rapidfuzz)
+target_link_libraries(Droppables PRIVATE rapidfuzz::rapidfuzz)

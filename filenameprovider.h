@@ -18,7 +18,7 @@ public:
         QString fileNameBase = text.left(100);
         // FIXME this should be declared once
         static const QRegularExpression invalidFileNameChars(
-            R"([^A-Za-z0-9_.-])"
+            R"([^A-Za-z0-9_. -])"
         );
         fileNameBase.replace(invalidFileNameChars, "_");
         fileNameBase.append(".txt");
@@ -32,13 +32,11 @@ public:
         QString fileNameBase = baseName;
         // FIXME this should be declared once
         static const QRegularExpression invalidFileNameChars(
-            R"([^A-Za-z0-9_.-])"
+            R"([^A-Za-z0-9_. -])"
         );
         fileNameBase.replace(invalidFileNameChars, "_");
         return QDir(rootPath + "/" + fileNameBase).path();
     }
-
-signals:
 };
 
 #endif // FILENAMEPROVIDER_H

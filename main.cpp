@@ -31,8 +31,9 @@ int main(int argc, char *argv[])
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
 
-    SortFilterProxy *sortFilterProxy = new SortFilterProxy(&w);
+    FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&w);
     sortFilterProxy->setSourceModel(fsModel);
+    sortFilterProxy->setSourceRoot(rootIndex);
 
     sortFilterProxy->setDynamicSortFilter(true);
     sortFilterProxy->sort(0, Qt::DescendingOrder);
@@ -70,6 +71,13 @@ int main(int argc, char *argv[])
     dropHandler->moveToThread(th);
     worker->moveToThread(th);
     th->start();
+
+    DropAwareFileSystemModel::connect(
+        w.uiHandle()->searchBar,
+        &QLineEdit::textChanged,
+        sortFilterProxy,
+        &FSSortFilterProxy::setSearch
+    );
 
     w.show();
     return a.exec();
