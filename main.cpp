@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&w);
     sortFilterProxy->setSourceModel(fsModel);
-    sortFilterProxy->setSourceRoot(rootIndex);
 
     sortFilterProxy->setDynamicSortFilter(true);
     sortFilterProxy->sort(0, Qt::DescendingOrder);

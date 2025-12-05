@@ -13,13 +13,9 @@ public:
 
     void setSearch(const QString &string);
 
-    // unused
-    void setSourceRoot(const QModelIndex &root);
-
 private:
     double score(const QString &candidate) const;
     QString mSearch;
-    QPersistentModelIndex mSourceRoot;
 };
 
 #endif // SORTFILTERPROXY_H

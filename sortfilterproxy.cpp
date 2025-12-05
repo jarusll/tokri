@@ -58,15 +58,6 @@ void FSSortFilterProxy::setSearch(const QString &string)
     }
 }
 
-void FSSortFilterProxy::setSourceRoot(const QModelIndex &root)
-{
-    if (mSourceRoot != root){
-        beginFilterChange();
-        mSourceRoot = root;
-        endFilterChange();
-    }
-}
-
 double FSSortFilterProxy::score(const QString &candidate) const
 {
     const auto result = rapidfuzz::fuzz::ratio(mSearch.toStdString(), candidate.toLower().toStdString());
