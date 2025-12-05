@@ -16,32 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPlainTextEdit" name="searchBar">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-      </property>
-     </widget>
+     <widget class="QLineEdit" name="searchBar"/>
     </item>
     <item>
      <widget class="QListView" name="listView"/>
@@ -54,7 +29,7 @@
      <x>0</x>
      <y>0</y>
      <width>280</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -109,7 +84,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
-     <y>77</y>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
@@ -125,7 +100,23 @@
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
-     <y>77</y>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSearch</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>searchBar</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>139</x>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
