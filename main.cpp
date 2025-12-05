@@ -3,6 +3,7 @@
 #include "drophandler.h"
 #include "droppableswindow.h"
 #include "settings.h"
+#include "sortfilterproxy.h"
 #include "ui_droppableswindow.h"
 
 #include <QAbstractProxyModel>
@@ -25,12 +26,19 @@ int main(int argc, char *argv[])
 
     DroppablesWindow w;
 
+
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
-    w.uiHandle()->listView->setModel(fsModel);
-    w.uiHandle()->listView->setRootIndex(rootIndex);
 
+    SortFilterProxy *sortFilterProxy = new SortFilterProxy(&w);
+    sortFilterProxy->setSourceModel(fsModel);
+
+    sortFilterProxy->setDynamicSortFilter(true);
+    sortFilterProxy->sort(0, Qt::DescendingOrder);
+
+    w.uiHandle()->listView->setModel(sortFilterProxy);
+    w.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(rootIndex));
 
     TextDropHandler *dropHandler = new TextDropHandler;
     DropAwareFileSystemModel::connect(
