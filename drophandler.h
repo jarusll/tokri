@@ -6,12 +6,12 @@
 #include <QUrl>
 #include <QFile>
 
-class DropHandler : public QObject
+class TextDropHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit DropHandler(QObject *parent = nullptr);
-    bool dropText(const QString &text);
+    explicit TextDropHandler(QObject *parent = nullptr);
+    bool handleTextDrop(const QString &text);
 };
 
 #endif // DROPHANDLER_H

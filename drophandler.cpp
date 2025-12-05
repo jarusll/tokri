@@ -4,11 +4,11 @@
 
 #include <QRegularExpression>
 
-DropHandler::DropHandler(QObject *parent)
+TextDropHandler::TextDropHandler(QObject *parent)
     : QObject{parent}
 {}
 
-bool DropHandler::dropText(const QString &text)
+bool TextDropHandler::handleTextDrop(const QString &text)
 {
     TextFile file;
     file.setContent(text);

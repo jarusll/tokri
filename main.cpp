@@ -32,17 +32,17 @@ int main(int argc, char *argv[])
     w.uiHandle()->listView->setRootIndex(rootIndex);
 
 
-    DropHandler *dropHandler = new DropHandler(&w);
+    QThread* th = new QThread;
+
+    TextDropHandler *dropHandler = new TextDropHandler(&w);
     DropAwareFileSystemModel::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedText,
         dropHandler,
-        &DropHandler::dropText
+        &TextDropHandler::handleTextDrop
     );
 
-    QThread* th = new QThread;
     CopyWorker *worker = new CopyWorker;
-
     CopyWorker::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedDirectory,
@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 
     CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
 
+    dropHandler->moveToThread(th);
     worker->moveToThread(th);
     th->start();
 
