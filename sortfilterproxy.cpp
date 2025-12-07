@@ -41,6 +41,7 @@ bool FSSortFilterProxy::filterAcceptsRow(int row, const QModelIndex &parent) con
         return false;
 
     // FIXME - please handle file for filtering
+    // This can be solved if I use a filesystem => list proxy
     if (fs->isDir(srcIndex)){
         return true;
     }

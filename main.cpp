@@ -24,6 +24,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    #if defined(__linux__)
+        qDebug() << "Linux";
+        // define the user interface in dbus
+    #endif
+
     DroppablesWindow w;
 
 
