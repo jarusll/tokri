@@ -29,7 +29,7 @@
      <x>0</x>
      <y>0</y>
      <width>280</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
@@ -48,6 +48,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionSearch"/>
+   <addaction name="actionDelete"/>
   </widget>
   <action name="actionSearch">
    <property name="checkable">
@@ -67,6 +68,20 @@
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::ApplicationSpecificRole</enum>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

@@ -87,6 +87,22 @@ int main(int argc, char *argv[])
         &FSSortFilterProxy::setSearch
     );
 
+    // FIXME - move this to dropaware fs model
+    DropAwareFileSystemModel::connect(
+        w.uiHandle()->actionDelete,
+        &QAction::triggered,
+        w.uiHandle()->listView,
+        [&w](){
+            auto selectionModel = w.uiHandle()->listView->selectionModel();
+            QModelIndexList indexes = selectionModel->selectedIndexes();
+            for (const auto &index: indexes){
+                const auto filePath = index.data(Qt::FileInfoRole).value<QFileInfo>().filePath();
+                QFile(filePath).moveToTrash();
+                qDebug() << filePath;
+            }
+        }
+    );
+
 
     auto sessionBus = QDBusConnection::sessionBus();
     if (!sessionBus.isConnected()){
