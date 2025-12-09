@@ -26,8 +26,6 @@ public:
 public slots:
     void onShakeDetect();
 
-    // void dragEnterEvent(QDragEnterEvent *event);
-    // void dragMoveEvent(QDragMoveEvent *event);
 private:
     Ui::DroppablesWindow *ui;
 };
