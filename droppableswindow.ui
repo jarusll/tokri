@@ -19,7 +19,7 @@
      <widget class="QLineEdit" name="searchBar"/>
     </item>
     <item>
-     <widget class="QListView" name="listView"/>
+     <widget class="NoInternalDragListView" name="listView"/>
     </item>
    </layout>
   </widget>
@@ -142,6 +142,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NoInternalDragListView</class>
+   <extends>QListView</extends>
+   <header>nointernaldraglistview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
