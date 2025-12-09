@@ -22,6 +22,8 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
     Q_UNUSED(column);
     Q_UNUSED(parent);
 
+    qDebug() << "Formats" << data->formats();
+
     // TODO wtf is this?
     if (action == Qt::IgnoreAction)
         return true;
@@ -31,6 +33,10 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
     } else if (data->hasText()){
         return true;
     }
+
+    // FIXME - handle application/x-color
+    // FIXME - handle image urls
+
     // FIXME
     // else if (data->hasImage()){
     //     qDebug() << "Dropping Image" << data->imageData();
