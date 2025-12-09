@@ -20,6 +20,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -40,6 +41,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         copyworker.h copyworker.cpp
         README.md
         sortfilterproxy.h sortfilterproxy.cpp
+        fstolistproxy.h fstolistproxy.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -99,3 +101,4 @@ FetchContent_Declare(rapidfuzz
 FetchContent_MakeAvailable(rapidfuzz)
 target_link_libraries(Droppables PRIVATE rapidfuzz::rapidfuzz)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)

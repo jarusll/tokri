@@ -2,6 +2,7 @@
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
 #include "droppableswindow.h"
+#include "fstolistproxy.h"
 #include "settings.h"
 #include "sortfilterproxy.h"
 #include "ui_droppableswindow.h"
@@ -39,6 +40,10 @@ int main(int argc, char *argv[])
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
+
+    FSToListProxy *listProxy = new FSToListProxy(&w);
+    listProxy->setSourceModel(fsModel);
+    listProxy->setRootSourceIndex(rootIndex);
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&w);
     sortFilterProxy->setSourceModel(fsModel);
