@@ -49,6 +49,9 @@
    </attribute>
    <addaction name="actionSearch"/>
    <addaction name="actionDelete"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionPaste"/>
   </widget>
   <action name="actionSearch">
    <property name="checkable">
@@ -63,6 +66,9 @@
    <property name="iconText">
     <string>Search</string>
    </property>
+   <property name="toolTip">
+    <string>Search (Ctrl-F)</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
    </property>
@@ -72,13 +78,64 @@
   </action>
   <action name="actionDelete">
    <property name="text">
-    <string>Delete</string>
+    <string>Trash</string>
    </property>
    <property name="toolTip">
-    <string>Delete</string>
+    <string>Move to Trash (Del)</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditCopy"/>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy (Ctrl-C)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditCut"/>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="toolTip">
+    <string>Cut (Ctrl-X)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditPaste"/>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste (Ctrl-V)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
