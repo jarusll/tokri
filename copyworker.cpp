@@ -8,11 +8,12 @@ CopyWorker::CopyWorker(QObject *parent)
 
 void CopyWorker::copyDirectory(const QString &src)
 {
-    qDebug() << "Copying Directory" << src;
+    qDebug() << "Directory to copy" << src;
 
     QString dst = FileNameProvider::nameFromPath(src);
     bool makePath = QDir().mkpath(dst);
     if (makePath == false){
+        // FIXME
         emit makePathFailed(dst);
     }
 
@@ -26,10 +27,13 @@ void CopyWorker::copyDirectory(const QString &src)
         QString out = dst + "/" + rel;
 
         if (it.fileInfo().isDir()) {
+            // FIXME handle errors here
             QDir().mkpath(out);
         } else {
+            // FIXME handle errors here
             QDir().mkpath(QFileInfo(out).path());
             if (!QFile::copy(it.filePath(), out)){
+                // FIXME handle copy error
                 emit copyFailed(out);
                 return;
             }
@@ -39,6 +43,7 @@ void CopyWorker::copyDirectory(const QString &src)
 
 void CopyWorker::copyFile(const QString &filePath)
 {
+    qDebug() << "File to copy" << filePath;
     QFile file(filePath);
     bool copied = file.copy(FileNameProvider::nameFromPath(filePath));
     if (copied == false){

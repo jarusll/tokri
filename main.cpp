@@ -7,23 +7,22 @@
 #include "sortfilterproxy.h"
 #include "ui_droppableswindow.h"
 
+#include <QAbstractItemView>
 #include <QAbstractProxyModel>
 #include <QApplication>
+#include <QDBusConnection>
 #include <QDateTime>
 #include <QFileInfo>
-#include <QMimeDatabase>
-#include <QSortFilterProxyModel>
 #include <QFileSystemModel>
-#include <QStandardPaths>
-#include <QQueue>
-#include <QStackedWidget>
-#include <QVBoxLayout>
-#include <QAbstractItemView>
-#include <QThread>
 #include <QLineEdit>
-
+#include <QMimeDatabase>
+#include <QQueue>
+#include <QSortFilterProxyModel>
+#include <QStackedWidget>
+#include <QStandardPaths>
+#include <QThread>
+#include <QVBoxLayout>
 #include <QtDBus>
-#include <QDBusConnection>
 
 int main(int argc, char *argv[])
 {
@@ -35,7 +34,6 @@ int main(int argc, char *argv[])
     #endif
 
     DroppablesWindow w;
-
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
@@ -65,16 +63,16 @@ int main(int argc, char *argv[])
     CopyWorker *worker = new CopyWorker;
     CopyWorker::connect(
         fsModel,
-        &DropAwareFileSystemModel::droppedDirectory,
+        &DropAwareFileSystemModel::droppedFile,
         worker,
-        &CopyWorker::copyDirectory,
+        &CopyWorker::copyFile,
         Qt::QueuedConnection
     );
     CopyWorker::connect(
         fsModel,
-        &DropAwareFileSystemModel::droppedFile,
+        &DropAwareFileSystemModel::droppedDirectory,
         worker,
-        &CopyWorker::copyFile,
+        &CopyWorker::copyDirectory,
         Qt::QueuedConnection
     );
 
@@ -100,7 +98,7 @@ int main(int argc, char *argv[])
         [&w](){
             auto selectionModel = w.uiHandle()->listView->selectionModel();
             QModelIndexList indexes = selectionModel->selectedIndexes();
-            for (const auto &index: indexes){
+            for (const QModelIndex &index : std::as_const(indexes)) {
                 const auto filePath = index.data(Qt::FileInfoRole).value<QFileInfo>().filePath();
                 QFile(filePath).moveToTrash();
                 qDebug() << filePath;
