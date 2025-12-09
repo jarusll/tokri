@@ -19,6 +19,10 @@
 #include <QVBoxLayout>
 #include <QAbstractItemView>
 #include <QThread>
+#include <QLineEdit>
+
+#include <QtDBus>
+#include <QDBusConnection>
 
 int main(int argc, char *argv[])
 {
@@ -82,6 +86,24 @@ int main(int argc, char *argv[])
         sortFilterProxy,
         &FSSortFilterProxy::setSearch
     );
+
+
+    auto sessionBus = QDBusConnection::sessionBus();
+    if (!sessionBus.isConnected()){
+        qDebug() << "Failed to connect";
+    }
+
+    bool ok = sessionBus.connect(
+        "oneman.jarusll.MouseShakeDetector",
+        "/oneman/jarusll/MouseShakeDetector",
+        "oneman.jarusll.MouseShakeDetector",
+        "ShakeDetected",
+        &w,
+        SLOT(onShakeDetect())
+    );
+    qDebug() << "dbus connect ok?" << ok
+             << sessionBus.lastError().name()
+             << sessionBus.lastError().message();
 
     w.show();
     return a.exec();

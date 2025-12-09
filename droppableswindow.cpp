@@ -7,7 +7,8 @@ DroppablesWindow::DroppablesWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    // This is not needed when I can detect click and shake
+    // setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
     ui->listView->setResizeMode(QListView::Adjust);
     ui->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -28,6 +29,20 @@ DroppablesWindow::~DroppablesWindow()
 Ui::DroppablesWindow *DroppablesWindow::uiHandle()
 {
     return ui;
+}
+
+void DroppablesWindow::onShakeDetect()
+{
+    qDebug() << "Shaked";
+
+    if (isMinimized())
+        showNormal();
+
+    if (!isVisible())
+        show();
+
+    raise();
+    activateWindow();
 }
 
 // void DroppablesWindow::status(const QString &message, int timeout = 5000)

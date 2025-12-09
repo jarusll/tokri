@@ -19,6 +19,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -97,3 +98,4 @@ FetchContent_Declare(rapidfuzz
   GIT_TAG main)
 FetchContent_MakeAvailable(rapidfuzz)
 target_link_libraries(Droppables PRIVATE rapidfuzz::rapidfuzz)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
