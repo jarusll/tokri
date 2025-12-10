@@ -26,7 +26,6 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QShortcut>
-#include <QGraphicsDropShadowEffect>
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +33,6 @@ int main(int argc, char *argv[])
     QApplication::setStyle("Fusion");
     QLocalServer server;
     TokriWindow w;
-    w.setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
 
     // Single Instance
     const QString lockPath =
