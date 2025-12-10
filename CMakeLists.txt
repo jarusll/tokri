@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 include(FetchContent)
 
-project(Droppables VERSION 0.1 LANGUAGES CXX)
+project(Tokri VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -22,13 +22,13 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
-        droppableswindow.cpp
-        droppableswindow.h
-        droppableswindow.ui
+        tokriwindow.cpp
+        tokriwindow.h
+        tokriwindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(Droppables
+    qt_add_executable(Tokri
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         dropawarefilesystemmodel.h dropawarefilesystemmodel.cpp
@@ -47,34 +47,34 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
     )
 # Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Droppables APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#    set_property(TARGET Tokri APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
-        add_library(Droppables SHARED
+        add_library(Tokri SHARED
             ${PROJECT_SOURCES}
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-        add_executable(Droppables
+        add_executable(Tokri
             ${PROJECT_SOURCES}
         )
     endif()
 endif()
 
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Droppables)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Tokri)
 endif()
-set_target_properties(Droppables PROPERTIES
+set_target_properties(Tokri PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -83,26 +83,26 @@ set_target_properties(Droppables PROPERTIES
 )
 
 include(GNUInstallDirs)
-install(TARGETS Droppables
+install(TARGETS Tokri
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(Droppables)
+    qt_finalize_executable(Tokri)
 endif()
 
 FetchContent_Declare(rapidfuzz
   GIT_REPOSITORY https://github.com/rapidfuzz/rapidfuzz-cpp.git
   GIT_TAG main)
 FetchContent_MakeAvailable(rapidfuzz)
-target_link_libraries(Droppables PRIVATE rapidfuzz::rapidfuzz)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Network)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Tokri PRIVATE rapidfuzz::rapidfuzz)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

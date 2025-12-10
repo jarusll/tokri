@@ -1,9 +1,9 @@
-#include "droppableswindow.h"
-#include "./ui_droppableswindow.h"
+#include "tokriwindow.h"
+#include "./ui_tokriwindow.h"
 
-DroppablesWindow::DroppablesWindow(QWidget *parent)
+TokriWindow::TokriWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::DroppablesWindow)
+    , ui(new Ui::TokriWindow)
 {
     ui->setupUi(this);
 
@@ -21,22 +21,22 @@ DroppablesWindow::DroppablesWindow(QWidget *parent)
     ui->searchBar->setVisible(false);
 }
 
-DroppablesWindow::~DroppablesWindow()
+TokriWindow::~TokriWindow()
 {
     delete ui;
 }
 
-Ui::DroppablesWindow *DroppablesWindow::uiHandle()
+Ui::TokriWindow *TokriWindow::uiHandle()
 {
     return ui;
 }
 
-void DroppablesWindow::sleep()
+void TokriWindow::sleep()
 {
     showMinimized();
 }
 
-void DroppablesWindow::wakeUp()
+void TokriWindow::wakeUp()
 {
     if (isMinimized())
         showNormal();
@@ -48,7 +48,7 @@ void DroppablesWindow::wakeUp()
     activateWindow();
 }
 
-void DroppablesWindow::onShakeDetect()
+void TokriWindow::onShakeDetect()
 {
     qDebug() << "Shaked";
     wakeUp();

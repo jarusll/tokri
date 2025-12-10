@@ -1,11 +1,10 @@
 #include "copyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
-#include "droppableswindow.h"
-#include "fstolistproxy.h"
+#include "tokriwindow.h"
 #include "settings.h"
 #include "sortfilterproxy.h"
-#include "ui_droppableswindow.h"
+#include "ui_tokriwindow.h"
 #include "mouseinterceptor.h"
 
 #include <QAbstractItemView>
@@ -34,7 +33,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QApplication::setStyle("Fusion");
     QLocalServer server;
-    DroppablesWindow w;
+    TokriWindow w;
     w.setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
 
     // Single Instance
@@ -67,7 +66,7 @@ int main(int argc, char *argv[])
     searchAction->setCheckable(true);
     searchAction->setChecked(false);
     w.addAction(searchAction);
-    DroppablesWindow::connect(searchAction, &QAction::toggled,
+    TokriWindow::connect(searchAction, &QAction::toggled,
             [&w](bool on){
                 qDebug() << "Search" << on;
                 w.uiHandle()->searchBar->setVisible(on);
@@ -152,7 +151,7 @@ int main(int argc, char *argv[])
     QObject::connect(SleepShortcut,
                      &QShortcut::activated,
                      &w,
-                     &DroppablesWindow::sleep);
+                     &TokriWindow::sleep);
 
     auto sessionBus = QDBusConnection::sessionBus();
     if (!sessionBus.isConnected()){
@@ -165,7 +164,7 @@ int main(int argc, char *argv[])
         interceptor,
         &MouseInterceptor::shakeDetected,
         &w,
-        &DroppablesWindow::wakeUp
+        &TokriWindow::wakeUp
         );
 
     w.show();

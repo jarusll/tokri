@@ -1,5 +1,5 @@
-#ifndef DROPPABLESWINDOW_H
-#define DROPPABLESWINDOW_H
+#ifndef TOKRIWINDOW_H
+#define TOKRIWINDOW_H
 
 #include <QListView>
 #include <QMainWindow>
@@ -10,18 +10,18 @@
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
-class DroppablesWindow;
+class TokriWindow;
 }
 QT_END_NAMESPACE
 
-class DroppablesWindow : public QMainWindow
+class TokriWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    DroppablesWindow(QWidget *parent = nullptr);
-    ~DroppablesWindow();
-    Ui::DroppablesWindow* uiHandle();
+    TokriWindow(QWidget *parent = nullptr);
+    ~TokriWindow();
+    Ui::TokriWindow* uiHandle();
     void sleep();
     void wakeUp();
 
@@ -29,6 +29,6 @@ public slots:
     void onShakeDetect();
 
 private:
-    Ui::DroppablesWindow *ui;
+    Ui::TokriWindow *ui;
 };
-#endif // DROPPABLESWINDOW_H
+#endif // TOKRIWINDOW_H
