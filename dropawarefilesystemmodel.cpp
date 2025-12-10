@@ -32,7 +32,7 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         return true;
     }
 
-    // FIXME - handle application/x-color
+    // FIXME - handle application/x-color. Edit - is this needed?
     // FIXME - handle image urls
 
     // FIXME
