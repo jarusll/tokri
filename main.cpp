@@ -27,12 +27,15 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QShortcut>
+#include <QGraphicsDropShadowEffect>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QApplication::setStyle("Fusion");
     QLocalServer server;
     DroppablesWindow w;
+    w.setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
 
     // Single Instance
     const QString lockPath =
@@ -58,6 +61,23 @@ int main(int argc, char *argv[])
         });
     }
 
+    // Actions
+    QAction *searchAction = new QAction(&w);
+    searchAction->setShortcut(QKeySequence::Find);
+    searchAction->setCheckable(true);
+    searchAction->setChecked(false);
+    w.addAction(searchAction);
+    DroppablesWindow::connect(searchAction, &QAction::toggled,
+            [&w](bool on){
+                qDebug() << "Search" << on;
+                w.uiHandle()->searchBar->setVisible(on);
+            });
+
+    QAction *deleteAction = new QAction(&w);
+    deleteAction->setShortcut(QKeySequence::Delete);
+    w.addAction(deleteAction);
+
+    // View & Models
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
@@ -112,7 +132,7 @@ int main(int argc, char *argv[])
 
     // FIXME - move this to dropaware fs model
     DropAwareFileSystemModel::connect(
-        w.uiHandle()->actionDelete,
+        deleteAction,
         &QAction::triggered,
         w.uiHandle()->listView,
         [&w](){
