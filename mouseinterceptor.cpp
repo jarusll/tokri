@@ -1,35 +1,38 @@
 #include "mouseinterceptor.h"
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <linux/input.h>
-
 #include <QDebug>
+#include <QDir>
 
 MouseInterceptor::MouseInterceptor(QObject *parent)
     : QObject{parent}
 {
-    const char *dev = "/dev/input/event5"; // FIXME add in global var
+    const QStringList absRelDevices = MouseInterceptor::collectRelAbsDevices();
+    qDebug() << "Valid pointer devices" << absRelDevices;
 
-    mEventsFd = ::open(dev, O_RDONLY | O_NONBLOCK);
-    if (mEventsFd < 0) {
-        // FIXME handle error (log, etc.)
-        qDebug() << "failed to open";
-        return;
+    QVector<int> fds;
+    for (const QString &path : absRelDevices) {
+        int fd = ::open(path.toLocal8Bit().constData(),
+                        O_RDONLY | O_CLOEXEC | O_NONBLOCK);
+        if (fd < 0)
+            continue;
+        fds.append(fd);
+
+        auto *notifier = new QSocketNotifier(fd,
+                                             QSocketNotifier::Read,
+                                             this);
+
+        connect(notifier, &QSocketNotifier::activated,
+                this, &MouseInterceptor::onEvents);
     }
-
-    mNotifier = new QSocketNotifier(mEventsFd, QSocketNotifier::Read, this);
-    connect(mNotifier, &QSocketNotifier::activated,
-            this, &MouseInterceptor::onEvents);
 }
 
-void MouseInterceptor::onEvents()
+void MouseInterceptor::onEvents(int fd)
 {
     // qDebug() << "Evdev ready";
-    struct input_event buffer[16];
+    struct input_event buffer[17];
 
     while (true) {
-        ssize_t n = ::read(mEventsFd, buffer, sizeof(buffer));
+        ssize_t n = ::read(fd, buffer, sizeof(buffer));
         if (n < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
                 break;
@@ -53,10 +56,10 @@ void MouseInterceptor::onEvents()
             if (event.type == EV_KEY){
                 if (event.code == BTN_LEFT){
                     if (event.value == 1){
-                        mLeftClicked = true;
+                        mLeftButtonClicked = true;
                     } else {
-                        mLeftClicked = false;
-                        mShake.reset();
+                        mLeftButtonClicked = false;
+                        mShakeDetector.reset();
                     }
                 }
             }
@@ -76,14 +79,18 @@ void MouseInterceptor::onEvents()
             // Touchpad absolute → convert to relative
             else if (isEventAbsolute && isHorizontalAbsoluteMovement) {
                 // qDebug() << "Absolute" << mHaveLastX << mLastX;
-                if (mHaveLastX) {
-                    dx = event.value - mLastX;
+                if (mHaveLastAbsoluteX) {
+                    dx = event.value - mLastAbsoluteX;
                 }
-                mLastX = event.value;
-                mHaveLastX = true;
+                mLastAbsoluteX = event.value;
+                mHaveLastAbsoluteX = true;
             }
 
             if (dx == 0) {
+                continue;
+            }
+
+            if (!mLeftButtonClicked){
                 continue;
             }
 
@@ -91,10 +98,12 @@ void MouseInterceptor::onEvents()
                 (uint64_t)event.time.tv_sec * 1000ull +
                 (uint64_t)event.time.tv_usec / 1000ull;
 
-            if (mLeftClicked && mShake.feed(dx, tsMs)){
+            if (mShakeDetector.feed(dx, tsMs)){
                 emit shakeDetected();
                 qDebug() << "Shaked";
             }
         }
     }
 }
+
+
