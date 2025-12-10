@@ -25,6 +25,7 @@
 #include <QtDBus>
 #include <QLocalServer>
 #include <QLocalSocket>
+#include <QShortcut>
 
 int main(int argc, char *argv[])
 {
@@ -128,6 +129,13 @@ int main(int argc, char *argv[])
         }
         );
 
+    auto SleepShortcut = new QShortcut(QKeySequence("Escape"), &w);
+    SleepShortcut->setContext(Qt::WindowShortcut);
+
+    QObject::connect(SleepShortcut,
+                     &QShortcut::activated,
+                     &w,
+                     &DroppablesWindow::sleep);
 
     auto sessionBus = QDBusConnection::sessionBus();
     if (!sessionBus.isConnected()){

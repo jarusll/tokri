@@ -31,10 +31,13 @@ Ui::DroppablesWindow *DroppablesWindow::uiHandle()
     return ui;
 }
 
-void DroppablesWindow::onShakeDetect()
+void DroppablesWindow::sleep()
 {
-    qDebug() << "Shaked";
+    showMinimized();
+}
 
+void DroppablesWindow::wakeUp()
+{
     if (isMinimized())
         showNormal();
 
@@ -43,4 +46,10 @@ void DroppablesWindow::onShakeDetect()
 
     raise();
     activateWindow();
+}
+
+void DroppablesWindow::onShakeDetect()
+{
+    qDebug() << "Shaked";
+    wakeUp();
 }

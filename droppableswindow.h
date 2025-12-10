@@ -22,6 +22,8 @@ public:
     DroppablesWindow(QWidget *parent = nullptr);
     ~DroppablesWindow();
     Ui::DroppablesWindow* uiHandle();
+    void sleep();
+    void wakeUp();
 
 public slots:
     void onShakeDetect();
