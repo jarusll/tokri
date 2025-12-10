@@ -17,6 +17,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -37,9 +39,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         copyworker.h copyworker.cpp
         README.md
         sortfilterproxy.h sortfilterproxy.cpp
-        fstolistproxy.h fstolistproxy.cpp
+
         nointernaldraglistview.h nointernaldraglistview.cpp
         StandardNames.h
+        horizontalshakedetector.h horizontalshakedetector.cpp
+        mouseinterceptor.h mouseinterceptor.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -98,5 +102,7 @@ target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

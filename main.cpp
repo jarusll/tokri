@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "sortfilterproxy.h"
 #include "ui_droppableswindow.h"
+#include "mouseinterceptor.h"
 
 #include <QAbstractItemView>
 #include <QAbstractProxyModel>
@@ -61,10 +62,6 @@ int main(int argc, char *argv[])
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
-
-    FSToListProxy *listProxy = new FSToListProxy(&w);
-    listProxy->setSourceModel(fsModel);
-    listProxy->setRootSourceIndex(rootIndex);
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&w);
     sortFilterProxy->setSourceModel(fsModel);
@@ -142,17 +139,14 @@ int main(int argc, char *argv[])
         qDebug() << "Failed to connect";
     }
 
-    bool ok = sessionBus.connect(
-        "oneman.jarusll.MouseShakeDetector",
-        "/oneman/jarusll/MouseShakeDetector",
-        "oneman.jarusll.MouseShakeDetector",
-        "ShakeDetected",
+    MouseInterceptor *interceptor = new MouseInterceptor;
+
+    QObject::connect(
+        interceptor,
+        &MouseInterceptor::shakeDetected,
         &w,
-        SLOT(onShakeDetect())
+        &DroppablesWindow::wakeUp
         );
-    qDebug() << "dbus connect ok?" << ok
-             << sessionBus.lastError().name()
-             << sessionBus.lastError().message();
 
     w.show();
     return a.exec();

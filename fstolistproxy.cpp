@@ -6,11 +6,11 @@ FSToListProxy::FSToListProxy(QObject *parent)
 
 QModelIndex FSToListProxy::mapFromSource(const QModelIndex &sourceIndex) const
 {
-    if (!sourceIndex.isValid())
+    if (!sourceIndex.isValid() || !mRoot.isValid() || !sourceModel())
         return QModelIndex();
     if (sourceIndex.parent() != mRoot)
         return QModelIndex();
-    return createIndex(sourceIndex.row(), sourceIndex.column());
+    return index(sourceIndex.row(), sourceIndex.column(), QModelIndex());
 }
 
 QModelIndex FSToListProxy::mapToSource(const QModelIndex &proxyIndex) const
@@ -27,7 +27,11 @@ QModelIndex FSToListProxy::index(int row, int column, const QModelIndex &parent)
         return QModelIndex();
     if (row < 0 || row >= rowCount() || column < 0 || column >= columnCount())
         return QModelIndex();
-    return createIndex(row, column);
+    QModelIndex src = sourceModel()->index(row, column, mRoot);
+    if (!src.isValid())
+        return QModelIndex();
+
+    return createIndex(row, column, src.internalPointer());
 }
 
 QModelIndex FSToListProxy::parent(const QModelIndex &child) const
@@ -38,20 +42,17 @@ QModelIndex FSToListProxy::parent(const QModelIndex &child) const
 
 int FSToListProxy::rowCount(const QModelIndex &parent) const
 {
-    if (parent.isValid()){
+    if (parent.isValid() || !mRoot.isValid() || !sourceModel()){
         return 0;
     }
-    if (!mRoot.isValid()){
-        return 0;
-    }
-    return mRoot.model()->rowCount(mRoot);
+    return sourceModel()->rowCount(mRoot);
 }
 
 int FSToListProxy::columnCount(const QModelIndex &parent) const
 {
-    if (!mRoot.isValid())
+    if (!mRoot.isValid() || !sourceModel())
         return 0;
-    return mRoot.model()->columnCount(mRoot);
+    return sourceModel()->columnCount(mRoot);
 }
 
 QVariant FSToListProxy::data(const QModelIndex &idx, int role) const
@@ -66,8 +67,9 @@ Qt::ItemFlags FSToListProxy::flags(const QModelIndex &idx) const
 
 void FSToListProxy::setRootSourceIndex(const QModelIndex &srcRoot)
 {
-    if (mRoot != srcRoot)
-        mRoot = srcRoot;
+    beginResetModel();
+    mRoot = QPersistentModelIndex(srcRoot);
+    endResetModel();
 }
 
 QModelIndex FSToListProxy::rootSourceIndex() const
