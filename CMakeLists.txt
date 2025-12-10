@@ -22,6 +22,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -44,6 +45,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         sortfilterproxy.h sortfilterproxy.cpp
         fstolistproxy.h fstolistproxy.cpp
         nointernaldraglistview.h nointernaldraglistview.cpp
+        StandardNames.h
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -105,5 +107,6 @@ target_link_libraries(Droppables PRIVATE rapidfuzz::rapidfuzz)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Droppables PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

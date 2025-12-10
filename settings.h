@@ -1,25 +1,12 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include "StandardNames.h"
+
 #include <QDir>
 #include <QObject>
 #include <QStandardPaths>
 
-class StandardNames {
-public:
-    enum Names {
-        Directory,
-    };
-
-    static QString get(Names name){
-        switch (name){
-        case Directory:
-            return "Wallet";
-        default:
-            return "";
-        }
-    }
-};
 
 class StandardPaths {
 public:

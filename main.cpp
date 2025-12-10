@@ -23,17 +23,39 @@
 #include <QThread>
 #include <QVBoxLayout>
 #include <QtDBus>
+#include <QLocalServer>
+#include <QLocalSocket>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
-    #if defined(__linux__)
-        qDebug() << "Linux";
-        // define the user interface in dbus
-    #endif
-
+    QLocalServer server;
     DroppablesWindow w;
+
+    // Single Instance
+    const QString lockPath =
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation)
+                             + "/"
+                             + StandardNames::get(StandardNames::LockFile);
+    static QLockFile lockFile(lockPath);
+    lockFile.setStaleLockTime(0);
+    if (!lockFile.tryLock()) {
+        QLocalSocket localSocket;
+        localSocket.connectToServer(StandardNames::get(StandardNames::LocalServer));
+        if (localSocket.waitForConnected(100)) {
+            return 0;
+        }
+    } else {
+        server.removeServer(StandardNames::get(StandardNames::LocalServer));
+        server.listen(StandardNames::get(StandardNames::LocalServer));
+
+        QObject::connect(&server, &QLocalServer::newConnection, [&]{
+            auto sock = server.nextPendingConnection();
+            if (sock) sock->close();
+            w.onShakeDetect();
+        });
+    }
+
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
     QString rootPath = Settings::get(StandardPaths::RootPath);
@@ -58,7 +80,7 @@ int main(int argc, char *argv[])
         &DropAwareFileSystemModel::droppedText,
         dropHandler,
         &TextDropHandler::handleTextDrop
-    );
+        );
 
     CopyWorker *worker = new CopyWorker;
     CopyWorker::connect(
@@ -67,14 +89,14 @@ int main(int argc, char *argv[])
         worker,
         &CopyWorker::copyFile,
         Qt::QueuedConnection
-    );
+        );
     CopyWorker::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedDirectory,
         worker,
         &CopyWorker::copyDirectory,
         Qt::QueuedConnection
-    );
+        );
 
     QThread* th = new QThread;
     CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
@@ -88,7 +110,7 @@ int main(int argc, char *argv[])
         &QLineEdit::textChanged,
         sortFilterProxy,
         &FSSortFilterProxy::setSearch
-    );
+        );
 
     // FIXME - move this to dropaware fs model
     DropAwareFileSystemModel::connect(
@@ -104,7 +126,7 @@ int main(int argc, char *argv[])
                 qDebug() << filePath;
             }
         }
-    );
+        );
 
 
     auto sessionBus = QDBusConnection::sessionBus();
@@ -119,7 +141,7 @@ int main(int argc, char *argv[])
         "ShakeDetected",
         &w,
         SLOT(onShakeDetect())
-    );
+        );
     qDebug() << "dbus connect ok?" << ok
              << sessionBus.lastError().name()
              << sessionBus.lastError().message();
