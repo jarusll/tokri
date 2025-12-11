@@ -19,7 +19,29 @@
      <widget class="QLineEdit" name="searchBar"/>
     </item>
     <item>
-     <widget class="NoInternalDragListView" name="listView"/>
+     <widget class="NoInternalDragListView" name="listView">
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::NoFrame</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="dragEnabled">
+       <bool>true</bool>
+      </property>
+      <property name="dragDropMode">
+       <enum>QAbstractItemView::DragDropMode::DragDrop</enum>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
+      </property>
+      <property name="resizeMode">
+       <enum>QListView::ResizeMode::Adjust</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

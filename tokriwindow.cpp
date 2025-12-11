@@ -10,12 +10,6 @@ TokriWindow::TokriWindow(QWidget *parent)
     // This is not needed when I can detect click and shake
     // setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
-    ui->listView->setResizeMode(QListView::Adjust);
-    ui->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    ui->listView->setDragEnabled(true);
-    ui->listView->setAcceptDrops(true);
-    ui->listView->setDragDropMode(QAbstractItemView::DragDrop);
-    ui->listView->setDefaultDropAction(Qt::CopyAction);
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
