@@ -1,10 +1,10 @@
-# Name TDB
+# Tokri
 
-## What this does?
-
-Wallet thing where I can drag text/image/url/files/directories and it saves to HOMEDIR/Wallet.
+Basket for your compooter.
 
 MVP
 v2025.12.01-alpha.1
 - I can drop files/directories/text
 
+v2025.12.02
+- It looks pretty
