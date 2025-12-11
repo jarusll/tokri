@@ -56,7 +56,7 @@ void TokriWindow::paintEvent(QPaintEvent *)
     p.drawRoundedRect(r, 10, 10);
 
     // border stroke
-    QPen pen(palette().color(QPalette::BrightText));
+    QPen pen(palette().color(QPalette::Shadow));
     pen.setWidth(2);
     p.setBrush(Qt::NoBrush);
     p.setPen(pen);
