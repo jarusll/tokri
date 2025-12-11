@@ -51,15 +51,16 @@ void RemoteUrlDropHandler::handle(QString urlStr)
             emit droppedUrl(urlStr);
         } else if (contentType.startsWith("image")) {
             qDebug() << "image";
-            QDir d(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+            QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
             QString fileName;
+            // FIXME for other content disposition formats
             if (cd.isValid()) {
                 fileName = cd.toString().section("filename=", 1).remove('"');
             }
             if (fileName.isEmpty()){
                 fileName = QUuid::createUuid().toString(QUuid::WithoutBraces);
             }
-            QString tmpFilePath = d.filePath(fileName);
+            QString tmpFilePath = tempDir.filePath(fileName);
 
             QFile *tempFile = new QFile(tmpFilePath);
             bool opened = tempFile->open(QIODevice::WriteOnly);
