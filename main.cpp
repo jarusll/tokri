@@ -1,6 +1,7 @@
 #include "copyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
+#include "themeprovider.h"
 #include "tokriwindow.h"
 #include "settings.h"
 #include "sortfilterproxy.h"
@@ -30,6 +31,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setPalette(ThemeProvider::light());
+
     QApplication::setStyle("Fusion");
     QLocalServer server;
     TokriWindow w;

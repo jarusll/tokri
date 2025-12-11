@@ -25,6 +25,8 @@ public:
     void sleep();
     void wakeUp();
 
+    void paintEvent(QPaintEvent *);
+
 public slots:
     void onShakeDetect();
 

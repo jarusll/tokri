@@ -1,5 +1,6 @@
 #include "tokriwindow.h"
 #include "./ui_tokriwindow.h"
+#include "themeprovider.h"
 
 TokriWindow::TokriWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,6 +41,26 @@ void TokriWindow::wakeUp()
 
     raise();
     activateWindow();
+}
+
+void TokriWindow::paintEvent(QPaintEvent *)
+{
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    const QRect r = rect().adjusted(1, 1, -1, -1);
+
+    // fill background
+    p.setPen(Qt::NoPen);
+    p.setBrush(palette().color(QPalette::Window));
+    p.drawRoundedRect(r, 12, 12);
+
+    // border stroke
+    QPen pen(palette().color(QPalette::BrightText));
+    pen.setWidth(2);
+    p.setBrush(Qt::NoBrush);
+    p.setPen(pen);
+    p.drawRoundedRect(r, 12, 12);
 }
 
 void TokriWindow::onShakeDetect()
