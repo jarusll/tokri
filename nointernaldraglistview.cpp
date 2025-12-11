@@ -28,3 +28,10 @@ void NoInternalDragListView::dragLeaveEvent(QDragLeaveEvent *e)
     qDebug() << "Exited";
     emit dropping(false);
 }
+
+void NoInternalDragListView::dropEvent(QDropEvent *e)
+{
+    emit dropping(false);
+
+    QListView::dropEvent(e);
+}
