@@ -15,6 +15,9 @@ public:
 protected:
     void dragEnterEvent(QDragEnterEvent *e) override;
     void dragMoveEvent(QDragMoveEvent *e) override;
+    void dragLeaveEvent(QDragLeaveEvent *e) override;
+signals:
+    void dropping(bool status);
 };
 
 #endif // NOINTERNALDRAGLISTVIEW_H

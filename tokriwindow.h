@@ -26,11 +26,13 @@ public:
     void wakeUp();
 
     void paintEvent(QPaintEvent *);
+    void setDropping(bool status);
 
 public slots:
     void onShakeDetect();
 
 private:
     Ui::TokriWindow *ui;
+    bool mDropping = false;
 };
 #endif // TOKRIWINDOW_H

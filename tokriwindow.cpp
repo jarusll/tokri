@@ -13,6 +13,13 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
+
+    connect(
+        ui->listView,
+        &NoInternalDragListView::dropping,
+        this,
+        &TokriWindow::setDropping
+        );
 }
 
 TokriWindow::~TokriWindow()
@@ -55,11 +62,21 @@ void TokriWindow::paintEvent(QPaintEvent *)
     p.drawRoundedRect(r, 10, 10);
 
     // border stroke
-    QPen pen(palette().color(QPalette::Shadow));
+    auto color = palette().color(QPalette::Shadow);
+    if (mDropping){
+        color = palette().color(QPalette::Accent);
+    }
+    QPen pen(color);
     pen.setWidth(2);
     p.setBrush(Qt::NoBrush);
     p.setPen(pen);
     p.drawRoundedRect(r, 10, 10);
+}
+
+void TokriWindow::setDropping(bool status)
+{
+    mDropping = status;
+    update();
 }
 
 void TokriWindow::onShakeDetect()
