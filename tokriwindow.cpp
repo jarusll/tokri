@@ -8,9 +8,8 @@ TokriWindow::TokriWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // This is not needed when I can detect click and shake
-    // setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Window);
+    setAttribute(Qt::WA_TranslucentBackground);
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
