@@ -7,6 +7,7 @@
 #include "sortfilterproxy.h"
 #include "ui_tokriwindow.h"
 #include "mouseinterceptor.h"
+#include "remoteurldrophandler.h"
 
 #include <QAbstractItemView>
 #include <QAbstractProxyModel>
@@ -100,7 +101,36 @@ int main(int argc, char *argv[])
         &TextDropHandler::handleTextDrop
         );
 
+    RemoteUrlDropHandler *urlHandler = new RemoteUrlDropHandler(&w);
+    DropAwareFileSystemModel::connect(
+        fsModel,
+        &DropAwareFileSystemModel::droppedUrl,
+        urlHandler,
+        &RemoteUrlDropHandler::handle
+        );
+
+    RemoteUrlDropHandler::connect(
+        urlHandler,
+        &RemoteUrlDropHandler::droppedText,
+        dropHandler,
+        &TextDropHandler::handleTextDrop
+        );
+    RemoteUrlDropHandler::connect(
+        urlHandler,
+        &RemoteUrlDropHandler::droppedUrl,
+        dropHandler,
+        &TextDropHandler::handleTextDrop
+        );
+
     CopyWorker *worker = new CopyWorker;
+    RemoteUrlDropHandler::connect(
+        urlHandler,
+        &RemoteUrlDropHandler::downloaded,
+        worker,
+        &CopyWorker::copyFile,
+        Qt::QueuedConnection
+        );
+
     CopyWorker::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedFile,

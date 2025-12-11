@@ -54,7 +54,7 @@ bool HorizontalShakeDetector::feed(int dx, uint64_t tsMs)
 
 void HorizontalShakeDetector::reset()
 {
-    qDebug() << "Reset";
+    // qDebug() << "Reset";
     lastDir  = 0;
     flips    = 0;
     lastTsMs = 0;

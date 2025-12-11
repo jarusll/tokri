@@ -19,6 +19,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -45,6 +46,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         horizontalshakedetector.h horizontalshakedetector.cpp
         mouseinterceptor.h mouseinterceptor.cpp
         themeprovider.h themeprovider.cpp
+        remoteurldrophandler.h remoteurldrophandler.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -103,6 +105,7 @@ target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 

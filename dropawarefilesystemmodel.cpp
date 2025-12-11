@@ -2,6 +2,14 @@
 
 #include <QBuffer>
 
+bool isValidHttpUrl(const QString &s)
+{
+    QUrl u(s, QUrl::StrictMode);
+    return u.isValid()
+       && !u.scheme().isEmpty()
+       && (u.scheme() == "http" || u.scheme() == "https")
+       && !u.host().isEmpty();
+}
 
 DropAwareFileSystemModel::DropAwareFileSystemModel(QObject *parent)
     : QFileSystemModel{parent}
@@ -73,8 +81,8 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
                     emit droppedDirectory(url.toLocalFile());
                 }
             } else {
-                qDebug() << "Dropped Text" << url.url();
-                emit droppedText(url.toString());
+                qDebug() << "Dropped url" << url.url();
+                emit droppedUrl(url.toString());
                 handled = true;
             }
         }
@@ -84,9 +92,14 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
 
     // DECISION - not to save html for now
     if (data->hasText()) {
-        emit droppedText(data->text());
-        qDebug() << "Text" << data->text();
-        return true;
+        if (isValidHttpUrl( data->text())){
+            emit droppedUrl(data->text());
+            return true;
+        } else {
+            emit droppedText(data->text());
+            qDebug() << "Text" << data->text();
+            return true;
+        }
     }
 
     // FIXME
