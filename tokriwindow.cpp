@@ -1,6 +1,5 @@
 #include "tokriwindow.h"
 #include "./ui_tokriwindow.h"
-#include "themeprovider.h"
 
 TokriWindow::TokriWindow(QWidget *parent)
     : QMainWindow(parent)
