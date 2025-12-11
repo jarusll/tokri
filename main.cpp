@@ -70,7 +70,6 @@ int main(int argc, char *argv[])
     w.addAction(searchAction);
     TokriWindow::connect(searchAction, &QAction::toggled,
             [&w](bool on){
-                qDebug() << "Search" << on;
                 w.uiHandle()->searchBar->setVisible(on);
             });
 
@@ -171,7 +170,6 @@ int main(int argc, char *argv[])
             for (const QModelIndex &index : std::as_const(indexes)) {
                 const auto filePath = index.data(Qt::FileInfoRole).value<QFileInfo>().filePath();
                 QFile(filePath).moveToTrash();
-                qDebug() << filePath;
             }
         }
         );
@@ -184,10 +182,6 @@ int main(int argc, char *argv[])
                      &w,
                      &TokriWindow::sleep);
 
-    auto sessionBus = QDBusConnection::sessionBus();
-    if (!sessionBus.isConnected()){
-        qDebug() << "Failed to connect";
-    }
 
     MouseInterceptor *interceptor = new MouseInterceptor;
 

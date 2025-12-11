@@ -9,7 +9,6 @@ void NoInternalDragListView::dragEnterEvent(QDragEnterEvent *e)
     if (e->source() == this)
         e->ignore();
     else {
-        qDebug() << "Entered";
         emit dropping(true);
         QListView::dragEnterEvent(e);
     }
@@ -25,7 +24,6 @@ void NoInternalDragListView::dragMoveEvent(QDragMoveEvent *e)
 
 void NoInternalDragListView::dragLeaveEvent(QDragLeaveEvent *e)
 {
-    qDebug() << "Exited";
     emit dropping(false);
 }
 

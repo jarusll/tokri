@@ -8,8 +8,6 @@ CopyWorker::CopyWorker(QObject *parent)
 
 void CopyWorker::copyDirectory(const QString &src)
 {
-    qDebug() << "Directory to copy" << src;
-
     QString dst = FileNameProvider::nameFromPath(src);
     bool makePath = QDir().mkpath(dst);
     if (makePath == false){
@@ -43,7 +41,6 @@ void CopyWorker::copyDirectory(const QString &src)
 
 void CopyWorker::copyFile(const QString &filePath)
 {
-    qDebug() << "File to copy" << filePath;
     QFile file(filePath);
     bool copied = file.copy(FileNameProvider::nameFromPath(filePath));
     if (copied == false){

@@ -2,7 +2,6 @@
 #define COPYWORKER_H
 
 #include <QObject>
-#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 

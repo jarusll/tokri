@@ -1,6 +1,5 @@
 #include "remoteurldrophandler.h"
 
-#include <QDebug>
 #include <QNetworkRequest>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -15,11 +14,8 @@ RemoteUrlDropHandler::RemoteUrlDropHandler(QObject *parent)
 
 void RemoteUrlDropHandler::handle(QString urlStr)
 {
-    qDebug() << "url" << urlStr;
-
     QUrl url(urlStr, QUrl::StrictMode);
     if (!url.isValid()) {
-        qDebug() << "invalid";
         emit droppedText(urlStr);
         return;
     }
@@ -33,7 +29,6 @@ void RemoteUrlDropHandler::handle(QString urlStr)
         response->deleteLater();
 
         if (response->error() != QNetworkReply::NoError) {
-            qDebug() << "error";
             emit droppedText(urlStr);
             return;
         }
@@ -41,16 +36,10 @@ void RemoteUrlDropHandler::handle(QString urlStr)
         QString contentType = response->header(QNetworkRequest::ContentTypeHeader).toString().toLower();
         QVariant cd = response->header(QNetworkRequest::ContentDispositionHeader);
         QString cdRaw = response->rawHeader("Content-Disposition");
-        qDebug() << "Content type" << contentType;
-        qDebug() << "Content Disposition" << cd;
-        qDebug() << "Content Disposition raw" << cdRaw;
 
         if (contentType.startsWith("text/html")) {
-            // save as url
-            qDebug() << "html";
             emit droppedUrl(urlStr);
         } else if (contentType.startsWith("image")) {
-            qDebug() << "image";
             QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
             QString fileName;
             // FIXME for other content disposition formats
@@ -83,7 +72,6 @@ void RemoteUrlDropHandler::handle(QString urlStr)
                 getResponse->deleteLater();
             });
         } else {
-            qDebug() << "other" << contentType;
             emit droppedText(urlStr);
         }
     });

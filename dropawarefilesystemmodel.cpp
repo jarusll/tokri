@@ -40,14 +40,10 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         return true;
     }
 
-    // FIXME - handle application/x-color. Edit - is this needed?
-    // FIXME - handle image urls
-
     // FIXME
     // else if (data->hasImage()){
-    //     qDebug() << "Dropping Image" << data->imageData();
-    //     return true;
     // }
+
     return QFileSystemModel::canDropMimeData(
         data,
         action,
@@ -74,14 +70,11 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
             if (url.isLocalFile()){
                 QFileInfo fileInfo(url.toLocalFile());
                 if (fileInfo.isFile()){
-                    qDebug() << "Dropped file" << fileInfo.filePath();
                     emit droppedFile(url.toLocalFile());
                 } else {
-                    qDebug() << "Dropped Directory" << fileInfo.filePath();
                     emit droppedDirectory(url.toLocalFile());
                 }
             } else {
-                qDebug() << "Dropped url" << url.url();
                 emit droppedUrl(url.toString());
                 handled = true;
             }
@@ -97,7 +90,6 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
             return true;
         } else {
             emit droppedText(data->text());
-            qDebug() << "Text" << data->text();
             return true;
         }
     }
@@ -138,7 +130,6 @@ QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) cons
             return QString::fromUtf8(buf);
         } else if (mime.inherits("image/png")){
             // FIXME is this even needed?
-            qDebug() << "Tooltip Image";
             QPixmap pix(path);
             QByteArray ba;
             QBuffer buffer(&ba);

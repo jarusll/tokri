@@ -80,6 +80,5 @@ void TokriWindow::setDropping(bool status)
 
 void TokriWindow::onShakeDetect()
 {
-    qDebug() << "Shaked";
     wakeUp();
 }

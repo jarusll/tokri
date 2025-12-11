@@ -1,7 +1,5 @@
 #include "horizontalshakedetector.h"
 
-#include <QDebug>
-
 HorizontalShakeDetector::HorizontalShakeDetector(QObject *parent)
     : QObject{parent}
 {}
@@ -20,7 +18,6 @@ bool HorizontalShakeDetector::feed(int dx, uint64_t tsMs)
         return false;
     }
 
-    qDebug() << dx;
     if (dx == 0)
         return false;
 
@@ -54,7 +51,6 @@ bool HorizontalShakeDetector::feed(int dx, uint64_t tsMs)
 
 void HorizontalShakeDetector::reset()
 {
-    // qDebug() << "Reset";
     lastDir  = 0;
     flips    = 0;
     lastTsMs = 0;

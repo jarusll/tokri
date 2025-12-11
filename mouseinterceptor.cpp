@@ -1,13 +1,11 @@
 #include "mouseinterceptor.h"
 
-#include <QDebug>
 #include <QDir>
 
 MouseInterceptor::MouseInterceptor(QObject *parent)
     : QObject{parent}
 {
     const QStringList absRelDevices = MouseInterceptor::collectRelAbsDevices();
-    qDebug() << "Valid pointer devices" << absRelDevices;
 
     QVector<int> fds;
     for (const QString &path : absRelDevices) {
@@ -28,7 +26,6 @@ MouseInterceptor::MouseInterceptor(QObject *parent)
 
 void MouseInterceptor::onEvents(int fd)
 {
-    // qDebug() << "Evdev ready";
     struct input_event buffer[17];
 
     while (true) {
@@ -44,10 +41,8 @@ void MouseInterceptor::onEvents(int fd)
             return;
 
         const size_t eventsRead = n / sizeof(struct input_event);
-        // qDebug() << "Read" << eventsRead << "items";
         for (size_t i = 0; i < eventsRead; ++i) {
             const struct input_event &event = buffer[i];
-            // qDebug() << "Event" << event.type << event.code << event.value;
 
             if (event.type != EV_REL && event.type != EV_ABS && event.type != EV_KEY){
                 continue;
@@ -73,12 +68,10 @@ void MouseInterceptor::onEvents(int fd)
             auto isHorizontalRelativeMovement = event.code == REL_X;
 
             if (isEventRelative && isHorizontalRelativeMovement) {
-                qDebug() << "Relative";
                 dx = event.value;
             }
             // Touchpad absolute → convert to relative
             else if (isEventAbsolute && isHorizontalAbsoluteMovement) {
-                // qDebug() << "Absolute" << mHaveLastX << mLastX;
                 if (mHaveLastAbsoluteX) {
                     dx = event.value - mLastAbsoluteX;
                 }
@@ -100,7 +93,6 @@ void MouseInterceptor::onEvents(int fd)
 
             if (mShakeDetector.feed(dx, tsMs)){
                 emit shakeDetected();
-                qDebug() << "Shaked";
             }
         }
     }
