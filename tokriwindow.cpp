@@ -53,14 +53,14 @@ void TokriWindow::paintEvent(QPaintEvent *)
     // fill background
     p.setPen(Qt::NoPen);
     p.setBrush(palette().color(QPalette::Window));
-    p.drawRoundedRect(r, 12, 12);
+    p.drawRoundedRect(r, 10, 10);
 
     // border stroke
     QPen pen(palette().color(QPalette::BrightText));
     pen.setWidth(2);
     p.setBrush(Qt::NoBrush);
     p.setPen(pen);
-    p.drawRoundedRect(r, 12, 12);
+    p.drawRoundedRect(r, 10, 10);
 }
 
 void TokriWindow::onShakeDetect()
