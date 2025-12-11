@@ -11,7 +11,6 @@ bool FSSortFilterProxy::lessThan(const QModelIndex &left, const QModelIndex &rig
 {
     const auto leftFileInfo = left.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
     const auto rightFileInfo = right.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
-    // qDebug() << leftFileInfo.birthTime() << rightFileInfo.birthTime() << (leftFileInfo.birthTime() > rightFileInfo.birthTime());
     if (mSearch.isEmpty()){
         return leftFileInfo.birthTime() < rightFileInfo.birthTime();
     }
