@@ -28,6 +28,8 @@ public:
     void paintEvent(QPaintEvent *);
     void setDropping(bool status);
 
+    void init();
+
 public slots:
     void onShakeDetect();
 

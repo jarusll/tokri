@@ -11,14 +11,15 @@ public:
         LocalServer
     };
 
+    // TODO make StandardPaths
     static QString get(Names name){
         switch (name){
         case Directory:
-            return "Wallet";
+            return "Tokri";
         case LockFile:
-            return "oneman.jarusll.DropDogger.lock";
+            return "oneman.jarusll.Tokri.lock";
         case LocalServer:
-            return "oneman.jarusll.DropDogger.ipc";
+            return "oneman.jarusll.Tokri.ipc";
         default:
             return "";
         }

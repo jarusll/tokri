@@ -1,10 +1,14 @@
 #include "tokriwindow.h"
 #include "./ui_tokriwindow.h"
+#include "standardpaths.h"
+#include <QDir>
 
 TokriWindow::TokriWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::TokriWindow)
 {
+    init();
+
     ui->setupUi(this);
 
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Window);
@@ -76,6 +80,18 @@ void TokriWindow::setDropping(bool status)
 {
     mDropping = status;
     update();
+}
+
+void TokriWindow::init()
+{
+    QString tokriDir = StandardPaths::getPath(StandardPaths::TokriDir);
+    QDir dir(tokriDir);
+    if (!dir.exists()){
+        bool success = dir.mkpath(tokriDir);
+        if (!success){
+            // FIXME handle error
+        }
+    }
 }
 
 void TokriWindow::onShakeDetect()
