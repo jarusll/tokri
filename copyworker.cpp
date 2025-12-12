@@ -55,7 +55,7 @@ void CopyWorker::copyFile(const QString &filePath)
 void CopyWorker::saveImage(const QImage &image)
 {
     QString fileName = FilePathProvider::nameFromUrl(
-        "image_" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".png"
+        "image_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
     );
 
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
