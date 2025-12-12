@@ -1,4 +1,4 @@
-#include "mouseinterceptor.h"
+#include "linuxmouseinterceptor.h"
 
 #include <QDir>
 

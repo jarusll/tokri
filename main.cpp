@@ -6,8 +6,11 @@
 #include "settings.h"
 #include "sortfilterproxy.h"
 #include "ui_tokriwindow.h"
-#include "mouseinterceptor.h"
 #include "remoteurldrophandler.h"
+
+#ifdef Q_OS_LINUX
+#include "linuxmouseinterceptor.h"
+#endif
 
 #include <QAbstractItemView>
 #include <QAbstractProxyModel>
@@ -183,6 +186,7 @@ int main(int argc, char *argv[])
                      &TokriWindow::sleep);
 
 
+    #ifdef Q_OS_LINUX
     MouseInterceptor *interceptor = new MouseInterceptor;
 
     QObject::connect(
@@ -191,6 +195,7 @@ int main(int argc, char *argv[])
         &w,
         &TokriWindow::wakeUp
         );
+    #endif
 
     w.show();
     return a.exec();

@@ -1,5 +1,5 @@
-#ifndef MOUSEINTERCEPTOR_H
-#define MOUSEINTERCEPTOR_H
+#ifndef LINUXMOUSEINTERCEPTOR_H
+#define LINUXMOUSEINTERCEPTOR_H
 
 #include <QDir>
 #include <QObject>
@@ -83,4 +83,4 @@ private:
     HorizontalShakeDetector mShakeDetector;
 };
 
-#endif // MOUSEINTERCEPTOR_H
+#endif // LINUXMOUSEINTERCEPTOR_H

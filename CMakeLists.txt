@@ -17,9 +17,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -27,6 +24,14 @@ set(PROJECT_SOURCES
         tokriwindow.h
         tokriwindow.ui
 )
+
+set(LINUX_SOURCES "")
+if (UNIX AND NOT APPLE)
+    list(APPEND LINUX_SOURCES
+        linuxmouseinterceptor.h
+        linuxmouseinterceptor.cpp
+    )
+endif()
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Tokri
@@ -40,14 +45,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         copyworker.h copyworker.cpp
         README.md
         sortfilterproxy.h sortfilterproxy.cpp
-
         nointernaldraglistview.h nointernaldraglistview.cpp
         StandardNames.h
         horizontalshakedetector.h horizontalshakedetector.cpp
-        mouseinterceptor.h mouseinterceptor.cpp
         themeprovider.h themeprovider.cpp
         remoteurldrophandler.h remoteurldrophandler.cpp
 
+        ${LINUX_SOURCES}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Tokri APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -103,10 +107,6 @@ FetchContent_MakeAvailable(rapidfuzz)
 target_link_libraries(Tokri PRIVATE rapidfuzz::rapidfuzz)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
