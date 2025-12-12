@@ -1,6 +1,7 @@
 #include "standardpaths.h"
-#include <QStandardPaths>
 #include "StandardNames.h"
+
+#include <QStandardPaths>
 
 StandardPaths::StandardPaths() {}
 

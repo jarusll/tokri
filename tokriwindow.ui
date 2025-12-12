@@ -16,6 +16,9 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="DragHandle" name="widget" native="true"/>
+    </item>
+    <item>
      <widget class="QLineEdit" name="searchBar"/>
     </item>
     <item>
@@ -45,16 +48,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>280</width>
-     <height>23</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
@@ -62,6 +55,12 @@
    <class>NoInternalDragListView</class>
    <extends>QListView</extends>
    <header>nointernaldraglistview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DragHandle</class>
+   <extends>QWidget</extends>
+   <header>draghandle.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
