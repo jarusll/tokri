@@ -67,15 +67,15 @@ int main(int argc, char *argv[])
     }
 
     // Actions
-    QAction *searchAction = new QAction(&w);
-    searchAction->setShortcut(QKeySequence::Find);
-    searchAction->setCheckable(true);
-    searchAction->setChecked(false);
-    w.addAction(searchAction);
-    TokriWindow::connect(searchAction, &QAction::toggled,
-            [&w](bool on){
-                w.uiHandle()->searchBar->setVisible(on);
-            });
+    // QAction *searchAction = new QAction(&w);
+    // searchAction->setShortcut(QKeySequence::Find);
+    // searchAction->setCheckable(true);
+    // searchAction->setChecked(false);
+    // w.addAction(searchAction);
+    // TokriWindow::connect(searchAction, &QAction::toggled,
+    //         [&w](bool on){
+    //             w.uiHandle()->searchBar->setVisible(on);
+    //         });
 
     QAction *deleteAction = new QAction(&w);
     deleteAction->setShortcut(QKeySequence::Delete);
@@ -163,12 +163,12 @@ int main(int argc, char *argv[])
     worker->moveToThread(th);
     th->start();
 
-    DropAwareFileSystemModel::connect(
-        w.uiHandle()->searchBar,
-        &QLineEdit::textChanged,
-        sortFilterProxy,
-        &FSSortFilterProxy::setSearch
-        );
+    // DropAwareFileSystemModel::connect(
+    //     w.uiHandle()->searchBar,
+    //     &QLineEdit::textChanged,
+    //     sortFilterProxy,
+    //     &FSSortFilterProxy::setSearch
+    //     );
 
     // FIXME - move this to dropaware fs model
     DropAwareFileSystemModel::connect(
