@@ -2,6 +2,11 @@
 
 Basket for your compooter.
 
+## TODO
+- Free up gui thread from sending Image
+- Add items from clipboard
+- Tray icon
+
 ## Logs
 MVP
 v2025.12.01-alpha.1
