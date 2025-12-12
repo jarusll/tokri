@@ -107,9 +107,9 @@ int main(int argc, char *argv[])
     RemoteUrlDropHandler *urlHandler = new RemoteUrlDropHandler(&w);
     DropAwareFileSystemModel::connect(
         fsModel,
-        &DropAwareFileSystemModel::droppedPossibleUrl,
-        urlHandler,
-        &RemoteUrlDropHandler::handle
+        &DropAwareFileSystemModel::droppedUrl,
+        dropHandler,
+        &TextDropHandler::handleUrlDrop
         );
 
     RemoteUrlDropHandler::connect(

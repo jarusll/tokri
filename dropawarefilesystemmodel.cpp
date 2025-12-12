@@ -91,7 +91,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
                     emit droppedDirectory(url.toLocalFile());
                 }
             } else {
-                emit droppedPossibleUrl(url.toString());
+                emit droppedUrl(url.toString());
                 handled = true;
             }
         }
@@ -101,7 +101,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
 
     if (data->hasText()) {
         if (isValidHttpUrl( data->text())){
-            emit droppedPossibleUrl(data->text());
+            emit droppedUrl(data->text());
             return true;
         } else {
             emit droppedText(data->text());
