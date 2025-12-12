@@ -99,7 +99,6 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
         return handled;
     }
 
-    // DECISION - not to save html for now
     if (data->hasText()) {
         if (isValidHttpUrl( data->text())){
             emit droppedPossibleUrl(data->text());
