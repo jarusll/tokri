@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
             auto selectionModel = w.uiHandle()->listView->selectionModel();
             QModelIndexList indexes = selectionModel->selectedIndexes();
             for (const QModelIndex &index : std::as_const(indexes)) {
-                const auto filePath = index.data(Qt::FileInfoRole).value<QFileInfo>().filePath();
+                const auto filePath = index.data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
                 QFile(filePath).moveToTrash();
             }
         }
