@@ -56,9 +56,7 @@ void CopyWorker::copyFile(const QString &filePath)
 
 void CopyWorker::saveImage(const QImage &image)
 {
-    QString fileName = FilePathProvider::nameFromUrl(
-        "image_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
-    );
+    QString fileName = FilePathProvider::nameWithPrefix("image");
 
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
     QString fullPath = QDir(rootPath).filePath(fileName);
@@ -75,8 +73,8 @@ void CopyWorker::saveImageBytes(QSharedPointer<QByteArray> bytes)
     QImageReader reader(&buf);
     QImage img = reader.read();
     auto filePath = FilePathProvider::nameWithPrefix("image");
-    bool status = img.save(filePath);
-    qDebug() << "Image Save" << status;
+    // TODO fix
+    img.save(filePath);
 }
 
 

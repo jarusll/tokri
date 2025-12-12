@@ -46,14 +46,12 @@ public:
         static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
         QString urlStr = url.toString();
         urlStr.replace(forbidden, "_");
-        return QDir(rootPath).filePath(urlStr + ".png");
+        return QDir(rootPath).filePath(urlStr);
     }
 
     static QString nameWithPrefix(QString prefix = QString()){
         QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
-        QString uuidStr = QUuid::createUuid().toString();
-        uuidStr.replace("{", "");
-        uuidStr.replace("}", "");
+        QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
         if (!prefix.isEmpty()){
             uuidStr = prefix + "_" + uuidStr;
         }
