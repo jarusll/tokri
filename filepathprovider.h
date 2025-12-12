@@ -1,16 +1,18 @@
-#ifndef FILENAMEPROVIDER_H
-#define FILENAMEPROVIDER_H
+#ifndef FILEPATHPROVIDER_H
+#define FILEPATHPROVIDER_H
 
 #include "settings.h"
 
 #include <QObject>
 #include <QRegularExpression>
+#include <QUrl>
+#include <QUuid>
 
-class FileNameProvider : public QObject
+class FilePathProvider : public QObject
 {
 public:
 
-    explicit FileNameProvider(QObject *parent = nullptr);
+    explicit FilePathProvider(QObject *parent = nullptr);
 
     static QString nameFromText(const QString &text){
         QString rootPath = Settings::get(StandardPaths::RootPath);
@@ -36,6 +38,14 @@ public:
         while (fileNameBase.endsWith("_")) fileNameBase.chop(1);
         return QDir(rootPath + "/" + fileNameBase).path();
     }
+
+    static QString nameFromUrl(const QUrl &url){
+        QString rootPath = Settings::get(StandardPaths::RootPath);
+        // FIXME can do content disposition and the url itself as fallback
+        QString fileName = QUuid::createUuid().toString();
+        fileName.remove('{').remove('}');
+        return QDir(rootPath).filePath(fileName + ".png");
+    }
 };
 
-#endif // FILENAMEPROVIDER_H
+#endif // FILEPATHPROVIDER_H

@@ -1,5 +1,5 @@
 #include "textfile.h"
-#include "filenameprovider.h"
+#include "filepathprovider.h"
 
 TextFile::TextFile(QObject *parent)
     : QObject{parent}
@@ -21,7 +21,7 @@ void TextFile::save()
     if (mName.length() > 0){
         file.setFileName(mName);
     } else {
-        file.setFileName(FileNameProvider::nameFromText(mContents));
+        file.setFileName(FilePathProvider::nameFromText(mContents));
     }
     if (file.open(QIODevice::NewOnly | QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);

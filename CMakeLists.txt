@@ -42,7 +42,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         drophandler.h drophandler.cpp
         settings.h settings.cpp
         textfile.h textfile.cpp
-        filenameprovider.h filenameprovider.cpp
+        filepathprovider.h filepathprovider.cpp
         copyworker.h copyworker.cpp
         README.md
         sortfilterproxy.h sortfilterproxy.cpp

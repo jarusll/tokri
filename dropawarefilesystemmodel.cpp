@@ -1,6 +1,9 @@
 #include "dropawarefilesystemmodel.h"
 
+#include "filenameprovider.h"
+
 #include <QBuffer>
+#include <QUuid>
 
 bool isValidHttpUrl(const QString &s)
 {
@@ -34,15 +37,13 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
     if (action == Qt::IgnoreAction)
         return true;
 
-    if (data->hasUrls()){
+    if (data->hasImage()){
+        return true;
+    } else if (data->hasUrls()){
         return true;
     } else if (data->hasText()){
         return true;
     }
-
-    // FIXME
-    // else if (data->hasImage()){
-    // }
 
     return QFileSystemModel::canDropMimeData(
         data,
@@ -60,6 +61,13 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
     Q_UNUSED(row);
     Q_UNUSED(column);
     Q_UNUSED(parent);
+
+    if (data->hasImage()) {
+        QImage img = data->imageData().value<QImage>();
+        QString path = FilePathProvider::nameFromUrl(data->urls().first());
+        img.save(path);
+        return true;
+    }
 
 
     if (data->hasUrls()) {
@@ -93,12 +101,6 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
             return true;
         }
     }
-
-    // FIXME
-    // if (data->hasImage()) {
-    //     emit dropped(data);
-    //     return true;
-    // }
 
     return QFileSystemModel::dropMimeData(
         data,

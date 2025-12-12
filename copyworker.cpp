@@ -1,6 +1,6 @@
 #include "copyworker.h"
 
-#include "filenameprovider.h"
+#include "filepathprovider.h"
 
 CopyWorker::CopyWorker(QObject *parent)
     : QObject{parent}
@@ -8,7 +8,7 @@ CopyWorker::CopyWorker(QObject *parent)
 
 void CopyWorker::copyDirectory(const QString &src)
 {
-    QString dst = FileNameProvider::nameFromPath(src);
+    QString dst = FilePathProvider::nameFromPath(src);
     bool makePath = QDir().mkpath(dst);
     if (makePath == false){
         // FIXME
@@ -42,7 +42,7 @@ void CopyWorker::copyDirectory(const QString &src)
 void CopyWorker::copyFile(const QString &filePath)
 {
     QFile file(filePath);
-    bool copied = file.copy(FileNameProvider::nameFromPath(filePath));
+    bool copied = file.copy(FilePathProvider::nameFromPath(filePath));
     if (copied == false){
         emit copyFailed(filePath);
     }
