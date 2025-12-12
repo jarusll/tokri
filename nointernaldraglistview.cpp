@@ -25,6 +25,8 @@ void NoInternalDragListView::dragMoveEvent(QDragMoveEvent *e)
 void NoInternalDragListView::dragLeaveEvent(QDragLeaveEvent *e)
 {
     emit dropping(false);
+
+    QListView::dragLeaveEvent(e);
 }
 
 void NoInternalDragListView::dropEvent(QDropEvent *e)
