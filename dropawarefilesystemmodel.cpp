@@ -114,34 +114,39 @@ QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) cons
     if (!index.isValid()){
         return QFileSystemModel::data(index, role);
     }
+
     if (role == Qt::ToolTipRole){
-        const auto path = filePath(index);
-        QMimeDatabase mimeDb;
-        auto mime = mimeDb.mimeTypeForFile(path);
-        if (mime.inherits("text/plain")){
-            QFile file(path);
-            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-                QVariant();
-
-            QByteArray buf = file.read(1024);
-            if (file.bytesAvailable() > 1024){
-                buf.append("...");
-            }
-            return QString::fromUtf8(buf);
-        } else if (mime.inherits("image/png")){
-            // FIXME is this even needed?
-            QPixmap pix(path);
-            QByteArray ba;
-            QBuffer buffer(&ba);
-            buffer.open(QIODevice::WriteOnly);
-            pix.save(&buffer, "PNG");
-            QString base64 = ba.toBase64();
-
-            return "<img src=\"data:image/png;base64," + base64 + "\" width=\"256\"/>";
-        } else {
-            return QFileSystemModel::data(index, role);
-        }
+        return fileName(index);
     }
+
+    // if (role == Qt::ToolTipRole){
+    //     const auto path = filePath(index);
+    //     QMimeDatabase mimeDb;
+    //     auto mime = mimeDb.mimeTypeForFile(path);
+    //     if (mime.inherits("text/plain")){
+    //         QFile file(path);
+    //         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    //             QVariant();
+
+    //         QByteArray buf = file.read(1024);
+    //         if (file.bytesAvailable() > 1024){
+    //             buf.append("...");
+    //         }
+    //         return QString::fromUtf8(buf);
+    //     } else if (mime.inherits("image/png")){
+    //         // FIXME is this even needed?
+    //         QPixmap pix(path);
+    //         QByteArray ba;
+    //         QBuffer buffer(&ba);
+    //         buffer.open(QIODevice::WriteOnly);
+    //         pix.save(&buffer, "PNG");
+    //         QString base64 = ba.toBase64();
+
+    //         return "<img src=\"data:image/png;base64," + base64 + "\" width=\"256\"/>";
+    //     } else {
+    //         return QFileSystemModel::data(index, role);
+    //     }
+    // }
 
     return QFileSystemModel::data(index, role);
 }
