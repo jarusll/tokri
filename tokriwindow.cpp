@@ -3,7 +3,6 @@
 #include "standardpaths.h"
 #include <QDir>
 #include <QMenu>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QApplication>
@@ -59,6 +58,7 @@ TokriWindow::TokriWindow(QWidget *parent)
 
             if (chosen == openAction) {
                 // if .url.txt file, try to open as url
+                // TODO add open as link option
                 if (fileInfo.fileName().endsWith(".url.txt")) {
                     QFile file(filePath);
                     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -76,15 +76,11 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
 
                 QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
-                qDebug() << "Open";
             } else if (chosen == revealAction) {
-                qDebug() << "Reveal in Explorer";
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absolutePath()));
             } else if (chosen == renameAction) {
-                qDebug() << "Rename";
                 ui->listView->edit(index);
             } else if (chosen == deleteAction) {
-                qDebug() << "Delete" << selected[0].row();
                 QFile file(filePath);
                 if (file.exists()) {
                     bool success = file.remove();
@@ -112,7 +108,6 @@ TokriWindow::TokriWindow(QWidget *parent)
                     mime->setData("text/uri-list", uriList);
                     QApplication::clipboard()->setMimeData(mime);
                 }
-                qDebug() << "Copy";
             }
         } else {
             QList<QFileInfo> fileInfos;
@@ -141,9 +136,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                     mime->setData("text/uri-list", uriList);
                     QApplication::clipboard()->setMimeData(mime);
                 }
-                qDebug() << "Copy";
             } else if (chosen == deleteAction) {
-                qDebug() << "Delete" << count << "items";
                 for (const auto &fileInfo : fileInfos) {
                     QFile file(fileInfo.filePath());
                     if (file.exists()) {
@@ -154,7 +147,6 @@ TokriWindow::TokriWindow(QWidget *parent)
                     }
                 }
             } else if (chosen == selectAllAction) {
-                qDebug() << "Select All";
                 ui->listView->selectAll();
             }
         }
