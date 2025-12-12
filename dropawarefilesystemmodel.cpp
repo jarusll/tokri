@@ -38,10 +38,6 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         return true;
 
     if (data->hasImage()){
-        QImage img = data->imageData().value<QImage>();
-        if (img.isNull()){
-            return false;
-        }
         return true;
     } else if (data->hasUrls()){
         return true;
@@ -66,6 +62,15 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
     Q_UNUSED(column);
     Q_UNUSED(parent);
 
+    for (const QString &fmt : data->formats()) {
+        if (fmt.startsWith("image/")) {
+            QByteArray bytes = data->data(fmt);
+            auto ptr = QSharedPointer<QByteArray>::create(bytes);
+            emit droppedImageBytes(ptr);
+            return true;
+        }
+    }
+
     if (data->hasImage()) {
         const auto image = data->imageData().value<QImage>();
         emit droppedImage(image);
@@ -86,7 +91,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
                     emit droppedDirectory(url.toLocalFile());
                 }
             } else {
-                emit droppedUrl(url.toString());
+                emit droppedPossibleUrl(url.toString());
                 handled = true;
             }
         }
@@ -97,7 +102,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
     // DECISION - not to save html for now
     if (data->hasText()) {
         if (isValidHttpUrl( data->text())){
-            emit droppedUrl(data->text());
+            emit droppedPossibleUrl(data->text());
             return true;
         } else {
             emit droppedText(data->text());

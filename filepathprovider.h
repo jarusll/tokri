@@ -48,6 +48,17 @@ public:
         urlStr.replace(forbidden, "_");
         return QDir(rootPath).filePath(urlStr + ".png");
     }
+
+    static QString nameWithPrefix(QString prefix = QString()){
+        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
+        QString uuidStr = QUuid::createUuid().toString();
+        uuidStr.replace("{", "");
+        uuidStr.replace("}", "");
+        if (!prefix.isEmpty()){
+            uuidStr = prefix + "_" + uuidStr;
+        }
+        return QDir(rootPath).filePath(uuidStr);
+    }
 };
 
 #endif // FILEPATHPROVIDER_H

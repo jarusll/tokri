@@ -1,11 +1,13 @@
 #include "remoteurldrophandler.h"
 
-#include <QNetworkRequest>
+#include "filepathprovider.h"
+
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QFile>
 #include <QStandardPaths>
 #include <QDir>
+#include <QImage>
 #include <QUuid>
 
 RemoteUrlDropHandler::RemoteUrlDropHandler(QObject *parent)
@@ -34,22 +36,11 @@ void RemoteUrlDropHandler::handle(QString urlStr)
         }
 
         QString contentType = response->header(QNetworkRequest::ContentTypeHeader).toString().toLower();
-        QVariant cd = response->header(QNetworkRequest::ContentDispositionHeader);
-        QString cdRaw = response->rawHeader("Content-Disposition");
 
-        if (contentType.startsWith("text/html")) {
-            emit droppedUrl(urlStr);
-        } else if (contentType.startsWith("image")) {
+        if (contentType.startsWith("image")) {
             QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
             QString fileName;
-            // FIXME for other content disposition formats
-            if (cd.isValid()) {
-                fileName = cd.toString().section("filename=", 1).remove('"');
-            }
-            if (fileName.isEmpty()){
-                fileName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-            }
-            QString tmpFilePath = tempDir.filePath(fileName);
+            QString tmpFilePath = FilePathProvider::nameFromUrl(urlStr);
 
             QFile *tempFile = new QFile(tmpFilePath);
             bool opened = tempFile->open(QIODevice::WriteOnly);

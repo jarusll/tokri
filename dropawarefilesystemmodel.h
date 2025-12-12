@@ -28,8 +28,9 @@ signals:
     void droppedText(const QString &text);
     void droppedFile(const QString &file);
     void droppedDirectory(const QString &directory);
-    void droppedUrl(const QString &url);
-    void droppedImage(const QImage);
+    void droppedPossibleUrl(const QString &url);
+    void droppedImage(const QImage image);
+    void droppedImageBytes(QSharedPointer<QByteArray>);
 private:
 };
 

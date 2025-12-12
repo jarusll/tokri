@@ -14,6 +14,7 @@ public:
     void copyDirectory(const QString &directory);
     void copyFile(const QString &filePath);
     void saveImage(const QImage &image);
+    void saveImageBytes(QSharedPointer<QByteArray> bytes);
 
 signals:
     void makePathFailed(QString);

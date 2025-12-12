@@ -3,7 +3,9 @@
 #include "filepathprovider.h"
 #include "standardpaths.h"
 
+#include <QBuffer>
 #include <QImage>
+#include <QImageReader>
 #include <QUuid>
 
 CopyWorker::CopyWorker(QObject *parent)
@@ -64,6 +66,17 @@ void CopyWorker::saveImage(const QImage &image)
     if (!image.save(fullPath)) {
         emit copyFailed(fullPath);
     }
+}
+
+void CopyWorker::saveImageBytes(QSharedPointer<QByteArray> bytes)
+{
+    QBuffer buf(bytes.data());
+    buf.open(QIODevice::ReadOnly);
+    QImageReader reader(&buf);
+    QImage img = reader.read();
+    auto filePath = FilePathProvider::nameWithPrefix("image");
+    bool status = img.save(filePath);
+    qDebug() << "Image Save" << status;
 }
 
 

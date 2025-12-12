@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     RemoteUrlDropHandler *urlHandler = new RemoteUrlDropHandler(&w);
     DropAwareFileSystemModel::connect(
         fsModel,
-        &DropAwareFileSystemModel::droppedUrl,
+        &DropAwareFileSystemModel::droppedPossibleUrl,
         urlHandler,
         &RemoteUrlDropHandler::handle
         );
@@ -155,6 +155,13 @@ int main(int argc, char *argv[])
         &CopyWorker::saveImage,
         Qt::QueuedConnection
         );
+    CopyWorker::connect(
+        fsModel,
+        &DropAwareFileSystemModel::droppedImageBytes,
+        worker,
+        &CopyWorker::saveImageBytes,
+        Qt::QueuedConnection
+        );
 
     QThread* th = new QThread;
     CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
@@ -178,12 +185,20 @@ int main(int argc, char *argv[])
         [&w](){
             auto selectionModel = w.uiHandle()->listView->selectionModel();
             QModelIndexList indexes = selectionModel->selectedIndexes();
-            for (const QModelIndex &index : std::as_const(indexes)) {
-                const auto filePath = index.data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
-                QFile(filePath).moveToTrash();
+            for (const QModelIndex &index : selectionModel->selectedIndexes()) {
+                if (!index.isValid())
+                    continue;
+
+                QFileInfo fi = index.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
+                const QString path = fi.filePath();
+
+                if (fi.isDir()) {
+                    QDir(path).removeRecursively();
+                } else {
+                    QFile(path).moveToTrash();
+                }
             }
-        }
-        );
+        });
 
     auto SleepShortcut = new QShortcut(QKeySequence("Escape"), &w);
     SleepShortcut->setContext(Qt::WindowShortcut);
@@ -194,7 +209,7 @@ int main(int argc, char *argv[])
                      &TokriWindow::sleep);
 
 
-    #ifdef Q_OS_LINUX
+#ifdef Q_OS_LINUX
     MouseInterceptor *interceptor = new MouseInterceptor;
 
     QObject::connect(
@@ -203,7 +218,7 @@ int main(int argc, char *argv[])
         &w,
         &TokriWindow::wakeUp
         );
-    #endif
+#endif
 
     w.show();
     return a.exec();
