@@ -30,6 +30,7 @@ TokriWindow::TokriWindow(QWidget *parent)
         int count = selected.size();
         QMenu menu;
         QAction *openAction = nullptr;
+        QAction *openLinkAction = nullptr;
         QAction *revealAction = nullptr;
         QAction *renameAction = nullptr;
         QAction *copyAction = nullptr;
@@ -57,6 +58,23 @@ TokriWindow::TokriWindow(QWidget *parent)
             const auto filePath = selected[0].data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
 
             if (chosen == openAction) {
+                // if .url.txt file, try to open as url
+                if (fileInfo.fileName().endsWith(".url.txt")) {
+                    QFile file(filePath);
+                    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        QByteArray content = file.readAll();
+                        QString textContent = QString::fromUtf8(content);
+                        // this can be centralized
+                        QRegularExpression urlRegex(R"(https?://[^\s]+)");
+                        QRegularExpressionMatch match = urlRegex.match(textContent);
+                        if (match.hasMatch()) {
+                            QString urlStr = match.captured(0);
+                            QDesktopServices::openUrl(QUrl(urlStr));
+                            return;
+                        }
+                    }
+                }
+
                 QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
                 qDebug() << "Open";
             } else if (chosen == revealAction) {
