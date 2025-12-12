@@ -42,9 +42,10 @@ public:
     static QString nameFromUrl(const QUrl &url){
         QString rootPath = Settings::get(StandardPaths::RootPath);
         // FIXME can do content disposition and the url itself as fallback
-        QString fileName = QUuid::createUuid().toString();
-        fileName.remove('{').remove('}');
-        return QDir(rootPath).filePath(fileName + ".png");
+        static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
+        QString urlStr = url.toString();
+        urlStr.replace(forbidden, "_");
+        return QDir(rootPath).filePath(urlStr + ".png");
     }
 };
 
