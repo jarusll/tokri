@@ -1,6 +1,6 @@
 #include "dropawarefilesystemmodel.h"
 
-#include "filenameprovider.h"
+#include "filepathprovider.h"
 
 #include <QBuffer>
 #include <QUuid>
