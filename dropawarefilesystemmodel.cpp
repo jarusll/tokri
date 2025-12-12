@@ -38,6 +38,10 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         return true;
 
     if (data->hasImage()){
+        QImage img = data->imageData().value<QImage>();
+        if (img.isNull()){
+            return false;
+        }
         return true;
     } else if (data->hasUrls()){
         return true;
@@ -63,9 +67,8 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
     Q_UNUSED(parent);
 
     if (data->hasImage()) {
-        QImage img = data->imageData().value<QImage>();
-        QString path = FilePathProvider::nameFromUrl(data->urls().first());
-        img.save(path);
+        const auto image = data->imageData().value<QImage>();
+        emit droppedImage(image);
         return true;
     }
 

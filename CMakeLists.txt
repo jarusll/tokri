@@ -40,7 +40,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         dropawarefilesystemmodel.h dropawarefilesystemmodel.cpp
         drophandler.h drophandler.cpp
-        settings.h settings.cpp
+
         textfile.h textfile.cpp
         filepathprovider.h filepathprovider.cpp
         copyworker.h copyworker.cpp

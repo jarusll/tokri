@@ -1,8 +1,9 @@
 #ifndef FILEPATHPROVIDER_H
 #define FILEPATHPROVIDER_H
 
-#include "settings.h"
+#include "standardpaths.h"
 
+#include <QDir>
 #include <QObject>
 #include <QRegularExpression>
 #include <QUrl>
@@ -15,7 +16,7 @@ public:
     explicit FilePathProvider(QObject *parent = nullptr);
 
     static QString nameFromText(const QString &text){
-        QString rootPath = Settings::get(StandardPaths::RootPath);
+        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
         QString fileNameBase = text.left(80);
         // FIXME this should be declared once
         static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
@@ -29,7 +30,7 @@ public:
     static QString nameFromPath(const QString &path){
         QDir dir(path);
         QString baseName = dir.dirName();
-        QString rootPath = Settings::get(StandardPaths::RootPath);
+        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
         QString fileNameBase = baseName;
         // FIXME this should be declared once
         static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
@@ -40,7 +41,7 @@ public:
     }
 
     static QString nameFromUrl(const QUrl &url){
-        QString rootPath = Settings::get(StandardPaths::RootPath);
+        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
         // FIXME can do content disposition and the url itself as fallback
         static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
         QString urlStr = url.toString();

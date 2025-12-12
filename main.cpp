@@ -3,13 +3,14 @@
 #include "drophandler.h"
 #include "themeprovider.h"
 #include "tokriwindow.h"
-#include "settings.h"
 #include "sortfilterproxy.h"
 #include "ui_tokriwindow.h"
 #include "remoteurldrophandler.h"
 
 #ifdef Q_OS_LINUX
+#include "StandardNames.h"
 #include "linuxmouseinterceptor.h"
+#include "standardpaths.h"
 #endif
 
 #include <QAbstractItemView>
@@ -83,7 +84,7 @@ int main(int argc, char *argv[])
     // View & Models
 
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
-    QString rootPath = Settings::get(StandardPaths::RootPath);
+    QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&w);
@@ -145,6 +146,13 @@ int main(int argc, char *argv[])
         &DropAwareFileSystemModel::droppedDirectory,
         worker,
         &CopyWorker::copyDirectory,
+        Qt::QueuedConnection
+        );
+    CopyWorker::connect(
+        fsModel,
+        &DropAwareFileSystemModel::droppedImage,
+        worker,
+        &CopyWorker::saveImage,
         Qt::QueuedConnection
         );
 

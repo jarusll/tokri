@@ -1,6 +1,10 @@
 #include "copyworker.h"
 
 #include "filepathprovider.h"
+#include "standardpaths.h"
+
+#include <QImage>
+#include <QUuid>
 
 CopyWorker::CopyWorker(QObject *parent)
     : QObject{parent}
@@ -45,6 +49,20 @@ void CopyWorker::copyFile(const QString &filePath)
     bool copied = file.copy(FilePathProvider::nameFromPath(filePath));
     if (copied == false){
         emit copyFailed(filePath);
+    }
+}
+
+void CopyWorker::saveImage(const QImage &image)
+{
+    QString fileName = FilePathProvider::nameFromUrl(
+        "image_" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".png"
+    );
+
+    QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
+    QString fullPath = QDir(rootPath).filePath(fileName);
+
+    if (!image.save(fullPath)) {
+        emit copyFailed(fullPath);
     }
 }
 

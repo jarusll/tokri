@@ -13,6 +13,7 @@ public:
 
     void copyDirectory(const QString &directory);
     void copyFile(const QString &filePath);
+    void saveImage(const QImage &image);
 
 signals:
     void makePathFailed(QString);
