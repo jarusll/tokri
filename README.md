@@ -13,7 +13,7 @@ Note: Please log out and log back in for the group changes to take effect.
 
 ### Build
 ```bash
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
