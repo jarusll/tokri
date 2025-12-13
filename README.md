@@ -3,6 +3,7 @@
 Basket for your compooter.
 
 ## TODO
+- Offer drag with multiple formats
 - Free up gui thread from sending Image
 - Add items from clipboard
 - Tray icon
