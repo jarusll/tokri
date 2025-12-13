@@ -1,15 +1,22 @@
 # Tokri
 
-Basket for your compooter.
+Basket for your Linux computer.
+
+> **Note**
+>
+> This application reads from `/dev/input/*`.
+> Add your user to the `input` group:
+> ```bash
+> sudo usermod -aG input $USER
+> ```
+> Log out and log back in for the change to take effect.
 
 ## Building
 
-### Prerequisites
-Since this read `/dev/input/*` you need to be part of `input` group.
-```bash
-sudo usermod -aG input $USER
-```
-Note: Please log out and log back in for the group changes to take effect.
+#### Dependencies
+- qt6
+- cmake
+- gcc/g++
 
 ### Build
 ```bash
@@ -23,6 +30,7 @@ cmake --build build
 - Add items from clipboard
 - Tray icon
 - Accept clipboard contents
+- Find(is this even needed)?
 
 ## Logs
 MVP
