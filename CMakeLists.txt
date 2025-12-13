@@ -12,11 +12,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
@@ -74,10 +73,6 @@ else()
     endif()
 endif()
 
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
-
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
@@ -103,13 +98,15 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Tokri)
 endif()
 
-FetchContent_Declare(rapidfuzz
-  GIT_REPOSITORY https://github.com/rapidfuzz/rapidfuzz-cpp.git
-  GIT_TAG main)
-FetchContent_MakeAvailable(rapidfuzz)
-target_link_libraries(Tokri PRIVATE rapidfuzz::rapidfuzz)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
+# FetchContent_Declare(rapidfuzz
+#   GIT_REPOSITORY https://github.com/rapidfuzz/rapidfuzz-cpp.git
+#   GIT_TAG main)
+# FetchContent_MakeAvailable(rapidfuzz)
+# target_link_libraries(Tokri PRIVATE rapidfuzz::rapidfuzz)
+
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::DBus)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 

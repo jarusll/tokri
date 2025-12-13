@@ -1,5 +1,5 @@
 #include "sortfilterproxy.h"
-#include <rapidfuzz/fuzz.hpp>
+// #include <rapidfuzz/fuzz.hpp>
 
 #include <QFileSystemModel>
 
@@ -11,11 +11,12 @@ bool FSSortFilterProxy::lessThan(const QModelIndex &left, const QModelIndex &rig
 {
     const auto leftFileInfo = left.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
     const auto rightFileInfo = right.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
-    if (mSearch.isEmpty()){
-        return leftFileInfo.birthTime() < rightFileInfo.birthTime();
-    }
+    return leftFileInfo.birthTime() < rightFileInfo.birthTime();
 
-    return score(leftFileInfo.fileName()) < score(rightFileInfo.fileName());
+    // if (mSearch.isEmpty()){
+    // }
+
+    // return score(leftFileInfo.fileName()) < score(rightFileInfo.fileName());
 }
 
 bool FSSortFilterProxy::filterAcceptsRow(int row, const QModelIndex &parent) const
@@ -41,22 +42,23 @@ bool FSSortFilterProxy::filterAcceptsRow(int row, const QModelIndex &parent) con
         return true;
 
     const QString name = info.fileName();
-    return score(name) > 30;
+    return true;
+    // return score(name) > 30;
 }
 
-void FSSortFilterProxy::setSearch(const QString &string)
-{
-    if (mSearch != string){
-        beginFilterChange();
-        mSearch = string;
-        endFilterChange();
-    }
-}
+// void FSSortFilterProxy::setSearch(const QString &string)
+// {
+//     if (mSearch != string){
+//         beginFilterChange();
+//         mSearch = string;
+//         endFilterChange();
+//     }
+// }
 
-double FSSortFilterProxy::score(const QString &candidate) const
-{
-    const auto result = rapidfuzz::fuzz::ratio(
-        mSearch.toStdString(),
-        candidate.toLower().toStdString());
-    return result;
-}
+// double FSSortFilterProxy::score(const QString &candidate) const
+// {
+//     const auto result = rapidfuzz::fuzz::ratio(
+//         mSearch.toStdString(),
+//         candidate.toLower().toStdString());
+//     return result;
+// }
