@@ -30,6 +30,22 @@ Rename - Pass
 Copy - Fail
 Delete - Pass
 
+# Debian (KDE)
+Shake Activation - Fail in VM
+Drop Text - Pass
+Drop Files - Pass
+Drop Directory - Pass
+Drop Image - Pass
+
+Drag - Pass and its cuter with copy/move option
+
+Context Menu
+Open - Pass
+Reveal in Explorer - Pass
+Rename - Pass
+Copy - Pass
+Delete - Pass
+
 # Fedora (XFCE)
 Shake Activation - Pass
 Drop Text - Pass
