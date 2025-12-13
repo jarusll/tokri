@@ -59,21 +59,21 @@ TokriWindow::TokriWindow(QWidget *parent)
             if (chosen == openAction) {
                 // if .url.txt file, try to open as url
                 // TODO add open as link option
-                if (fileInfo.fileName().endsWith(".url.txt")) {
-                    QFile file(filePath);
-                    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                        QByteArray content = file.readAll();
-                        QString textContent = QString::fromUtf8(content);
-                        // this can be centralized
-                        QRegularExpression urlRegex(R"(https?://[^\s]+)");
-                        QRegularExpressionMatch match = urlRegex.match(textContent);
-                        if (match.hasMatch()) {
-                            QString urlStr = match.captured(0);
-                            QDesktopServices::openUrl(QUrl(urlStr));
-                            return;
-                        }
-                    }
-                }
+                // if (fileInfo.fileName().endsWith(".url.txt")) {
+                //     QFile file(filePath);
+                //     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                //         QByteArray content = file.readAll();
+                //         QString textContent = QString::fromUtf8(content);
+                //         // this can be centralized
+                //         QRegularExpression urlRegex(R"(https?://[^\s]+)");
+                //         QRegularExpressionMatch match = urlRegex.match(textContent);
+                //         if (match.hasMatch()) {
+                //             QString urlStr = match.captured(0);
+                //             QDesktopServices::openUrl(QUrl(urlStr));
+                //             return;
+                //         }
+                //     }
+                // }
 
                 QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
             } else if (chosen == revealAction) {
