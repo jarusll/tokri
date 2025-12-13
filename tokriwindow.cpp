@@ -90,24 +90,12 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
             } else if (chosen == copyAction) {
                 QList<QUrl> urls;
-                for (const auto &idx : selected) {
-                    const auto filePath = idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
-                    QFileInfo fi(filePath);
-                    if (fi.exists()) {
-                        urls << QUrl::fromLocalFile(fi.absoluteFilePath());
-                    }
-                }
-                if (!urls.isEmpty()) {
-                    QMimeData *mime = new QMimeData;
-                    mime->setUrls(urls);
-                    QByteArray uriList;
-                    for (const QUrl &u : urls) {
-                        uriList += u.toString(QUrl::FullyEncoded).toUtf8();
-                        uriList += '\n';
-                    }
-                    mime->setData("text/uri-list", uriList);
-                    QApplication::clipboard()->setMimeData(mime);
-                }
+                urls << QUrl::fromLocalFile(filePath);
+
+                auto *mime = new QMimeData;
+                mime->setUrls(urls);
+
+                QGuiApplication::clipboard()->setMimeData(mime);
             }
         } else {
             QList<QFileInfo> fileInfos;
@@ -119,22 +107,16 @@ TokriWindow::TokriWindow(QWidget *parent)
             if (chosen == copyAction) {
                 QList<QUrl> urls;
                 for (const auto &idx : selected) {
-                    const auto filePath = idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
-                    QFileInfo fi(filePath);
-                    if (fi.exists()) {
+                    const auto fi = idx.data(QFileSystemModel::FileInfoRole)
+                                        .value<QFileInfo>();
+                    if (fi.exists())
                         urls << QUrl::fromLocalFile(fi.absoluteFilePath());
-                    }
                 }
+
                 if (!urls.isEmpty()) {
-                    QMimeData *mime = new QMimeData;
-                    mime->setUrls(urls);
-                    QByteArray uriList;
-                    for (const QUrl &u : urls) {
-                        uriList += u.toString(QUrl::FullyEncoded).toUtf8();
-                        uriList += '\n';
-                    }
-                    mime->setData("text/uri-list", uriList);
-                    QApplication::clipboard()->setMimeData(mime);
+                    auto *mime = new QMimeData;
+                    mime->setUrls(urls);   // supports multiple files
+                    QGuiApplication::clipboard()->setMimeData(mime);
                 }
             } else if (chosen == deleteAction) {
                 for (const auto &fileInfo : fileInfos) {
