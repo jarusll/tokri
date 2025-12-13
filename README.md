@@ -34,3 +34,6 @@ v2025.12.02
 
 v2025.12.03
 - It looks even prettier and you can drop images now
+
+v2025.12.04
+- Handle image drops
