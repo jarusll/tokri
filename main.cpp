@@ -16,7 +16,6 @@
 #include <QAbstractItemView>
 #include <QAbstractProxyModel>
 #include <QApplication>
-#include <QDBusConnection>
 #include <QDateTime>
 #include <QFileInfo>
 #include <QFileSystemModel>
@@ -28,10 +27,10 @@
 #include <QStandardPaths>
 #include <QThread>
 #include <QVBoxLayout>
-#include <QtDBus>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QShortcut>
+#include <QLockFile>
 
 int main(int argc, char *argv[])
 {
