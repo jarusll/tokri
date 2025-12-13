@@ -3,6 +3,7 @@
 #include "filepathprovider.h"
 
 #include <QBuffer>
+#include <QImageReader>
 #include <QUuid>
 
 bool isValidHttpUrl(const QString &s)
@@ -38,6 +39,7 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         return true;
 
     if (data->hasImage()){
+        qDebug() << "Can drop image";
         return true;
     } else if (data->hasUrls()){
         return true;
@@ -62,17 +64,28 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
     Q_UNUSED(column);
     Q_UNUSED(parent);
 
-    for (const QString &fmt : data->formats()) {
-        if (fmt.startsWith("image/")) {
-            QByteArray bytes = data->data(fmt);
-            auto ptr = QSharedPointer<QByteArray>::create(bytes);
-            emit droppedImageBytes(ptr);
-            return true;
-        }
+    for (const QString &format : data->formats()) {
+        if (!format.startsWith("image/"))
+            continue;
+        if (!QImageReader::supportedMimeTypes().contains(format.toLatin1()))
+            continue;
+
+        qDebug() << "Dropping image with format:" << format;
+        QByteArray bytes = data->data(format);
+        if (bytes.isEmpty())
+            // TODO emit error
+            return false;
+        emit droppedImageBytes(bytes, format);
+        return true;
     }
 
     if (data->hasImage()) {
         const auto image = data->imageData().value<QImage>();
+        if (image.isNull()) {
+            // TODO emit error
+            return false;
+        }
+
         emit droppedImage(image);
         return true;
     }

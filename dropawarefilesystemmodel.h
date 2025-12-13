@@ -30,7 +30,8 @@ signals:
     void droppedDirectory(const QString &directory);
     void droppedUrl(const QString &url);
     void droppedImage(const QImage image);
-    void droppedImageBytes(QSharedPointer<QByteArray>);
+    void droppedImageBytes(QByteArray bytes,
+                           const QString &mimeType);
 private:
 };
 

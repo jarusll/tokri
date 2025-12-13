@@ -6,6 +6,7 @@
 #include <QBuffer>
 #include <QImage>
 #include <QImageReader>
+#include <QMimeDatabase>
 #include <QUuid>
 
 CopyWorker::CopyWorker(QObject *parent)
@@ -66,15 +67,38 @@ void CopyWorker::saveImage(const QImage &image)
     }
 }
 
-void CopyWorker::saveImageBytes(QSharedPointer<QByteArray> bytes)
-{
-    QBuffer buf(bytes.data());
-    buf.open(QIODevice::ReadOnly);
-    QImageReader reader(&buf);
-    QImage img = reader.read();
-    auto filePath = FilePathProvider::nameWithPrefix("image");
-    // TODO fix
-    img.save(filePath);
+static QByteArray mimeToFormat(const QString &mime){
+    QMimeDatabase db;
+    QMimeType mt = db.mimeTypeForName(mime);
+    const QStringList exts = mt.suffixes();
+    if (!exts.isEmpty()){
+        return exts.first().toLatin1();
+    }
+    return QByteArray();
 }
 
+void CopyWorker::saveImageBytes(const QByteArray bytes,
+                                const QString format)
+{
+    QBuffer buf;
+    buf.setData(bytes);
+    buf.open(QIODevice::ReadOnly);
 
+    QImageReader reader(&buf, format.toLatin1());
+    QImage img = reader.read();
+    if (img.isNull())
+        return;
+
+    const QString ext = "." + mimeToFormat(format);
+    qDebug() << "Ext" << ext;
+    const QString fileName = FilePathProvider::nameWithPrefix("image") + ext;
+    qDebug() << fileName;
+
+    const QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
+    const QString fullPath = QDir(rootPath).filePath(fileName);
+
+    bool status = img.save(fullPath);
+    if (!status){
+        qDebug() << "Image save failed";
+    }
+}
