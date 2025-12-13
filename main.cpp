@@ -37,7 +37,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setPalette(ThemeProvider::light());
 
-    QApplication::setStyle("Fusion");
     QLocalServer server;
     TokriWindow w;
 
