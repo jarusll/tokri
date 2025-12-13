@@ -2,11 +2,27 @@
 
 Basket for your compooter.
 
+## Building
+
+### Prerequisites
+Since this read `/dev/input/*` you need to be part of `input` group.
+```bash
+sudo usermod -aG input $USER
+```
+Note: Please log out and log back in for the group changes to take effect.
+
+### Build
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
 ## TODO
 - Offer drag with multiple formats
 - Free up gui thread from sending Image
 - Add items from clipboard
 - Tray icon
+- Accept clipboard contents
 
 ## Logs
 MVP
