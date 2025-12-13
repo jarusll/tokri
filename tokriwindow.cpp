@@ -211,6 +211,33 @@ void TokriWindow::init()
     }
 }
 
+// TODO cleanup duplication
+void TokriWindow::handlePaste(const QMimeData *mime)
+{
+    if (mime->hasUrls())
+    {
+        for (const QUrl &u : mime->urls())
+        {
+            if (u.isLocalFile())
+                qDebug() << "Local file paste not yet implemented:" << u.toLocalFile();
+            else
+                qDebug() << "Remote URL paste not yet implemented:" << u.toString();
+        }
+        return;
+    }
+
+    if (mime->hasImage())
+    {
+        qDebug() << "Image paste not yet implemented.";
+        return;
+    }
+
+    if (mime->hasText())
+    {
+        qDebug() << "Text paste not yet implemented.";
+    }
+}
+
 void TokriWindow::onShakeDetect()
 {
     wakeUp();

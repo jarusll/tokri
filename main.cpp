@@ -32,6 +32,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QShortcut>
+#include <QClipboard>
 
 int main(int argc, char *argv[])
 {
@@ -199,6 +200,17 @@ int main(int argc, char *argv[])
                 }
             }
         });
+
+    auto pasteAction = new QAction(&w);
+    pasteAction->setShortcut(QKeySequence::Paste);
+    TokriWindow::connect(
+        pasteAction,
+        &QAction::triggered,
+        &w,
+        [&w] {
+            w.handlePaste(QGuiApplication::clipboard()->mimeData());
+        });
+    w.addAction(pasteAction);
 
     auto SleepShortcut = new QShortcut(QKeySequence("Escape"), &w);
     SleepShortcut->setContext(Qt::WindowShortcut);

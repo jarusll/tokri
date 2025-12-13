@@ -29,7 +29,8 @@ public:
     void setDropping(bool status);
 
     void init();
-
+    
+    void handlePaste(const QMimeData *);
 public slots:
     void onShakeDetect();
 
