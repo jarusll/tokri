@@ -15,15 +15,16 @@ public:
 
     explicit FilePathProvider(QObject *parent = nullptr);
 
-    static QString nameFromText(const QString &text){
+    static QString nameFromText(const QString &text) {
         QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
-        QString fileNameBase = text.left(80);
-        // FIXME this should be declared once
+        QString fileNameBase = text.trimmed().left(80);
+
         static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
         fileNameBase.replace(forbidden, "_");
-        while (fileNameBase.startsWith("_")) fileNameBase.remove(0, 1);
-        while (fileNameBase.endsWith("_")) fileNameBase.chop(1);
+        fileNameBase = fileNameBase.trimmed();
+        fileNameBase.remove(QRegularExpression(R"(^_+|_+$)"));
         fileNameBase.append(".txt");
+
         return QDir(rootPath).filePath(fileNameBase);
     }
 
