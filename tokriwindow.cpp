@@ -1,6 +1,7 @@
 #include "tokriwindow.h"
 #include "./ui_tokriwindow.h"
 #include "standardpaths.h"
+#include "listitemdelegate.h"
 #include <QDir>
 #include <QMenu>
 #include <QDesktopServices>
@@ -21,6 +22,8 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
+
+    ui->listView->setItemDelegate(new ListItemDelegate(ui->listView));
 
     ui->listView->setDropIndicatorShown(false);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
