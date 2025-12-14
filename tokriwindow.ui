@@ -41,6 +41,9 @@
       <property name="selectionMode">
        <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
       </property>
+      <property name="textElideMode">
+       <enum>Qt::TextElideMode::ElideMiddle</enum>
+      </property>
       <property name="resizeMode">
        <enum>QListView::ResizeMode::Adjust</enum>
       </property>
