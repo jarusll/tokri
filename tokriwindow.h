@@ -1,6 +1,8 @@
 #ifndef TOKRIWINDOW_H
 #define TOKRIWINDOW_H
 
+#include "closebutton.h"
+
 #include <QListView>
 #include <QMainWindow>
 #include <QDragEnterEvent>
@@ -28,6 +30,13 @@ public:
     void paintEvent(QPaintEvent *);
     void setDropping(bool status);
 
+    void resizeEvent(QResizeEvent *e)
+    {
+        QMainWindow::resizeEvent(e);
+        const int m = 8;
+        mCloseButton->move(width() - mCloseButton->width() - m, m);
+    }
+
     void init();
 
 public slots:
@@ -36,5 +45,6 @@ public slots:
 private:
     Ui::TokriWindow *ui;
     bool mDropping = false;
+    CloseButton *mCloseButton;
 };
 #endif // TOKRIWINDOW_H

@@ -2,6 +2,7 @@
 #include "./ui_tokriwindow.h"
 #include "standardpaths.h"
 #include "listitemdelegate.h"
+#include "closebutton.h"
 #include <QDir>
 #include <QMenu>
 #include <QDesktopServices>
@@ -19,6 +20,23 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
+
+    mCloseButton = new CloseButton(this);
+    mCloseButton->setParent(this);
+    mCloseButton->raise();
+
+    auto placeClose = [this] {
+        const int m = 8;
+        mCloseButton->move(width() - mCloseButton->width() - m, m);
+    };
+    connect(
+        mCloseButton,
+        &QAbstractButton::clicked,
+        this,
+        &TokriWindow::sleep
+        );
+
+    placeClose();
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
