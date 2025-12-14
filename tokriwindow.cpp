@@ -16,7 +16,7 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     ui->setupUi(this);
 
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Window);
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
