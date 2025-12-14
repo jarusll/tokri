@@ -31,15 +31,30 @@
 #include <QLocalSocket>
 #include <QShortcut>
 #include <QLockFile>
+#include <QSystemTrayIcon>
+#include <QMenu>
+#include <QAction>
+#include <QMenu>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    a.setPalette(ThemeProvider::light());
+    QIcon icon = QApplication::style()
+                     ->standardIcon(QStyle::SP_ComputerIcon);
+    auto *tray = new QSystemTrayIcon(icon, &a);
+    tray->setToolTip("Tokri - Running");
 
     QLocalServer server;
     TokriWindow w;
+
+    auto *menu = new QMenu();
+    menu->addAction("Show", &w, &TokriWindow::wakeUp);
+    menu->addAction("Quit", &a, &QCoreApplication::quit);
+
+    tray->setContextMenu(menu);
+    tray->show();
+    a.setPalette(ThemeProvider::light());
 
     // Single Instance
     const QString lockPath =
