@@ -28,7 +28,7 @@ cmake --build build
 - Offer drag with multiple formats
 - Free up gui thread from sending Image
 - Add items from clipboard
-- Tray icon
+- Tray icon and hide window from alt tab
 - Accept clipboard contents
 - Find(is this even needed)?
 
