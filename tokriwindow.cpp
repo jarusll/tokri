@@ -190,7 +190,7 @@ void TokriWindow::paintEvent(QPaintEvent *)
     pen.setWidth(2);
     p.setBrush(Qt::NoBrush);
     p.setPen(pen);
-    p.drawRoundedRect(r, 10, 10);
+    p.drawRoundedRect(r, 16, 16);
 }
 
 void TokriWindow::setDropping(bool status)
