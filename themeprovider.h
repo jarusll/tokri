@@ -14,27 +14,27 @@ public:
         // Backgrounds
         pal.setColor(QPalette::Window,        QColor("#FFFFFF"));
         pal.setColor(QPalette::Base,          QColor("#FFFFFF"));
-        pal.setColor(QPalette::AlternateBase, QColor("#F7F7F7"));
-        pal.setColor(QPalette::Button,        QColor("#F3F3F3"));
+        pal.setColor(QPalette::AlternateBase, QColor("#F2F0F7"));
+        pal.setColor(QPalette::Button,        QColor("#E7E4ED"));
 
         // Text
         pal.setColor(QPalette::WindowText,    QColor("#000000"));
         pal.setColor(QPalette::Text,          QColor("#000000"));
         pal.setColor(QPalette::ButtonText,    QColor("#000000"));
-        pal.setColor(QPalette::PlaceholderText, QColor("#6D6D6D"));
+        pal.setColor(QPalette::PlaceholderText, QColor("#615C6D"));
         pal.setColor(QPalette::BrightText,    QColor("#FFFFFF"));
 
         // Borders
         pal.setColor(QPalette::Light,         QColor("#FFFFFF"));
-        pal.setColor(QPalette::Midlight,      QColor("#D9D9D9"));
-        pal.setColor(QPalette::Mid,           QColor("#CCCCCC"));
-        pal.setColor(QPalette::Dark,          QColor("#A6A6A6"));
-        pal.setColor(QPalette::Shadow,        QColor("#D1D1D1"));
+        pal.setColor(QPalette::Midlight,      QColor("#CFCAD9"));
+        pal.setColor(QPalette::Mid,           QColor("#B7B1C4"));
+        pal.setColor(QPalette::Dark,          QColor("#948CA3"));
+        pal.setColor(QPalette::Shadow,        QColor("#C4BECF"));
 
         // Selection
-        pal.setColor(QPalette::Highlight,     QColor("#CCE8FF"));
+        pal.setColor(QPalette::Highlight,     QColor("#D8CBF2"));
         pal.setColor(QPalette::HighlightedText, QColor("#000000"));
-        pal.setColor(QPalette::Accent,        QColor("#0078D4"));
+        pal.setColor(QPalette::Accent,        QColor("#7537F1"));
 
         // Links
         pal.setColor(QPalette::Link,          QColor("#005FB8"));
