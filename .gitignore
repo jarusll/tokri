@@ -86,3 +86,4 @@ CMakeLists.txt.user*
 
 # output
 AppDir/
+*.AppImage
