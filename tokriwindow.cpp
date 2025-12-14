@@ -22,6 +22,7 @@ TokriWindow::TokriWindow(QWidget *parent)
     // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
 
+    ui->listView->setDropIndicatorShown(false);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->listView, &QWidget::customContextMenuRequested, this, [this](const QPoint &pos){
         QModelIndex index = ui->listView->indexAt(pos);
@@ -172,25 +173,31 @@ void TokriWindow::wakeUp()
 void TokriWindow::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
+    p.setRenderHint(QPainter::Antialiasing, true);
 
-    const QRect r = rect().adjusted(1, 1, -1, -1);
+    const QRectF r = QRectF(rect()).adjusted(2.0, 2.0, -2.0, -2.0);
 
-    // fill background
+    // background
     p.setPen(Qt::NoPen);
     p.setBrush(palette().color(QPalette::Window));
-    p.drawRoundedRect(r, 10, 10);
+    p.drawRoundedRect(r, 16.0, 16.0);
 
-    // border stroke
-    auto color = palette().color(QPalette::Shadow);
-    if (mDropping){
-        color = palette().color(QPalette::Accent);
-    }
+    // border / drop indicator
+    QColor color = palette().color(
+        mDropping ? QPalette::Accent : QPalette::Shadow
+        );
+
     QPen pen(color);
-    pen.setWidth(2);
+    pen.setWidthF(2.0);
+    if (mDropping){
+        pen.setWidthF(8.0);
+    }
+    pen.setJoinStyle(Qt::RoundJoin);
+    pen.setCapStyle(Qt::RoundCap);
+
     p.setBrush(Qt::NoBrush);
     p.setPen(pen);
-    p.drawRoundedRect(r, 16, 16);
+    p.drawRoundedRect(r, 16.0, 16.0);
 }
 
 void TokriWindow::setDropping(bool status)
