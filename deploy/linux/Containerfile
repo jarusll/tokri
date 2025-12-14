@@ -1,0 +1,22 @@
+FROM debian:13
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt install -y \
+  build-essential \
+  cmake \
+  git \
+  wget \
+  patchelf \
+  file \
+  squashfs-tools \
+  pkg-config \
+  qt6-base-dev \
+  qt6-tools-dev \
+  qt6-tools-dev-tools \
+  qt6-wayland \
+  libwayland-client0 \
+  libxkbcommon0 \
+  libgl1-mesa-dev \
+  libegl1-mesa-dev
+
