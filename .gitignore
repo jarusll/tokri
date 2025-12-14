@@ -87,3 +87,4 @@ CMakeLists.txt.user*
 # output
 AppDir/
 *.AppImage
+squashfs-root/
