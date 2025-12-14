@@ -83,3 +83,6 @@ CMakeLists.txt.user*
 
 # vscode
 .vscode/
+
+# output
+AppDir/
