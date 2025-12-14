@@ -45,7 +45,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         README.md
         sortfilterproxy.h sortfilterproxy.cpp
         nointernaldraglistview.h nointernaldraglistview.cpp
-        StandardNames.h
+        standardnames.h
         horizontalshakedetector.h horizontalshakedetector.cpp
         themeprovider.h themeprovider.cpp
         remoteurldrophandler.h remoteurldrophandler.cpp

@@ -1,5 +1,5 @@
 #include "standardpaths.h"
-#include "StandardNames.h"
+#include "standardnames.h"
 
 #include <QStandardPaths>
 

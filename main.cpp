@@ -6,11 +6,11 @@
 #include "sortfilterproxy.h"
 #include "ui_tokriwindow.h"
 #include "remoteurldrophandler.h"
+#include "standardnames.h"
+#include "standardpaths.h"
 
 #ifdef Q_OS_LINUX
-#include "StandardNames.h"
 #include "linuxmouseinterceptor.h"
-#include "standardpaths.h"
 #endif
 
 #include <QAbstractItemView>
@@ -35,6 +35,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     a.setPalette(ThemeProvider::light());
 
     QLocalServer server;
