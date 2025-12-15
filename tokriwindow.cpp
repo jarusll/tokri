@@ -9,7 +9,10 @@
 #include <QFileSystemModel>
 #include <QApplication>
 #include <QClipboard>
+
+#ifdef Q_OS_WIN
 #include <windows.h>
+#endif
 
 TokriWindow::TokriWindow(QWidget *parent)
     : QMainWindow(parent)

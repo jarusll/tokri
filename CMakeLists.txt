@@ -34,6 +34,14 @@ if (UNIX AND NOT APPLE)
     )
 endif()
 
+set(WINDOWS_SOURCES "")
+if (WIN32)
+    list(APPEND WINDOWS_SOURCES
+        windowsmouseinterceptor.h
+        windowsmouseinterceptor.cpp
+    )
+endif()
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Tokri
         MANUAL_FINALIZATION
@@ -51,13 +59,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         horizontalshakedetector.h horizontalshakedetector.cpp
         themeprovider.h themeprovider.cpp
         remoteurldrophandler.h remoteurldrophandler.cpp
-
-        ${LINUX_SOURCES}
         standardpaths.h standardpaths.cpp
         draghandle.h draghandle.cpp
         listitemdelegate.h listitemdelegate.cpp
         closebutton.h closebutton.cpp
-        windowsmouseinterceptor.h windowsmouseinterceptor.cpp
+
+        ${LINUX_SOURCES}
+        ${WINDOWS_SOURCES}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Tokri APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

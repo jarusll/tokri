@@ -8,7 +8,10 @@
 #include "remoteurldrophandler.h"
 #include "standardnames.h"
 #include "standardpaths.h"
+
+#ifdef Q_OS_WIN
 #include "windowsmouseinterceptor.h"
+#endif
 
 #ifdef Q_OS_LINUX
 #include "linuxmouseinterceptor.h"
