@@ -3,6 +3,7 @@
 #include "standardpaths.h"
 #include "listitemdelegate.h"
 #include "closebutton.h"
+#include "themeprovider.h"
 #include <QDir>
 #include <QMenu>
 #include <QDesktopServices>
@@ -54,6 +55,7 @@ TokriWindow::TokriWindow(QWidget *parent)
         auto selected = ui->listView->selectionModel()->selectedIndexes();
         int count = selected.size();
         QMenu menu;
+        menu.setPalette(ThemeProvider::light());
         QAction *openAction = nullptr;
         QAction *openLinkAction = nullptr;
         QAction *revealAction = nullptr;

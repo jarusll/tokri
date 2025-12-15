@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     auto *menu = new QMenu();
     menu->addAction("Show", &w, &TokriWindow::wakeUp);
     menu->addAction("Quit", &a, &QCoreApplication::quit);
+    menu->setPalette(ThemeProvider::light());
 
     tray->setContextMenu(menu);
     tray->show();
