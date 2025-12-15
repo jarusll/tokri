@@ -124,3 +124,14 @@ target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+install(TARGETS Tokri RUNTIME DESTINATION bin)
+install(
+  FILES deploy/linux/oneman.jarusll.Tokri.png
+  DESTINATION share/icons/hicolor/256x256/apps
+)
+install(
+  FILES deploy/linux/oneman.jarusll.Tokri.desktop
+  DESTINATION share/applications
+)
+
