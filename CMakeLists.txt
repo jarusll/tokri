@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-include(FetchContent)
+# include(FetchContent)
 
 project(Tokri VERSION 0.1 LANGUAGES CXX)
 
@@ -16,8 +16,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -46,13 +44,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Tokri
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+
         dropawarefilesystemmodel.h dropawarefilesystemmodel.cpp
         drophandler.h drophandler.cpp
-
         textfile.h textfile.cpp
         filepathprovider.h filepathprovider.cpp
         copyworker.h copyworker.cpp
-        README.md
         sortfilterproxy.h sortfilterproxy.cpp
         nointernaldraglistview.h nointernaldraglistview.cpp
         standardnames.h
@@ -120,18 +117,16 @@ target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-install(TARGETS Tokri RUNTIME DESTINATION bin)
-install(
-  FILES deploy/linux/oneman.jarusll.Tokri.png
-  DESTINATION share/icons/hicolor/256x256/apps
-)
-install(
-  FILES deploy/linux/oneman.jarusll.Tokri.desktop
-  DESTINATION share/applications
-)
-
+if(UNIX AND NOT APPLE)
+        install(
+          FILES deploy/linux/oneman.jarusll.Tokri.png
+          DESTINATION share/icons/hicolor/256x256/apps
+        )
+        install(
+          FILES deploy/linux/oneman.jarusll.Tokri.desktop
+          DESTINATION share/applications
+        )
+endif()
