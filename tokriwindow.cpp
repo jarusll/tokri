@@ -179,7 +179,6 @@ void TokriWindow::sleep()
 {
     showMinimized();
 }
-
 void TokriWindow::wakeUp()
 {
     if (isMinimized())
@@ -192,11 +191,16 @@ void TokriWindow::wakeUp()
     activateWindow();
 
 #ifdef Q_OS_WIN
+    // wtf is this??????
     HWND hWnd = reinterpret_cast<HWND>(winId());
+    DWORD fgThread = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
+    DWORD thisThread = GetCurrentThreadId();
+    AttachThreadInput(thisThread, fgThread, TRUE);
     SetForegroundWindow(hWnd);
     SetFocus(hWnd);
     SetActiveWindow(hWnd);
-    FlashWindow(hWnd, TRUE); // optional: visually notify user
+    AttachThreadInput(thisThread, fgThread, FALSE);
+    FlashWindow(hWnd, TRUE);
 #endif
 }
 
