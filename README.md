@@ -28,7 +28,6 @@ cmake --build build
 - Offer drag with multiple formats
 - Free up gui thread from sending Image
 - Add items from clipboard
-- Tray icon and hide window from alt tab
 - Accept clipboard contents
 - Find(is this even needed)?
 
@@ -47,4 +46,4 @@ v2025.12.04
 - Handle image drops
 
 v2025.12.04
-- It works on Michaelsoft Binbows 
+- It works on Michaelsoft Binbows
