@@ -10,6 +10,7 @@ finish-args:
   - --device=dri
   - --socket=session-bus
   - --device=input
+  - --filesystem=home
 modules:
   - name: Tokri
     buildsystem: cmake-ninja
