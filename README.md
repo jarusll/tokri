@@ -45,3 +45,6 @@ v2025.12.03
 
 v2025.12.04
 - Handle image drops
+
+v2025.12.04
+- It works on Michaelsoft Binbows 
