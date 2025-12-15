@@ -25,11 +25,12 @@ cmake --build build
 ```
 
 ## TODO
+- Spawn near cursor(Impossible on wayland it seems)
 - Offer drag with multiple formats
 - Free up gui thread from sending Image
 - Add items from clipboard
 - Accept clipboard contents
-- Find(is this even needed)?
+- Search(is this even needed)?
 
 ## Logs
 MVP
