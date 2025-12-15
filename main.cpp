@@ -8,6 +8,7 @@
 #include "remoteurldrophandler.h"
 #include "standardnames.h"
 #include "standardpaths.h"
+#include "windowsmouseinterceptor.h"
 
 #ifdef Q_OS_LINUX
 #include "linuxmouseinterceptor.h"
@@ -233,7 +234,27 @@ int main(int argc, char *argv[])
         &TokriWindow::wakeUp
         );
 #endif
+#ifdef Q_OS_WIN
+    WindowsMouseInterceptor *interceptor = new WindowsMouseInterceptor;
+    interceptor->start();
+
+    QObject::connect(
+        interceptor,
+        &WindowsMouseInterceptor::shakeDetected,
+        &w,
+        &TokriWindow::wakeUp,
+        Qt::QueuedConnection
+        );
+#endif
 
     w.show();
-    return a.exec();
+    int ret = a.exec();
+
+#ifdef Q_OS_WIN
+    interceptor->quit();   // stop the event loop inside the thread
+    interceptor->wait();   // wait for thread to finish
+    delete interceptor;
+#endif
+
+    return ret;
 }

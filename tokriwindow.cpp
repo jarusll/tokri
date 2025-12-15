@@ -9,6 +9,7 @@
 #include <QFileSystemModel>
 #include <QApplication>
 #include <QClipboard>
+#include <windows.h>
 
 TokriWindow::TokriWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -189,6 +190,14 @@ void TokriWindow::wakeUp()
 
     raise();
     activateWindow();
+
+#ifdef Q_OS_WIN
+    HWND hWnd = reinterpret_cast<HWND>(winId());
+    SetForegroundWindow(hWnd);
+    SetFocus(hWnd);
+    SetActiveWindow(hWnd);
+    FlashWindow(hWnd, TRUE); // optional: visually notify user
+#endif
 }
 
 void TokriWindow::paintEvent(QPaintEvent *)
