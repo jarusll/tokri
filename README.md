@@ -21,6 +21,11 @@
 >
 > Log out and log back in for the change to take effect.
 
+> **Note for KDE users**
+>
+> Run the application under **XWayland**, as mouse activation gestures do not work on native Wayland.
+
+
 ## Building for Linux
 
 #### Dependencies
@@ -40,3 +45,6 @@ cmake --build build
 - Add items from clipboard
 - Accept clipboard contents
 - Search(is this even needed)?
+
+## Acknowledgements
+- 🎨 Design by [Akshay Majgaonkar](https://www.linkedin.com/in/akshay-majgaonkar/)
