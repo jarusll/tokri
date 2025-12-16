@@ -87,5 +87,7 @@ CMakeLists.txt.user*
 # output
 AppDir/
 *.AppImage
+*.flatpak
 squashfs-root/
 .flatpak-builder/
+repo/
