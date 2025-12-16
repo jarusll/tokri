@@ -30,6 +30,13 @@ TokriWindow::TokriWindow(QWidget *parent)
     mCloseButton->setParent(this);
     mCloseButton->raise();
 
+    ui->listView->setStyleSheet(R"(
+        QListView {
+            padding-left: 8px;
+        }
+    )");
+
+
     auto placeClose = [this] {
         const int m = 8;
         mCloseButton->move(width() - mCloseButton->width() - m, m);
