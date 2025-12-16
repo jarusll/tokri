@@ -30,12 +30,7 @@ public:
     void paintEvent(QPaintEvent *);
     void setDropping(bool status);
 
-    void resizeEvent(QResizeEvent *e)
-    {
-        QMainWindow::resizeEvent(e);
-        const int m = 8;
-        mCloseButton->move(width() - mCloseButton->width() - m, m);
-    }
+    void resizeEvent(QResizeEvent *e);
 
     void init();
 

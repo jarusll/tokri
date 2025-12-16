@@ -245,6 +245,13 @@ void TokriWindow::setDropping(bool status)
     update();
 }
 
+void TokriWindow::resizeEvent(QResizeEvent *e)
+{
+    QMainWindow::resizeEvent(e);
+    const int m = 8;
+    mCloseButton->move(width() - mCloseButton->width() - m, m);
+}
+
 void TokriWindow::init()
 {
     QString tokriDir = StandardPaths::getPath(StandardPaths::TokriDir);
