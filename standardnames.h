@@ -17,9 +17,9 @@ public:
         case Directory:
             return "Tokri";
         case LockFile:
-            return "oneman.jarusll.Tokri.lock";
+            return "net.surajyadav.Tokri.lock";
         case LocalServer:
-            return "oneman.jarusll.Tokri.ipc";
+            return "net.surajyadav.Tokri.ipc";
         default:
             return "";
         }
