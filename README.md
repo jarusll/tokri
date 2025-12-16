@@ -7,8 +7,8 @@
 > Tokri is a desktop basket to drop text, images, and files—hold them temporarily and drag them out when needed.
 
 ## Download
-- Linux — Flatpak
-- Windows — Portable `.zip`
+- Linux —  [Flatpak](https://github.com/jarusll/tokri/releases/download/v2025.12.07/Tokri.flatpak)
+- Windows — [Portable Zip](https://github.com/jarusll/tokri/releases/download/v2025.12.07/Tokri.zip)
 
 > **Note for Linux users**
 >
