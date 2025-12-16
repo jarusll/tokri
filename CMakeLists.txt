@@ -122,11 +122,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(UNIX AND NOT APPLE)
         install(
-          FILES deploy/linux/oneman.jarusll.Tokri.png
+          FILES net.surajyadav.Tokri.png
           DESTINATION share/icons/hicolor/256x256/apps
         )
         install(
-          FILES deploy/linux/oneman.jarusll.Tokri.desktop
+          FILES net.surajyadav.Tokri.desktop
           DESTINATION share/applications
         )
 endif()

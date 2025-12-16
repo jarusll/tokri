@@ -2,7 +2,7 @@
 Type=Application
 Name=Tokri
 Exec=Tokri
-Icon=oneman.jarusll.Tokri
+Icon=net.surajyadav.Tokri
 Categories=Utility;
 Terminal=false
 StartupWMClass=Tokri

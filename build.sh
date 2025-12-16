@@ -1,13 +1,24 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-APP_ID=oneman.jarusll.Tokri
-MANIFEST=$APP_ID.yml
-BUILD_DIR=build-flatpak
+APP_ID="net.surajyadav.Tokri"
+MANIFEST="${APP_ID}.yml"
+BUILD_DIR="build-flatpak"
+REPO_DIR="repo"
+BUNDLE="${APP_ID}.flatpak"
+BRANCH="stable"
+
+rm -rf "${BUILD_DIR}" "${REPO_DIR}" "${BUNDLE}"
 
 flatpak-builder \
   --force-clean \
-  --user \
-  --install \
-  "$BUILD_DIR" \
-  "$MANIFEST"
+  --default-branch="${BRANCH}" \
+  --repo="${REPO_DIR}" \
+  "${BUILD_DIR}" \
+  "${MANIFEST}"
+
+flatpak build-bundle \
+  "${REPO_DIR}" \
+  "${BUNDLE}" \
+  "${APP_ID}" \
+  "${BRANCH}"
