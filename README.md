@@ -1,17 +1,27 @@
+<img src="net.surajyadav.Tokri.png" width="128" height="128" alt="Tokri icon">
+
 # Tokri
 
-Basket for your computer.
+![](./demo.gif)
 
-> **Note**
+> Tokri is a desktop basket to drop text, images, and files—hold them temporarily and drag them out when needed.
+
+## Download
+- Linux — Flatpak
+- Windows — Portable `.zip`
+
+> **Note for Linux users**
 >
-> This application reads from `/dev/input/*`.
+> This application reads from `/dev/input/*` to detect mouse activation gestures.
 > Add your user to the `input` group:
+>
 > ```bash
 > sudo usermod -aG input $USER
 > ```
+>
 > Log out and log back in for the change to take effect.
 
-## Building
+## Building for Linux
 
 #### Dependencies
 - qt6-base
