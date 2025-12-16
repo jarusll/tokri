@@ -1,7 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/sh
 set -e
 
-rm -rf build
+APP_ID=oneman.jarusll.Tokri
+MANIFEST=$APP_ID.yml
+BUILD_DIR=build-flatpak
 
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+flatpak-builder \
+  --force-clean \
+  --user \
+  --install \
+  "$BUILD_DIR" \
+  "$MANIFEST"
