@@ -43,23 +43,13 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setPalette(ThemeProvider::light());
 
     QIcon icon = QApplication::style()
                      ->standardIcon(QStyle::SP_ComputerIcon);
-    auto *tray = new QSystemTrayIcon(icon, &a);
-    tray->setToolTip("Tokri - Running");
 
     QLocalServer server;
     TokriWindow w;
-
-    auto *menu = new QMenu();
-    menu->addAction("Show", &w, &TokriWindow::wakeUp);
-    menu->addAction("Quit", &a, &QCoreApplication::quit);
-    menu->setPalette(ThemeProvider::light());
-
-    tray->setContextMenu(menu);
-    tray->show();
-    a.setPalette(ThemeProvider::light());
 
     // Single Instance
     const QString lockPath =
@@ -95,6 +85,15 @@ int main(int argc, char *argv[])
     //         [&w](bool on){
     //             w.uiHandle()->searchBar->setVisible(on);
     //         });
+
+    auto *tray = new QSystemTrayIcon(icon, &a);
+    tray->setToolTip("Tokri - Running");
+    auto *menu = new QMenu();
+    menu->addAction("Show", &w, &TokriWindow::wakeUp);
+    menu->addAction("Quit", &a, &QCoreApplication::quit);
+    menu->setPalette(ThemeProvider::light());
+    tray->setContextMenu(menu);
+    tray->show();
 
     QAction *deleteAction = new QAction(&w);
     deleteAction->setShortcut(QKeySequence::Delete);
