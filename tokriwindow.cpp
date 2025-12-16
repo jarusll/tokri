@@ -219,7 +219,7 @@ void TokriWindow::paintEvent(QPaintEvent *)
     // background
     p.setPen(Qt::NoPen);
     p.setBrush(palette().color(QPalette::Window));
-    p.drawRoundedRect(r, 16.0, 16.0);
+    p.drawRoundedRect(r, 8.0, 8.0);
 
     // border / drop indicator
     QColor color = palette().color(
@@ -236,7 +236,7 @@ void TokriWindow::paintEvent(QPaintEvent *)
 
     p.setBrush(Qt::NoBrush);
     p.setPen(pen);
-    p.drawRoundedRect(r, 16.0, 16.0);
+    p.drawRoundedRect(r, 8.0, 8.0);
 }
 
 void TokriWindow::setDropping(bool status)
