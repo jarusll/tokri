@@ -45,8 +45,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setPalette(ThemeProvider::light());
 
-    QIcon icon = QApplication::style()
-                     ->standardIcon(QStyle::SP_ComputerIcon);
+    QIcon icon(":/tray.png");
 
     QLocalServer server;
     TokriWindow w;
