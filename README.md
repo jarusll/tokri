@@ -1,6 +1,6 @@
 # Tokri
 
-Basket for your Linux computer.
+Basket for your computer.
 
 > **Note**
 >
@@ -14,9 +14,7 @@ Basket for your Linux computer.
 ## Building
 
 #### Dependencies
-- qt6
-- cmake
-- gcc/g++
+- qt6-base
 
 ### Build
 ```bash
@@ -26,25 +24,9 @@ cmake --build build
 
 ## TODO
 - Spawn near cursor(Impossible on wayland it seems)
+- Move mode for drag out
 - Offer drag with multiple formats
 - Free up gui thread from sending Image
 - Add items from clipboard
 - Accept clipboard contents
 - Search(is this even needed)?
-
-## Logs
-MVP
-v2025.12.01-alpha.1
-- I can drop files/directories/text
-
-v2025.12.02
-- It looks pretty
-
-v2025.12.03
-- It looks even prettier and you can drop images now
-
-v2025.12.04
-- Handle image drops
-
-v2025.12.04
-- It works on Michaelsoft Binbows
