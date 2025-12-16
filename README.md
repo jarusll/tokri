@@ -37,6 +37,9 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
+## Acknowledgements
+- 🎨 Design by [Akshay Majgaonkar](https://www.linkedin.com/in/akshay-majgaonkar/)
+
 ## TODO
 - Spawn near cursor(Impossible on wayland it seems)
 - Move mode for drag out
@@ -45,6 +48,3 @@ cmake --build build
 - Add items from clipboard
 - Accept clipboard contents
 - Search(is this even needed)?
-
-## Acknowledgements
-- 🎨 Design by [Akshay Majgaonkar](https://www.linkedin.com/in/akshay-majgaonkar/)
