@@ -2,9 +2,16 @@
 
 # Tokri
 
-![](./assets/demo.gif)
+> A desktop basket to drag and drop text, URLs, images, and files.
 
-> Tokri is a desktop basket where you drag and drop text, images, and files.
+## Files
+![](./assets/files.gif)
+
+## Images
+![](./assets/image.gif)
+
+## Text & URLs
+![](./assets/text.gif)
 
 ## Download
 - Linux —  [Flatpak](https://github.com/jarusll/tokri/releases/download/v2025.12.08/Tokri.flatpak)
