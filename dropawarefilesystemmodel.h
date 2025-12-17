@@ -23,6 +23,7 @@ public:
                       const QModelIndex &parent) override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QMimeData* mimeData(const QModelIndexList &indexes) const override;
+    Qt::DropActions supportedDragActions() const override;
 
 signals:
     void droppedText(const QString &text);
@@ -32,7 +33,6 @@ signals:
     void droppedImage(const QImage image);
     void droppedImageBytes(QByteArray bytes,
                            const QString &mimeType);
-private:
 };
 
 #endif // DROPAWAREFILESYSTEMMODEL_H

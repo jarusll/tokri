@@ -1,7 +1,6 @@
 #include "dropawarefilesystemmodel.h"
 
-#include "filepathprovider.h"
-
+#include <QApplication>
 #include <QBuffer>
 #include <QImageReader>
 #include <QUuid>
@@ -10,9 +9,9 @@ bool isValidHttpUrl(const QString &s)
 {
     QUrl u(s, QUrl::StrictMode);
     return u.isValid()
-       && !u.scheme().isEmpty()
-       && (u.scheme() == "http" || u.scheme() == "https")
-       && !u.host().isEmpty();
+           && !u.scheme().isEmpty()
+           && (u.scheme() == "http" || u.scheme() == "https")
+           && !u.host().isEmpty();
 }
 
 DropAwareFileSystemModel::DropAwareFileSystemModel(QObject *parent)
@@ -53,7 +52,7 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         row,
         column,
         parent
-    );
+        );
 }
 
 bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
@@ -128,7 +127,7 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
         row,
         column,
         parent
-    );
+        );
 }
 
 QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) const
@@ -193,4 +192,10 @@ QMimeData* DropAwareFileSystemModel::mimeData(const QModelIndexList &indexes) co
         }
     }
     return mime;
+}
+
+Qt::DropActions DropAwareFileSystemModel::supportedDragActions() const {
+    return (QApplication::keyboardModifiers() & Qt::ControlModifier)
+               ? Qt::CopyAction
+               : Qt::MoveAction;
 }
