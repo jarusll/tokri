@@ -4,6 +4,9 @@
 
 > A desktop basket to drag and drop text, URLs, images, and files.
 
+- Drag items **out** to move them
+- Hold **Ctrl** while dragging out to **copy** instead
+
 ## Files
 ![](./assets/files.gif)
 
