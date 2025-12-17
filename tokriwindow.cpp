@@ -59,6 +59,7 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     ui->listView->setItemDelegate(new ListItemDelegate(ui->listView));
 
+    ui->listView->setMouseTracking(true);
     ui->listView->setFocusPolicy(Qt::NoFocus);
     ui->listView->setDropIndicatorShown(false);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
