@@ -10,6 +10,7 @@
 #include <QFileSystemModel>
 #include <QApplication>
 #include <QClipboard>
+#include "sleekscrollbar.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -52,6 +53,9 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
     ui->searchBar->setVisible(false);
+
+
+    ui->listView->setVerticalScrollBar(new SleekScrollBar(Qt::Vertical, ui->listView));
 
     ui->listView->setItemDelegate(new ListItemDelegate(ui->listView));
 

@@ -38,7 +38,6 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
-#include <QMenu>
 
 int main(int argc, char *argv[])
 {
