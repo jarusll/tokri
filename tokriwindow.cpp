@@ -59,6 +59,21 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     ui->listView->setItemDelegate(new ListItemDelegate(ui->listView));
 
+    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    connect(ui->listView, &QListView::doubleClicked,
+            this, [](const QModelIndex &idx){
+                if (!idx.isValid())
+                    return;
+
+                const QString filePath =
+                    idx.data(QFileSystemModel::FileInfoRole)
+                        .value<QFileInfo>()
+                        .filePath();
+
+                QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+            });
+
     ui->listView->setMouseTracking(true);
     ui->listView->setFocusPolicy(Qt::NoFocus);
     ui->listView->setDropIndicatorShown(false);
