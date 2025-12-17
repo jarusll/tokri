@@ -12,3 +12,6 @@ v2025.12.04
 
 v2025.12.04
 - It works on Michaelsoft Binbows
+
+v2025.12.07
+- Official release
