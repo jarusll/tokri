@@ -23,7 +23,7 @@
 
 > **Note for KDE users**
 >
-> Run the application under **XWayland**, as mouse activation gestures do not work on native Wayland.
+> Run the application under **XWayland**, as mouse activation gestures do not work on native Wayland for KDE specifically.
 
 
 ## Building for Linux
