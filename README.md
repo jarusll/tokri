@@ -47,3 +47,5 @@ cmake --build build
 - Add items from clipboard
 - Accept clipboard contents
 - Search(is this even needed)?
+- Placeholder text and Image
+- Item count
