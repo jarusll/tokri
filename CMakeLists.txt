@@ -18,25 +18,25 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
-        main.cpp
-        tokriwindow.cpp
-        tokriwindow.h
-        tokriwindow.ui
+        src/main.cpp
+        src/tokriwindow.cpp
+        src/tokriwindow.h
+        src/tokriwindow.ui
 )
 
 set(LINUX_SOURCES "")
 if (UNIX AND NOT APPLE)
     list(APPEND LINUX_SOURCES
-        linuxmouseinterceptor.h
-        linuxmouseinterceptor.cpp
+        src/linuxmouseinterceptor.h
+        src/linuxmouseinterceptor.cpp
     )
 endif()
 
 set(WINDOWS_SOURCES "")
 if (WIN32)
     list(APPEND WINDOWS_SOURCES
-        windowsmouseinterceptor.h
-        windowsmouseinterceptor.cpp
+        src/windowsmouseinterceptor.h
+        src/windowsmouseinterceptor.cpp
     )
 endif()
 
@@ -45,26 +45,27 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
 
-        dropawarefilesystemmodel.h dropawarefilesystemmodel.cpp
-        drophandler.h drophandler.cpp
-        textfile.h textfile.cpp
-        filepathprovider.h filepathprovider.cpp
-        copyworker.h copyworker.cpp
-        sortfilterproxy.h sortfilterproxy.cpp
-        nointernaldraglistview.h nointernaldraglistview.cpp
-        standardnames.h
-        horizontalshakedetector.h horizontalshakedetector.cpp
-        themeprovider.h themeprovider.cpp
-        remoteurldrophandler.h remoteurldrophandler.cpp
-        standardpaths.h standardpaths.cpp
-        draghandle.h draghandle.cpp
-        listitemdelegate.h listitemdelegate.cpp
-        closebutton.h closebutton.cpp
+        src/dropawarefilesystemmodel.h src/dropawarefilesystemmodel.cpp
+        src/drophandler.h src/drophandler.cpp
+        src/textfile.h src/textfile.cpp
+        src/filepathprovider.h src/filepathprovider.cpp
+        src/copyworker.h src/copyworker.cpp
+        src/sortfilterproxy.h src/sortfilterproxy.cpp
+        src/nointernaldraglistview.h src/nointernaldraglistview.cpp
+        src/standardnames.h
+        src/horizontalshakedetector.h src/horizontalshakedetector.cpp
+        src/themeprovider.h src/themeprovider.cpp
+        src/remoteurldrophandler.h src/remoteurldrophandler.cpp
+        src/standardpaths.h src/standardpaths.cpp
+        src/draghandle.h src/draghandle.cpp
+        src/listitemdelegate.h src/listitemdelegate.cpp
+        src/closebutton.h src/closebutton.cpp
+        src/sleekscrollbar.h src/sleekscrollbar.cpp
 
         ${LINUX_SOURCES}
         ${WINDOWS_SOURCES}
-        icons.qrc
-        sleekscrollbar.h sleekscrollbar.cpp
+
+        resources/icons.qrc
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Tokri APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -121,15 +122,16 @@ target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Tokri PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(UNIX AND NOT APPLE)
         install(
-          FILES net.surajyadav.Tokri.png
+          FILES resources/net.surajyadav.Tokri.png
           DESTINATION share/icons/hicolor/256x256/apps
         )
         install(
-          FILES net.surajyadav.Tokri.desktop
+          FILES resources/net.surajyadav.Tokri.desktop
           DESTINATION share/applications
         )
 endif()

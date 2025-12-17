@@ -2,7 +2,7 @@
 
 # Tokri
 
-![](./demo.gif)
+![](./assets/demo.gif)
 
 > Tokri is a desktop basket where you drag and drop text, images, and files.
 
