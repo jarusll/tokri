@@ -78,117 +78,82 @@ TokriWindow::TokriWindow(QWidget *parent)
     ui->listView->setFocusPolicy(Qt::NoFocus);
     ui->listView->setDropIndicatorShown(false);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->listView, &QWidget::customContextMenuRequested, this, [this](const QPoint &pos){
-        QModelIndex index = ui->listView->indexAt(pos);
-        auto selected = ui->listView->selectionModel()->selectedIndexes();
-        int count = selected.size();
-        QMenu menu;
-        menu.setPalette(ThemeProvider::light());
-        QAction *openAction = nullptr;
-        QAction *openLinkAction = nullptr;
-        QAction *revealAction = nullptr;
-        QAction *renameAction = nullptr;
-        QAction *copyAction = nullptr;
-        QAction *deleteAction = nullptr;
-        QAction *selectAllAction = nullptr;
+    connect(ui->listView, &QWidget::customContextMenuRequested, this,
+            [this](const QPoint &pos) {
+                auto *view = ui->listView;
+                auto *sel  = view->selectionModel();
+                const auto selected = sel->selectedIndexes();
+                const int count = selected.size();
 
-        if (count == 1) {
-            openAction = menu.addAction("&Open");
-            revealAction = menu.addAction("Reveal in &Explorer");
-            renameAction = menu.addAction("&Rename");
-            copyAction = menu.addAction("&Copy");
-            deleteAction = menu.addAction("&Delete");
-        } else {
-            copyAction = menu.addAction("&Copy");
-            deleteAction = menu.addAction("&Delete");
-            selectAllAction = menu.addAction("Select &All");
-        }
+                QMenu menu;
+                menu.setPalette(ThemeProvider::light());
 
+                QAction *open = nullptr, *reveal = nullptr, *rename = nullptr;
+                QAction *copy = nullptr, *del = nullptr, *selectAll = nullptr;
 
-        QAction *chosen = menu.exec(ui->listView->viewport()->mapToGlobal(pos));
-        if (!chosen) return;
+                if (count == 1) {
+                    open   = menu.addAction("&Open");
+                    reveal= menu.addAction("Reveal in &Explorer");
+                    rename= menu.addAction("&Rename");
+                }
+                if (count > 0) {
+                    copy = menu.addAction("&Copy");
+                    del  = menu.addAction("&Delete");
+                }
+                selectAll = menu.addAction("Select &All");
 
-        if (count == 1) {
-            const auto fileInfo = selected[0].data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
-            const auto filePath = selected[0].data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
+                QAction *chosen = menu.exec(view->viewport()->mapToGlobal(pos));
+                if (!chosen) return;
 
-            if (chosen == openAction) {
-                // if .url.txt file, try to open as url
-                // TODO add open as link option
-                // if (fileInfo.fileName().endsWith(".url.txt")) {
-                //     QFile file(filePath);
-                //     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                //         QByteArray content = file.readAll();
-                //         QString textContent = QString::fromUtf8(content);
-                //         // this can be centralized
-                //         QRegularExpression urlRegex(R"(https?://[^\s]+)");
-                //         QRegularExpressionMatch match = urlRegex.match(textContent);
-                //         if (match.hasMatch()) {
-                //             QString urlStr = match.captured(0);
-                //             QDesktopServices::openUrl(QUrl(urlStr));
-                //             return;
-                //         }
-                //     }
-                // }
+                auto fileInfoAt = [](const QModelIndex &idx) {
+                    return idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
+                };
 
-                QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
-            } else if (chosen == revealAction) {
-                QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absolutePath()));
-            } else if (chosen == renameAction) {
-                ui->listView->edit(index);
-            } else if (chosen == deleteAction) {
-                QFile file(filePath);
-                if (file.exists()) {
-                    bool success = file.remove();
-                    if (!success) {
-                        // FIXME handle error
+                if (chosen == selectAll) {
+                    view->selectAll();
+                    return;
+                }
+
+                if (chosen == open && count == 1) {
+                    QDesktopServices::openUrl(
+                        QUrl::fromLocalFile(fileInfoAt(selected[0]).filePath()));
+                    return;
+                }
+
+                if (chosen == reveal && count == 1) {
+                    QDesktopServices::openUrl(
+                        QUrl::fromLocalFile(fileInfoAt(selected[0]).absolutePath()));
+                    return;
+                }
+
+                if (chosen == rename && count == 1) {
+                    view->edit(selected[0]);
+                    return;
+                }
+
+                if (chosen == copy) {
+                    QList<QUrl> urls;
+                    for (const auto &idx : selected) {
+                        const auto fi = fileInfoAt(idx);
+                        if (fi.exists())
+                            urls << QUrl::fromLocalFile(fi.absoluteFilePath());
+                    }
+                    if (!urls.isEmpty()) {
+                        auto *mime = new QMimeData;
+                        mime->setUrls(urls);
+                        QGuiApplication::clipboard()->setMimeData(mime);
+                    }
+                    return;
+                }
+
+                if (chosen == del) {
+                    for (const auto &idx : selected) {
+                        QFile f(fileInfoAt(idx).filePath());
+                        if (f.exists())
+                            f.remove();
                     }
                 }
-            } else if (chosen == copyAction) {
-                QList<QUrl> urls;
-                urls << QUrl::fromLocalFile(filePath);
-
-                auto *mime = new QMimeData;
-                mime->setUrls(urls);
-
-                QGuiApplication::clipboard()->setMimeData(mime);
-            }
-        } else {
-            QList<QFileInfo> fileInfos;
-            for (const auto &idx : selected) {
-                const auto fileInfo = idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
-                fileInfos << fileInfo;
-            }
-
-            if (chosen == copyAction) {
-                QList<QUrl> urls;
-                for (const auto &idx : selected) {
-                    const auto fi = idx.data(QFileSystemModel::FileInfoRole)
-                                        .value<QFileInfo>();
-                    if (fi.exists())
-                        urls << QUrl::fromLocalFile(fi.absoluteFilePath());
-                }
-
-                if (!urls.isEmpty()) {
-                    auto *mime = new QMimeData;
-                    mime->setUrls(urls);   // supports multiple files
-                    QGuiApplication::clipboard()->setMimeData(mime);
-                }
-            } else if (chosen == deleteAction) {
-                for (const auto &fileInfo : fileInfos) {
-                    QFile file(fileInfo.filePath());
-                    if (file.exists()) {
-                        bool success = file.remove();
-                        if (!success) {
-                            // FIXME handle error
-                        }
-                    }
-                }
-            } else if (chosen == selectAllAction) {
-                ui->listView->selectAll();
-            }
-        }
-    });
+            });
 
     connect(
         ui->listView,
