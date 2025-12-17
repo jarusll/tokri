@@ -1,5 +1,6 @@
 #include "sleekscrollbar.h"
 #include "themeprovider.h"
+#include <QPainterPath>
 
 SleekScrollBar::SleekScrollBar() {}
 
@@ -11,6 +12,26 @@ void SleekScrollBar::paintEvent(QPaintEvent *)
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
+    auto pal = ThemeProvider::light();
+    QColor bg = pal.color(QPalette::Base);
+    QColor fg = pal.color(QPalette::PlaceholderText);
+
+    // Clear background properly (Windows-safe)
+    p.setCompositionMode(QPainter::CompositionMode_Source);
+    p.fillRect(rect(), bg);
+    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+    QRectF bgRect = QRectF(rect()).adjusted(1, 1, -1, -1);
+
+    // Background with square ends
+    QPainterPath bgPath;
+    bgPath.addRoundedRect(bgRect, 4, 4);
+    bgPath.addRect(bgRect.left(), bgRect.top(), bgRect.width(), 4);
+    bgPath.addRect(bgRect.left(), bgRect.bottom() - 4, bgRect.width(), 4);
+
+    p.fillPath(bgPath, bg);
+
+    // Slider
     QRect handle = style()->subControlRect(
         QStyle::CC_ScrollBar,
         &opt,
@@ -18,12 +39,10 @@ void SleekScrollBar::paintEvent(QPaintEvent *)
         this
         );
 
+    QRectF h = QRectF(handle).adjusted(1, 2, -1, -2);
+    p.setBrush(fg);
     p.setPen(Qt::NoPen);
-    auto pal = ThemeProvider::light();
-    QColor c = pal.color(QPalette::PlaceholderText);
-    c.setAlphaF(0.7);
-    p.setBrush(c);
-    p.drawRoundedRect(handle.adjusted(1,1,-1,-1), 4, 4);
+    p.drawRoundedRect(h, 3, 3);
 }
 
 QStyleOptionSlider SleekScrollBar::opt() const {
