@@ -7,8 +7,8 @@
 > Tokri is a desktop basket where you drag and drop text, images, and files.
 
 ## Download
-- Linux —  [Flatpak](https://github.com/jarusll/tokri/releases/download/v2025.12.07/Tokri.flatpak)
-- Windows — [Portable Zip](https://github.com/jarusll/tokri/releases/download/v2025.12.07/Tokri.zip)
+- Linux —  [Flatpak](https://github.com/jarusll/tokri/releases/download/v2025.12.08/Tokri.flatpak)
+- Windows — [Portable Zip](https://github.com/jarusll/tokri/releases/download/v2025.12.08/Tokri.zip)
 
 > **Note for Linux users**
 >
