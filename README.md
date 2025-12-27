@@ -51,11 +51,12 @@ cmake --build build
 - 🎨 Design by [Akshay Majgaonkar](https://www.linkedin.com/in/akshay-majgaonkar/)
 
 ## TODO
-- Spawn near cursor(Impossible on wayland it seems)
+- Theme using color scheme
+- Always on top behaviour(Opt in)
 - Offer drag with multiple formats
-- Free up gui thread from sending Image
 - Add items from clipboard
-- Accept clipboard contents
-- Search(is this even needed)?
+- Double click tray icon to wakeup
+- Spawn near cursor(Impossible on wayland it seems)
+- Free up gui thread from sending Image
 - Placeholder text and Image
 - Item count
