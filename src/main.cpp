@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     QIcon icon(":/tray.png");
 
     QLocalServer server;
-    TokriWindow w;
+    TokriWindow tokriWindow;
 
     // Single Instance
     const QString lockPath =
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         QObject::connect(&server, &QLocalServer::newConnection, [&]{
             auto sock = server.nextPendingConnection();
             if (sock) sock->close();
-            w.onShakeDetect();
+            tokriWindow.onShakeDetect();
         });
     }
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     auto *tray = new QSystemTrayIcon(icon, &a);
     tray->setToolTip("Tokri - Running");
     auto *menu = new QMenu();
-    menu->addAction("Show", &w, &TokriWindow::wakeUp);
+    menu->addAction("Show", &tokriWindow, &TokriWindow::wakeUp);
     menu->addAction("Quit", &a, &QCoreApplication::quit);
     menu->setPalette(ThemeProvider::theme());
     tray->setContextMenu(menu);
@@ -95,30 +95,30 @@ int main(int argc, char *argv[])
     QObject::connect(tray, &QSystemTrayIcon::activated,
                      [&](QSystemTrayIcon::ActivationReason r) {
                          if (r == QSystemTrayIcon::DoubleClick)
-                             w.wakeUp();
+                             tokriWindow.wakeUp();
                      });
 
     tray->show();
 
 
-    QAction *deleteAction = new QAction(&w);
+    QAction *deleteAction = new QAction(&tokriWindow);
     deleteAction->setShortcut(QKeySequence::Delete);
-    w.addAction(deleteAction);
+    tokriWindow.addAction(deleteAction);
 
     // View & Models
 
-    DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&w);
+    DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&tokriWindow);
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
 
-    FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&w);
+    FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&tokriWindow);
     sortFilterProxy->setSourceModel(fsModel);
 
     sortFilterProxy->setDynamicSortFilter(true);
     sortFilterProxy->sort(0, Qt::DescendingOrder);
 
-    w.uiHandle()->listView->setModel(sortFilterProxy);
-    w.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(rootIndex));
+    tokriWindow.uiHandle()->listView->setModel(sortFilterProxy);
+    tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(rootIndex));
 
     TextDropHandler *dropHandler = new TextDropHandler;
     DropAwareFileSystemModel::connect(
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
         &TextDropHandler::handleTextDrop
         );
 
-    RemoteUrlDropHandler *urlHandler = new RemoteUrlDropHandler(&w);
+    RemoteUrlDropHandler *urlHandler = new RemoteUrlDropHandler(&tokriWindow);
     DropAwareFileSystemModel::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedUrl,
@@ -205,9 +205,9 @@ int main(int argc, char *argv[])
     DropAwareFileSystemModel::connect(
         deleteAction,
         &QAction::triggered,
-        w.uiHandle()->listView,
-        [&w](){
-            auto selectionModel = w.uiHandle()->listView->selectionModel();
+        tokriWindow.uiHandle()->listView,
+        [&tokriWindow](){
+            auto selectionModel = tokriWindow.uiHandle()->listView->selectionModel();
             QModelIndexList indexes = selectionModel->selectedIndexes();
             for (const QModelIndex &index : selectionModel->selectedIndexes()) {
                 if (!index.isValid())
@@ -224,12 +224,12 @@ int main(int argc, char *argv[])
             }
         });
 
-    auto SleepShortcut = new QShortcut(QKeySequence("Escape"), &w);
+    auto SleepShortcut = new QShortcut(QKeySequence("Escape"), &tokriWindow);
     SleepShortcut->setContext(Qt::WindowShortcut);
 
     QObject::connect(SleepShortcut,
                      &QShortcut::activated,
-                     &w,
+                     &tokriWindow,
                      &TokriWindow::sleep);
 
 
@@ -250,13 +250,13 @@ int main(int argc, char *argv[])
     QObject::connect(
         interceptor,
         &WindowsMouseInterceptor::shakeDetected,
-        &w,
+        &tokriWindow,
         &TokriWindow::wakeUp,
         Qt::QueuedConnection
         );
 #endif
 
-    w.show();
+    tokriWindow.show();
     int ret = a.exec();
 
 #ifdef Q_OS_WIN
