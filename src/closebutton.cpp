@@ -22,7 +22,7 @@ void CloseButton::paintEvent(QPaintEvent *)
              width() * dpr - 1.0,
              height() * dpr - 1.0);
 
-    const auto pal = ThemeProvider::theme();
+    const auto pal = palette();
     QColor base = pal.color(QPalette::Button);
     base = base.darker(115);
 

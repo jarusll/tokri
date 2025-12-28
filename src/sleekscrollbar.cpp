@@ -12,7 +12,8 @@ void SleekScrollBar::paintEvent(QPaintEvent *)
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
-    auto pal = ThemeProvider::theme();
+    auto pal = opt.palette;
+
     QColor bg = pal.color(QPalette::Base);
     QColor fg = pal.color(QPalette::PlaceholderText);
 

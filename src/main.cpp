@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     auto *menu = new QMenu();
     menu->addAction("Show", &tokriWindow, &TokriWindow::wakeUp);
     menu->addAction("Quit", &a, &QCoreApplication::quit);
-    menu->setPalette(ThemeProvider::theme());
+    menu->setPalette(a.palette());
     tray->setContextMenu(menu);
 
     QObject::connect(tray, &QSystemTrayIcon::activated,

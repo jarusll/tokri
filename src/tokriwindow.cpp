@@ -89,7 +89,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                 const int count = selected.size();
 
                 QMenu menu;
-                menu.setPalette(ThemeProvider::theme());
+                menu.setPalette(this->palette());
 
                 QAction *open = nullptr, *reveal = nullptr, *rename = nullptr;
                 QAction *copy = nullptr, *del = nullptr, *selectAll = nullptr;
