@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
     QObject::connect(
         interceptor,
         &MouseInterceptor::shakeDetected,
-        &w,
+        &tokriWindow,
         &TokriWindow::wakeUp
         );
 #endif
