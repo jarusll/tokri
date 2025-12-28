@@ -42,7 +42,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    a.setPalette(ThemeProvider::light());
+    a.setPalette(ThemeProvider::theme());
 
     QIcon icon(":/tray.png");
 
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     auto *menu = new QMenu();
     menu->addAction("Show", &w, &TokriWindow::wakeUp);
     menu->addAction("Quit", &a, &QCoreApplication::quit);
-    menu->setPalette(ThemeProvider::light());
+    menu->setPalette(ThemeProvider::theme());
     tray->setContextMenu(menu);
     tray->show();
 

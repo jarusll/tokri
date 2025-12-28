@@ -1,8 +1,9 @@
 #ifndef THEMEPROVIDER_H
 #define THEMEPROVIDER_H
 
+#include <QGuiApplication>
 #include <QPalette>
-
+#include <QStyleHints>
 
 class ThemeProvider
 {
@@ -47,38 +48,45 @@ public:
         QPalette pal;
 
         // Backgrounds
-        pal.setColor(QPalette::Window,        QColor("#202020"));
-        pal.setColor(QPalette::Base,          QColor("#1C1C1C"));
-        pal.setColor(QPalette::AlternateBase, QColor("#262626"));
-        pal.setColor(QPalette::Button,        QColor("#2A2A2A"));
-        pal.setColor(QPalette::ToolTipBase,   QColor("#2C2C2C"));
+        pal.setColor(QPalette::Window,        QColor("#141216"));
+        pal.setColor(QPalette::Base,          QColor("#141216"));
+        pal.setColor(QPalette::AlternateBase, QColor("#221F27"));
+        pal.setColor(QPalette::Button,        QColor("#2B2732"));
 
         // Text
         pal.setColor(QPalette::WindowText,    QColor("#FFFFFF"));
         pal.setColor(QPalette::Text,          QColor("#FFFFFF"));
         pal.setColor(QPalette::ButtonText,    QColor("#FFFFFF"));
+        pal.setColor(QPalette::PlaceholderText, QColor("#8A8694"));
         pal.setColor(QPalette::BrightText,    QColor("#FFFFFF"));
-        pal.setColor(QPalette::ToolTipText,   QColor("#FFFFFF"));
-        pal.setColor(QPalette::PlaceholderText, QColor("#7A7A7A"));
 
         // Borders
-        pal.setColor(QPalette::Light,         QColor("#2C2C2C"));
-        pal.setColor(QPalette::Midlight,      QColor("#333333"));
-        pal.setColor(QPalette::Mid,           QColor("#3A3A3A"));
-        pal.setColor(QPalette::Dark,          QColor("#2B2B2B"));
-        pal.setColor(QPalette::Shadow,        QColor("#3F3F3F"));   // main border
+        pal.setColor(QPalette::Light,         QColor("#2F2A35"));
+        pal.setColor(QPalette::Midlight,      QColor("#3A3540"));
+        pal.setColor(QPalette::Mid,           QColor("#4A4453"));
+        pal.setColor(QPalette::Dark,          QColor("#5A5364"));
+        pal.setColor(QPalette::Shadow,        QColor("#2A2630"));
 
         // Selection
-        pal.setColor(QPalette::Highlight,     QColor("#094771"));
+        pal.setColor(QPalette::Highlight,     QColor("#4C2D91"));
         pal.setColor(QPalette::HighlightedText, QColor("#FFFFFF"));
-        pal.setColor(QPalette::Accent,        QColor("#0078D4"));
+        pal.setColor(QPalette::Accent,        QColor("#9E6CFF"));
 
         // Links
-        pal.setColor(QPalette::Link,          QColor("#4DA3FF"));
-        pal.setColor(QPalette::LinkVisited,   QColor("#B782FF"));
+        pal.setColor(QPalette::Link,          QColor("#4A90E2"));
+        pal.setColor(QPalette::LinkVisited,   QColor("#B76CD8"));
 
         return pal;
+    };
+
+    static QPalette theme()
+    {
+        const bool dark =
+            (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
+
+        return dark ? ThemeProvider::dark() : ThemeProvider::theme();
     }
+
 };
 
 #endif // THEMEPROVIDER_H

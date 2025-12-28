@@ -20,7 +20,7 @@ void ListItemDelegate::paint(QPainter *p,
     QStyleOptionViewItem o(opt);
     o.textElideMode = Qt::ElideMiddle;
 
-    auto pal = ThemeProvider::light();
+    auto pal = ThemeProvider::theme();
     if (o.state & QStyle::State_MouseOver) {
         QColor c = pal.color(QPalette::Midlight);
         c.setAlphaF(0.5);
