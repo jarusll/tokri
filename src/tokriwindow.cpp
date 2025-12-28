@@ -24,7 +24,10 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     ui->setupUi(this);
 
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
+    setWindowFlags(windowFlags()
+                   | Qt::FramelessWindowHint
+                   | Qt::Tool
+                   | Qt::WindowStaysOnTopHint);
     setAttribute(Qt::WA_TranslucentBackground);
 
     mCloseButton = new CloseButton(this);
