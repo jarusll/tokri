@@ -91,7 +91,15 @@ int main(int argc, char *argv[])
     menu->addAction("Quit", &a, &QCoreApplication::quit);
     menu->setPalette(ThemeProvider::theme());
     tray->setContextMenu(menu);
+
+    QObject::connect(tray, &QSystemTrayIcon::activated,
+                     [&](QSystemTrayIcon::ActivationReason r) {
+                         if (r == QSystemTrayIcon::DoubleClick)
+                             w.wakeUp();
+                     });
+
     tray->show();
+
 
     QAction *deleteAction = new QAction(&w);
     deleteAction->setShortcut(QKeySequence::Delete);
