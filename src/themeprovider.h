@@ -84,7 +84,7 @@ public:
         const bool dark =
             (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
 
-        return dark ? ThemeProvider::dark() : ThemeProvider::theme();
+        return dark ? ThemeProvider::dark() : ThemeProvider::light();
     }
 
 };
