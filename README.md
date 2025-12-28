@@ -51,10 +51,8 @@ cmake --build build
 - 🎨 Design by [Akshay Majgaonkar](https://www.linkedin.com/in/akshay-majgaonkar/)
 
 ## TODO
-- Always on top behaviour(Opt in)
 - Offer drag with multiple formats
 - Add items from clipboard
 - Spawn near cursor(Impossible on wayland it seems)
-- Free up gui thread from sending Image
 - Placeholder text and Image
 - Item count
