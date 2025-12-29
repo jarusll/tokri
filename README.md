@@ -34,8 +34,16 @@
 
 > **Note for KDE users**
 >
-> Run the application under **XWayland**, as mouse activation gestures do not work on native Wayland for KDE specifically.
-
+> Mouse activation gestures do not work on **native Wayland** (KDE-specific limitation).
+>
+> Run the app under **XWayland** by disabling Wayland access:
+> - Open **Flatseal**
+> - Select the app
+> - Remove the **Wayland** permission
+>
+> This forces XWayland and restores gesture support.
+>
+> ![](./assets/flatseal.png)
 
 ## Building for Linux
 
