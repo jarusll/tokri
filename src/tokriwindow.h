@@ -33,6 +33,7 @@ public:
     void resizeEvent(QResizeEvent *e);
 
     void init();
+    void moveNearCursor();
 
 public slots:
     void onShakeDetect();

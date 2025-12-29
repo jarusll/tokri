@@ -180,19 +180,24 @@ void TokriWindow::sleep()
 {
     showMinimized();
 }
+
 void TokriWindow::wakeUp()
 {
-    if (isMinimized())
-        showNormal();
+    const bool wasMinimized = isMinimized();
 
-    if (!isVisible())
+    if (wasMinimized){
+        moveNearCursor();
+        showNormal();
+    }
+    if (!isVisible()){
+        moveNearCursor();
         show();
+    }
 
     raise();
     activateWindow();
 
 #ifdef Q_OS_WIN
-    // wtf is this??????
     HWND hWnd = reinterpret_cast<HWND>(winId());
     DWORD fgThread = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
     DWORD thisThread = GetCurrentThreadId();
@@ -258,6 +263,26 @@ void TokriWindow::init()
             // FIXME handle error
         }
     }
+}
+
+void TokriWindow::moveNearCursor()
+{
+    const QPoint cursor = QCursor::pos();
+    const QSize  winSize = size();
+    QPoint p(cursor.x() + 20, cursor.y() + 20);
+
+    const QRect screen = QGuiApplication::screenAt(cursor)->availableGeometry();
+
+    if (p.x() + winSize.width() > screen.right())
+        p.setX(screen.right() - winSize.width());
+    if (p.y() + winSize.height() > screen.bottom())
+        p.setY(screen.bottom() - winSize.height());
+    if (p.x() < screen.left())
+        p.setX(screen.left());
+    if (p.y() < screen.top())
+        p.setY(screen.top());
+
+    move(p);
 }
 
 void TokriWindow::onShakeDetect()
