@@ -4,6 +4,7 @@
 
 > A desktop basket to drag and drop text, URLs, images, and files.
 
+- Shake while dragging to open the basket and drop items inside.
 - Drag items **out** to move them
 - Hold **Ctrl** while dragging out to **copy** instead
 
