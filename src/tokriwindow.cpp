@@ -3,7 +3,6 @@
 #include "standardpaths.h"
 #include "listitemdelegate.h"
 #include "closebutton.h"
-#include "themeprovider.h"
 #include <QDir>
 #include <QMenu>
 #include <QDesktopServices>

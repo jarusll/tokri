@@ -1,7 +1,5 @@
 #include "closebutton.h"
 
-#include "themeprovider.h"
-
 CloseButton::CloseButton(QWidget *parent)
     : QAbstractButton(parent)
 {

@@ -1,5 +1,4 @@
 #include "sleekscrollbar.h"
-#include "themeprovider.h"
 #include <QPainterPath>
 
 SleekScrollBar::SleekScrollBar() {}

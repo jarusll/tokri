@@ -1,7 +1,5 @@
 #include "listitemdelegate.h"
 
-#include "themeprovider.h"
-
 #include <QPainter>
 
 ListItemDelegate::ListItemDelegate() {}
