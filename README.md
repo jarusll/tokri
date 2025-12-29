@@ -52,8 +52,6 @@ cmake --build build
 - 🎨 Design by [Akshay Majgaonkar](https://www.linkedin.com/in/akshay-majgaonkar/)
 
 ## TODO
-- Offer drag with multiple formats
 - Add items from clipboard
-- Spawn near cursor(Impossible on wayland it seems)
 - Placeholder text and Image
 - Item count
