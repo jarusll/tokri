@@ -120,7 +120,6 @@ target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
 target_include_directories(Tokri PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR})
