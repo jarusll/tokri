@@ -1,6 +1,7 @@
 #include "copyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
+#include "macosmouseinterceptor.h"
 #include "themeprovider.h"
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
@@ -232,6 +233,20 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection
         );
 #endif
+
+#ifdef Q_OS_MACOS
+    MacOSMouseInterceptor *interceptor = new MacOSMouseInterceptor;
+
+    QObject::connect(
+        interceptor,
+        &MacOSMouseInterceptor::shakeDetected,
+        &tokriWindow,
+        &TokriWindow::wakeUp
+        );
+
+    interceptor->start();
+#endif
+
 
     tokriWindow.show();
     int ret = a.exec();
