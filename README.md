@@ -18,8 +18,8 @@
 ![](./assets/text.gif)
 
 ## Download
-- Linux —  [Flatpak](https://github.com/jarusll/tokri/releases/download/v2025.12.08/Tokri.flatpak)
-- Windows — [Portable Zip](https://github.com/jarusll/tokri/releases/download/v2025.12.08/Tokri.zip)
+- Linux —  [Flatpak](https://github.com/jarusll/tokri/releases/download/v2025.12.09/Tokri.flatpak)
+- Windows — [Portable Zip](https://github.com/jarusll/tokri/releases/download/v2025.12.09/Tokri.zip)
 
 > **Note for Linux users**
 >
