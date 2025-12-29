@@ -183,14 +183,16 @@ void TokriWindow::sleep()
 
 void TokriWindow::wakeUp()
 {
-    const bool wasMinimized = isMinimized();
+    const bool minimized = isMinimized();
+    const bool hidden = !isVisible();
 
-    if (wasMinimized){
+    if (minimized || hidden) {
         moveNearCursor();
-        showNormal();
     }
-    if (!isVisible()){
-        moveNearCursor();
+
+    if (minimized) {
+        showNormal();
+    } else if (hidden) {
         show();
     }
 
