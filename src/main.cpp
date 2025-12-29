@@ -5,7 +5,6 @@
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
 #include "ui_tokriwindow.h"
-#include "remoteurldrophandler.h"
 #include "standardnames.h"
 #include "standardpaths.h"
 
@@ -128,7 +127,6 @@ int main(int argc, char *argv[])
         &TextDropHandler::handleTextDrop
         );
 
-    RemoteUrlDropHandler *urlHandler = new RemoteUrlDropHandler(&tokriWindow);
     DropAwareFileSystemModel::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedUrl,
@@ -136,28 +134,7 @@ int main(int argc, char *argv[])
         &TextDropHandler::handleUrlDrop
         );
 
-    RemoteUrlDropHandler::connect(
-        urlHandler,
-        &RemoteUrlDropHandler::droppedText,
-        dropHandler,
-        &TextDropHandler::handleTextDrop
-        );
-    RemoteUrlDropHandler::connect(
-        urlHandler,
-        &RemoteUrlDropHandler::droppedUrl,
-        dropHandler,
-        &TextDropHandler::handleTextDrop
-        );
-
     CopyWorker *worker = new CopyWorker;
-    RemoteUrlDropHandler::connect(
-        urlHandler,
-        &RemoteUrlDropHandler::downloaded,
-        worker,
-        &CopyWorker::copyFile,
-        Qt::QueuedConnection
-        );
-
     CopyWorker::connect(
         fsModel,
         &DropAwareFileSystemModel::droppedFile,

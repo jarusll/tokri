@@ -55,7 +55,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/standardnames.h
         src/horizontalshakedetector.h src/horizontalshakedetector.cpp
         src/themeprovider.h src/themeprovider.cpp
-        src/remoteurldrophandler.h src/remoteurldrophandler.cpp
+
         src/standardpaths.h src/standardpaths.cpp
         src/draghandle.h src/draghandle.cpp
         src/listitemdelegate.h src/listitemdelegate.cpp
