@@ -5,7 +5,7 @@ APP_ID="net.surajyadav.Tokri"
 MANIFEST="${APP_ID}.yml"
 BUILD_DIR="build-flatpak"
 REPO_DIR="repo"
-BUNDLE="${APP_ID}.flatpak"
+BUNDLE="../dist/${APP_ID}.flatpak"
 BRANCH="stable"
 
 rm -rf "${BUILD_DIR}" "${REPO_DIR}" "${BUNDLE}"
