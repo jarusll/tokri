@@ -45,6 +45,8 @@ if (APPLE)
     list(APPEND MACOS_SOURCES
         src/macosmouseinterceptor.h
         src/macosmouseinterceptor.cpp
+        src/MacWindowLevel.h
+        src/MacWindowLevel.mm
     )
 endif()
 

@@ -34,6 +34,7 @@ public:
 
     void init();
     void moveNearCursor();
+    void showEvent(QShowEvent *e);
 
 public slots:
     void onShakeDetect();
