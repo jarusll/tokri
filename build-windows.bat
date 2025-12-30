@@ -6,7 +6,7 @@ set PRODUCT_VERSION=%1
 
 rem Paths
 set EXE=build\Release\Tokri.exe
-set OUTDIR=build\Windows
+set OUTDIR=dist\Windows
 set ICON=resources\net.surajyadav.Tokri.ico
 set PRODUCT_NAME=Tokri
 
