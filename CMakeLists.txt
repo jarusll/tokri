@@ -86,6 +86,20 @@ else()
     endif()
 endif()
 
+# macOS app icon
+if(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE Tokri.icns)
+
+    target_sources(Tokri PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/Tokri.icns
+    )
+
+    set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/Tokri.icns
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+    )
+endif()
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
