@@ -1,7 +1,6 @@
 #include "copyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
-#include "macosmouseinterceptor.h"
 #include "themeprovider.h"
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
@@ -15,6 +14,10 @@
 
 #ifdef Q_OS_LINUX
 #include "linuxmouseinterceptor.h"
+#endif
+
+#ifdef Q_OS_MACOS
+#include "macosmouseinterceptor.h"
 #endif
 
 #include <QAbstractItemView>
