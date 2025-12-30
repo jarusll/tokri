@@ -40,6 +40,14 @@ if (WIN32)
     )
 endif()
 
+set(MACOS_SOURCES "")
+if (APPLE)
+    list(APPEND MACOS_SOURCES
+        src/macosmouseinterceptor.h
+        src/macosmouseinterceptor.cpp
+    )
+endif()
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Tokri
         MANUAL_FINALIZATION
@@ -64,9 +72,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         ${LINUX_SOURCES}
         ${WINDOWS_SOURCES}
+        ${MACOS_SOURCES}
 
         resources/icons.qrc
-        src/macosmouseinterceptor.h src/macosmouseinterceptor.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Tokri APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
