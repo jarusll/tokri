@@ -16,6 +16,10 @@
 #include "linuxmouseinterceptor.h"
 #endif
 
+#ifdef Q_OS_MACOS
+#include "macosmouseinterceptor.h"
+#endif
+
 #include <QAbstractItemView>
 #include <QAbstractProxyModel>
 #include <QApplication>
@@ -232,6 +236,20 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection
         );
 #endif
+
+#ifdef Q_OS_MACOS
+    MacOSMouseInterceptor *interceptor = new MacOSMouseInterceptor;
+
+    QObject::connect(
+        interceptor,
+        &MacOSMouseInterceptor::shakeDetected,
+        &tokriWindow,
+        &TokriWindow::wakeUp
+        );
+
+    interceptor->start();
+#endif
+
 
     tokriWindow.show();
     int ret = a.exec();

@@ -8,6 +8,8 @@
 #include <QImageReader>
 #include <QMimeDatabase>
 #include <QUuid>
+#include <QImageWriter>
+#include <QColorSpace>
 
 CopyWorker::CopyWorker(QObject *parent)
     : QObject{parent}
@@ -62,7 +64,15 @@ void CopyWorker::saveImage(const QImage &image)
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
     QString fullPath = QDir(rootPath).filePath(fileName);
 
-    if (!image.save(fullPath)) {
+    QImage out = image;
+
+#ifdef Q_OS_MACOS
+    out.setColorSpace(QColorSpace());
+    out = out.convertToFormat(QImage::Format_ARGB32);
+#endif
+
+    QImageWriter w(fullPath, "png");
+    if (!w.write(out)) {
         emit copyFailed(fullPath);
     }
 }
@@ -86,19 +96,24 @@ void CopyWorker::saveImageBytes(const QByteArray bytes,
 
     QImageReader reader(&buf, format.toLatin1());
     QImage img = reader.read();
-    if (img.isNull())
+    if (img.isNull()) {
         return;
+    }
+
+#ifdef Q_OS_MACOS
+    // macOS: strip broken ICC profile before saving
+    img.setColorSpace(QColorSpace());
+    img = img.convertToFormat(QImage::Format_ARGB32);
+#endif
 
     const QString ext = "." + mimeToFormat(format);
-    qDebug() << "Ext" << ext;
     const QString fileName = FilePathProvider::nameWithPrefix("image") + ext;
-    qDebug() << fileName;
 
     const QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
     const QString fullPath = QDir(rootPath).filePath(fileName);
 
-    bool status = img.save(fullPath);
-    if (!status){
-        qDebug() << "Image save failed";
+    QImageWriter writer(fullPath, ext.mid(1).toLatin1());
+    if (!writer.write(img)) {
+        emit copyFailed(fullPath);
     }
 }

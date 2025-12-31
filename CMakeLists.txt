@@ -40,6 +40,16 @@ if (WIN32)
     )
 endif()
 
+set(MACOS_SOURCES "")
+if (APPLE)
+    list(APPEND MACOS_SOURCES
+        src/macosmouseinterceptor.h
+        src/macosmouseinterceptor.cpp
+        src/MacWindowLevel.h
+        src/MacWindowLevel.mm
+    )
+endif()
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Tokri
         MANUAL_FINALIZATION
@@ -64,6 +74,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         ${LINUX_SOURCES}
         ${WINDOWS_SOURCES}
+        ${MACOS_SOURCES}
 
         resources/icons.qrc
     )
@@ -85,17 +96,27 @@ else()
     endif()
 endif()
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Tokri)
+# macOS app icon
+if(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE Tokri.icns)
+
+    target_sources(Tokri PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/Tokri.icns
+    )
+
+    set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/Tokri.icns
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+    )
 endif()
+
 set_target_properties(Tokri PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_GUI_IDENTIFIER "net.surajyadav.Tokri"
+    MACOSX_BUNDLE_BUNDLE_NAME "Tokri"
+    MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+    MACOSX_BUNDLE_SHORT_VERSION_STRING
+        "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
     WIN32_EXECUTABLE TRUE
 )
 
