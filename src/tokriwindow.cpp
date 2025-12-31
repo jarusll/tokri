@@ -39,7 +39,8 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     ui->listView->setStyleSheet(R"(
         QListView {
-            padding-left: 8px;
+            padding: 0px;
+            margin: 0px;
         }
     )");
 
@@ -62,8 +63,8 @@ TokriWindow::TokriWindow(QWidget *parent)
 
 
     ui->listView->setVerticalScrollBar(new SleekScrollBar(Qt::Vertical, ui->listView));
-
-    ui->listView->setItemDelegate(new ListItemDelegate(ui->listView));
+    const auto delegate = new ListItemDelegate(ui->listView);
+    ui->listView->setItemDelegate(delegate);
 
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
@@ -80,9 +81,17 @@ TokriWindow::TokriWindow(QWidget *parent)
                 QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
             });
 
+    ui->listView->setViewMode(QListView::IconMode);
+    ui->listView->setGridSize({100, 120});
+    ui->listView->setFlow(QListView::LeftToRight);
+    ui->listView->setWrapping(true);
+    ui->listView->setUniformItemSizes(true);
+    ui->listView->setSpacing(8);
+
     ui->listView->setMouseTracking(true);
     ui->listView->setFocusPolicy(Qt::NoFocus);
     ui->listView->setDropIndicatorShown(false);
+
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->listView, &QWidget::customContextMenuRequested, this,
             [this](const QPoint &pos) {
