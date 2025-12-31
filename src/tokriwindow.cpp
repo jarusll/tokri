@@ -58,7 +58,7 @@ TokriWindow::TokriWindow(QWidget *parent)
     placeClose();
 
     // FIXME could attach a slot to window#show for lifecycle reset of search action
-    ui->searchBar->setVisible(false);
+    // ui->searchBar->setVisible(false);
 
 
     ui->listView->setVerticalScrollBar(new SleekScrollBar(Qt::Vertical, ui->listView));

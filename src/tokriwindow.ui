@@ -19,9 +19,6 @@
      <widget class="DragHandle" name="widget" native="true"/>
     </item>
     <item>
-     <widget class="QLineEdit" name="searchBar"/>
-    </item>
-    <item>
      <widget class="NoInternalDragListView" name="listView">
       <property name="acceptDrops">
        <bool>true</bool>
