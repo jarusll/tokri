@@ -74,6 +74,8 @@ void CopyWorker::saveImage(const QImage &image)
     QImageWriter w(fullPath, "png");
     if (!w.write(out)) {
         emit copyFailed(fullPath);
+    } else {
+        emit copySuccess(fullPath);
     }
 }
 
@@ -115,5 +117,7 @@ void CopyWorker::saveImageBytes(const QByteArray bytes,
     QImageWriter writer(fullPath, ext.mid(1).toLatin1());
     if (!writer.write(img)) {
         emit copyFailed(fullPath);
+    } else {
+        emit copySuccess(fullPath);
     }
 }

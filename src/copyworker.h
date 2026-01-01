@@ -21,6 +21,7 @@ public:
 signals:
     void makePathFailed(QString);
     void copyFailed(QString);
+    void copySuccess(QString);
 };
 
 #endif // COPYWORKER_H
