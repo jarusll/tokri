@@ -6,7 +6,7 @@
 
 - Shake while dragging to open the basket and drop items inside.
 - Drag items **out** to move them
-- Hold **Ctrl** while dragging out to **copy** instead
+- Hold Ctrl (Windows/Linux) or ⌘ Command (macOS) while dragging to copy
 
 ## Files
 ![](./assets/files.gif)
