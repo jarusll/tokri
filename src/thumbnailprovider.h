@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QMimeDatabase>
 #include <QFileIconProvider>
+#include <QCache>
 
 class ThumbnailProvider : public QObject
 {
@@ -16,6 +17,9 @@ public:
     QIcon iconForFile(const QFileInfo &fi, const QSize &size) const;
 
 private:
+    QString makeKey(const QFileInfo &fi) const;
+
+    mutable QCache<QString, QIcon> cache{256};
     QMimeDatabase db;
     QFileIconProvider iconProvider;
 };
