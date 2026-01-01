@@ -171,23 +171,26 @@ int main(int argc, char *argv[])
 
     QTimer *reloadDebounce = new QTimer(&tokriWindow);
     reloadDebounce->setSingleShot(true);
-    reloadDebounce->setInterval(1000);
+
+    bool first = true;
 
     QObject::connect(worker, &CopyWorker::copySuccess,
                      reloadDebounce,
-                     [&](const QString &path) {
+                     [&reloadDebounce, &first] {
+                         reloadDebounce->setInterval(first ? 500 : 3000);
+                         first = false;
                          reloadDebounce->start();
                      },
                      Qt::QueuedConnection);
 
     QObject::connect(reloadDebounce, &QTimer::timeout,
-            fsModel,
-            [fsModel, sortFilterProxy] {
-                const QString root = fsModel->rootPath();
-                fsModel->setRootPath(QString());
-                fsModel->setRootPath(root);
-                sortFilterProxy->invalidate();
-            });
+                     fsModel,
+                     [&first, &fsModel] {
+                         first = true;
+                         const QString root = fsModel->rootPath();
+                         fsModel->setRootPath(QString());
+                         fsModel->setRootPath(root);
+                     });
 
     QThread* th = new QThread;
     CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
