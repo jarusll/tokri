@@ -18,6 +18,7 @@ public:
 
 private:
     QString makeKey(const QFileInfo &fi) const;
+    QIcon textPreviewIcon(const QFileInfo &fi, const QSize &size) const;
 
     mutable QCache<QString, QIcon> cache{256};
     QMimeDatabase db;
