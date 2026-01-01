@@ -168,24 +168,6 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection
         );
 
-    DropAwareFileSystemModel::connect(
-        worker,
-        &CopyWorker::copySuccess,
-        fsModel,
-        [fsModel](const QString &path) {
-            const QModelIndex idx = fsModel->index(path);
-            if (!idx.isValid())
-                return;
-
-            emit fsModel->dataChanged(
-                idx, idx,
-                { Qt::DecorationRole }
-                );
-        },
-        Qt::QueuedConnection
-        );
-
-
     QThread* th = new QThread;
     CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
     TextDropHandler::connect(th, &QThread::finished, worker, &QObject::deleteLater);
