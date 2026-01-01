@@ -19,7 +19,6 @@ QIcon ThumbnailProvider::iconForFile(const QFileInfo &fi, const QSize &size) con
         QString::number(fi.lastModified().toMSecsSinceEpoch());
 
     if (auto *cached = cache.object(key)) {
-        qDebug() << "Cached";
         return *cached;
     }
 
