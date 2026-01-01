@@ -4,6 +4,15 @@
 #include <QPainter>
 #include <QGuiApplication>
 #include <QPalette>
+#include <QtGui/qimagereader.h>
+#include <QtGui/qpainterpath.h>
+
+namespace {
+    constexpr int outerPad = 4;
+    constexpr int innerPad = 8;
+    constexpr int radius   = 8;
+    constexpr int maxDim = 256;
+}
 
 ThumbnailProvider::ThumbnailProvider(QObject *parent)
     : QObject{parent}
@@ -15,24 +24,51 @@ QString ThumbnailProvider::makeKey(const QFileInfo &fi) const
            QString::number(fi.lastModified().toMSecsSinceEpoch());
 }
 
-QIcon ThumbnailProvider::iconForFile(const QFileInfo &fi, const QSize &size) const
+QIcon ThumbnailProvider::iconForFile(const QFileInfo &fi,
+                                     const QSize &size) const
 {
-    const QString key =
-        fi.filePath() + "|" +
-        QString::number(fi.lastModified().toMSecsSinceEpoch());
+    const QString key = makeKey(fi);
 
-    if (auto *cached = cache.object(key)) {
+    if (auto *cached = cache.object(key))
         return *cached;
-    }
 
     QIcon icon;
-
     const auto mime = db.mimeTypeForFile(fi);
+
     if (mime.name().startsWith("image/")) {
-        QPixmap pm(fi.filePath());
-        if (!pm.isNull()) {
-            pm = pm.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            icon = QIcon(pm);
+        QImageReader reader(fi.filePath());
+        QSize imgSize = reader.size();
+
+        if (imgSize.isValid()) {
+            imgSize.scale(maxDim, maxDim, Qt::KeepAspectRatio);
+
+            QPixmap src(fi.filePath());
+            if (!src.isNull()) {
+                QPixmap pm(imgSize);
+                pm.fill(Qt::transparent);
+
+                QPainter p(&pm);
+                p.setRenderHint(QPainter::Antialiasing);
+
+                const QRect r = pm.rect();
+
+                QPainterPath clip;
+                clip.addRoundedRect(r, radius, radius);
+                p.setClipPath(clip);
+
+                QPixmap scaled =
+                    src.scaled(r.size(),
+                               Qt::KeepAspectRatio,
+                               Qt::SmoothTransformation);
+
+                const QPoint topLeft(
+                    r.center().x() - scaled.width() / 2,
+                    r.center().y() - scaled.height() / 2);
+
+                p.drawPixmap(topLeft, scaled);
+
+                icon = QIcon(pm);
+            }
         }
     } else if (mime.name().startsWith("text/")) {
         icon = textPreviewIcon(fi, size);
