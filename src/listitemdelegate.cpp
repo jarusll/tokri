@@ -35,54 +35,52 @@ void ListItemDelegate::paint(QPainter *p,
     QStyleOptionViewItem o(opt);
     initStyleOption(&o, idx);
 
-    p->save();
+    o.text.clear();
+    o.icon = QIcon();
 
-    p->fillRect(o.rect, o.palette.base());
+    if (opt.state & QStyle::State_Selected) {
+        QColor c = opt.palette.color(QPalette::Highlight);
+        p->fillRect(opt.rect, c);
+    }
+    else if (opt.state & QStyle::State_MouseOver) {
+        QColor c = opt.palette.color(QPalette::Midlight);
+        p->fillRect(opt.rect, c);
+    }
 
-    // base (selection / hover / focus)
-    QApplication::style()->drawPrimitive(
-        QStyle::PE_PanelItemViewItem, &o, p, nullptr);
+    QApplication::style()->drawControl(
+        QStyle::CE_ItemViewItem, &o, p);
 
     const QRect r = o.rect;
-
-    const QFileInfo fi =
-        idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
 
     // icon
     const QRect iconRect(
         r.center().x() - iconPx / 2,
         r.top() + gapPx,
-        iconPx,
-        iconPx
-        );
+        iconPx, iconPx);
 
     static ThumbnailProvider provider;
-    provider.iconForFile(fi, iconRect.size())
+    provider.iconForFile(
+                idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>(),
+                iconRect.size())
         .paint(p, iconRect, Qt::AlignCenter);
 
     // text
-    const QFontMetrics fm(o.font);
-    const int textHeight = fm.ascent() + fm.descent();
-
-    QRect textRect(
+    const QFontMetrics fm(opt.font);
+    const QRect textRect(
         r.left() + textHorzPadPx,
         iconRect.bottom() + iconTextGap,
         r.width() - 2 * textHorzPadPx,
-        textHeight + textBottomPadPx
-        );
+        fm.height());
 
     p->setPen(o.state & QStyle::State_Selected
                   ? o.palette.color(QPalette::HighlightedText)
                   : o.palette.color(QPalette::Text));
 
     p->drawText(
-        textRect.adjusted(0, 0, 0, -textBottomPadPx),
-        Qt::AlignHCenter | Qt::AlignBottom,
+        textRect,
+        Qt::AlignHCenter | Qt::AlignVCenter,
         fm.elidedText(
             idx.data(Qt::DisplayRole).toString(),
             Qt::ElideMiddle,
-            textRect.width())
-        );
-
-    p->restore();
+            textRect.width()));
 }
