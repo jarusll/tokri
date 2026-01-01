@@ -37,19 +37,13 @@ void ListItemDelegate::paint(QPainter *p,
 
     p->save();
 
-    // base (selection / focus)
+    p->fillRect(o.rect, o.palette.base());
+
+    // base (selection / hover / focus)
     QApplication::style()->drawPrimitive(
         QStyle::PE_PanelItemViewItem, &o, p, nullptr);
 
     const QRect r = o.rect;
-
-    // hover
-    if ((o.state & QStyle::State_MouseOver) &&
-        !(o.state & QStyle::State_Selected)) {
-        QColor c = o.palette.color(QPalette::Midlight);
-        c.setAlphaF(0.5);
-        p->fillRect(r, c);
-    }
 
     const QFileInfo fi =
         idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
