@@ -8,14 +8,14 @@
 - Drag items **out** to move them
 - Hold Ctrl (Windows/Linux) or ⌘ Command (macOS) while dragging to copy
 
-## Files
-![](./assets/files.gif)
-
 ## Images
 ![](./assets/image.gif)
 
 ## Text & URLs
 ![](./assets/text.gif)
+
+## Files
+![](./assets/files.gif)
 
 ## Download
 
