@@ -71,7 +71,6 @@ cmake --build build
 - 🎨 Design by [Akshay Majgaonkar](https://www.linkedin.com/in/akshay-majgaonkar/)
 
 ## TODO
-- Grid view with previews
 - Add items from clipboard
 - Placeholder text and Image
 - Item count
