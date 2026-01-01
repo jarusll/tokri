@@ -18,9 +18,19 @@
 ![](./assets/text.gif)
 
 ## Download
-- Windows - [Portable Zip](https://github.com/jarusll/tokri/releases/download/v2025.12.09/Tokri.zip)
-- Linux -  [Flatpak](https://github.com/jarusll/tokri/releases/download/v2025.12.09/Tokri.flatpak)
-- macOS - Coming soon
+
+### Windows - [Portable (.zip)](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.zip)
+
+### macOS - [DMG installer](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.dmg)
+
+#### Trust the application
+- Drag Tokri.app into Applications
+- Then execute in Terminal:
+```zsh
+sudo xattr -dr com.apple.quarantine /Applications/Tokri.app
+```
+
+### Linux - [Flatpak bundle](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.flatpak)
 
 > **Note for Linux users**
 >
