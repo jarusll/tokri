@@ -1,8 +1,8 @@
 #include "listitemdelegate.h"
+#include "thumbnailprovider.h"
 
 #include <QPainter>
 #include <QFileInfo>
-#include <QMimeDatabase>
 #include <QFileSystemModel>
 #include <QApplication>
 
@@ -62,23 +62,9 @@ void ListItemDelegate::paint(QPainter *p,
         iconPx
         );
 
-    static QMimeDatabase db;
-    if (db.mimeTypeForFile(fi).name().startsWith("image/")) {
-        QPixmap pm(fi.filePath());
-        if (!pm.isNull()) {
-            pm = pm.scaled(
-                iconRect.size(),
-                Qt::KeepAspectRatio,
-                Qt::SmoothTransformation);
-            p->drawPixmap(
-                iconRect.center()
-                    - QPoint(pm.width() / 2, pm.height() / 2),
-                pm);
-        }
-    } else {
-        idx.data(Qt::DecorationRole).value<QIcon>()
+    static ThumbnailProvider provider;
+    provider.iconForFile(fi, iconRect.size())
         .paint(p, iconRect, Qt::AlignCenter);
-    }
 
     // text
     const QFontMetrics fm(o.font);
