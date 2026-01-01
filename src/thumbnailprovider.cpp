@@ -27,55 +27,27 @@ QString ThumbnailProvider::makeKey(const QFileInfo &fi) const
 QIcon ThumbnailProvider::iconForFile(const QFileInfo &fi,
                                      const QSize &size) const
 {
+    if (!fi.exists() || fi.size() == 0)
+        return iconProvider.icon(fi);
+
     const QString key = makeKey(fi);
 
     if (auto *cached = cache.object(key))
         return *cached;
 
+    const QMimeType mime =
+        db.mimeTypeForFile(fi, QMimeDatabase::MatchContent);
+
     QIcon icon;
-    const auto mime = db.mimeTypeForFile(fi);
 
     if (mime.name().startsWith("image/")) {
-        QImageReader reader(fi.filePath());
-        QSize imgSize = reader.size();
-
-        if (imgSize.isValid()) {
-            imgSize.scale(maxDim, maxDim, Qt::KeepAspectRatio);
-
-            QPixmap src(fi.filePath());
-            if (!src.isNull()) {
-                QPixmap pm(imgSize);
-                pm.fill(Qt::transparent);
-
-                QPainter p(&pm);
-                p.setRenderHint(QPainter::Antialiasing);
-
-                const QRect r = pm.rect();
-
-                QPainterPath clip;
-                clip.addRoundedRect(r, radius, radius);
-                p.setClipPath(clip);
-
-                QPixmap scaled =
-                    src.scaled(r.size(),
-                               Qt::KeepAspectRatio,
-                               Qt::SmoothTransformation);
-
-                const QPoint topLeft(
-                    r.center().x() - scaled.width() / 2,
-                    r.center().y() - scaled.height() / 2);
-
-                p.drawPixmap(topLeft, scaled);
-
-                icon = QIcon(pm);
-            }
-        }
+        icon = imagePreviewIcon(fi, size);
     } else if (mime.name().startsWith("text/")) {
         icon = textPreviewIcon(fi, size);
     }
 
     if (icon.isNull())
-        icon = iconProvider.icon(fi);
+        return iconProvider.icon(fi);
 
     cache.insert(key, new QIcon(icon), 1);
     return icon;
@@ -123,6 +95,42 @@ QIcon ThumbnailProvider::textPreviewIcon(const QFileInfo &fi,
     p.drawText(textRect,
                Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap,
                text);
+
+    return QIcon(pm);
+}
+
+QIcon ThumbnailProvider::imagePreviewIcon(const QFileInfo &fi,
+                                          const QSize &size) const
+{
+    QPixmap src(fi.filePath());
+    if (src.isNull())
+        return {};
+
+    QSize target = size;
+    target.scale(maxDim, maxDim, Qt::KeepAspectRatio);
+
+    QPixmap pm(target);
+    pm.fill(Qt::transparent);
+
+    QPainter p(&pm);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    const QRect r = pm.rect();
+
+    QPainterPath clip;
+    clip.addRoundedRect(r, radius, radius);
+    p.setClipPath(clip);
+
+    QPixmap scaled =
+        src.scaled(r.size(),
+                   Qt::KeepAspectRatio,
+                   Qt::SmoothTransformation);
+
+    const QPoint topLeft(
+        r.center().x() - scaled.width()  / 2,
+        r.center().y() - scaled.height() / 2);
+
+    p.drawPixmap(topLeft, scaled);
 
     return QIcon(pm);
 }
