@@ -41,6 +41,7 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -167,6 +168,26 @@ int main(int argc, char *argv[])
         &CopyWorker::saveImageBytes,
         Qt::QueuedConnection
         );
+
+    QTimer *reloadDebounce = new QTimer(&tokriWindow);
+    reloadDebounce->setSingleShot(true);
+    reloadDebounce->setInterval(1000);
+
+    QObject::connect(worker, &CopyWorker::copySuccess,
+                     reloadDebounce,
+                     [&](const QString &path) {
+                         reloadDebounce->start();
+                     },
+                     Qt::QueuedConnection);
+
+    QObject::connect(reloadDebounce, &QTimer::timeout,
+            fsModel,
+            [fsModel, sortFilterProxy] {
+                const QString root = fsModel->rootPath();
+                fsModel->setRootPath(QString());
+                fsModel->setRootPath(root);
+                sortFilterProxy->invalidate();
+            });
 
     QThread* th = new QThread;
     CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
