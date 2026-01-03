@@ -23,6 +23,12 @@
 
 ### macOS - [DMG installer](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.dmg)
 
+#### Install via brew
+```zsh
+brew tap jarusll/tap
+brew install --cask jarusll/tap/tokri
+```
+
 > **Note for macOS users**
 >
 > This app is **unsigned**, so macOS will block it on first launch.
@@ -81,6 +87,7 @@ cmake --build build
 ## TODO
 - Open url on double click
 - Publish on Flathub
+- Double click on macOS dock should wakeup Tokri
 - Add items from clipboard
 - Placeholder text and Image
 - Item count
