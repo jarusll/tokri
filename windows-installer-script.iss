@@ -12,6 +12,7 @@ DisableDirPage=no
 DisableProgramGroupPage=no
 DefaultGroupName={#AppName}
 OutputBaseFilename=TokriSetup
+OutputDir=dist\installer
 Compression=lzma2
 SolidCompression=yes
 PrivilegesRequired=lowest
@@ -23,3 +24,9 @@ WizardStyle=modern
 Source: "dist\Windows\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion; Excludes: "Tokri.exe"
 Source: "dist\Windows\Tokri.exe"; DestDir: "{app}"; Flags: ignoreversion
 
+[Tasks]
+Name: desktopicon; Description: "Create a &desktop shortcut"; Flags: unchecked
+
+[Icons]
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"
+Name: "{userdesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
