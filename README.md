@@ -24,11 +24,14 @@
 ### macOS - [DMG installer](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.dmg)
 
 #### Trust the application
-- Drag Tokri.app into Applications
-- Then execute in Terminal:
+1. Drag **Tokri.app** into **Applications**
+2. Run in Terminal:
 ```zsh
-sudo xattr -dr com.apple.quarantine /Applications/Tokri.app
+sudo /usr/bin/xattr -dr com.apple.quarantine /Applications/Tokri.app
 ```
+
+Alternatively:
+System Settings → Privacy & Security → **Open Anyway**
 
 ### Linux - [Flatpak bundle](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.flatpak)
 
@@ -72,6 +75,7 @@ cmake --build build
 
 ## TODO
 - Open url on double click
+- Publish on winget, Homebrew and Flathub
 - Add items from clipboard
 - Placeholder text and Image
 - Item count
