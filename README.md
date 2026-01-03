@@ -25,12 +25,11 @@
 
 ### macOS
 - DMG installer: [Tokri.dmg](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.dmg)
-
-#### Install via brew
-```zsh
-brew tap jarusll/tap
-brew install --cask jarusll/tap/tokri
-```
+- Install via Homebrew:
+    ```zsh
+    brew tap jarusll/tap
+    brew install --cask jarusll/tap/tokri
+    ```
 
 > **Note for macOS users**
 >
