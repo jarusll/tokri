@@ -31,7 +31,7 @@ sudo /usr/bin/xattr -dr com.apple.quarantine /Applications/Tokri.app
 ```
 
 Alternatively:
-System Settings → Privacy & Security → **Open Anyway**
+System Settings → Privacy & Security → **Open Anyway** (for Tokri)
 
 ### Linux - [Flatpak bundle](https://github.com/jarusll/tokri/releases/download/v2026.01.01/Tokri.flatpak)
 
