@@ -35,7 +35,6 @@ brew install --cask jarusll/tap/tokri
 >
 > To run it:
 >
-> - Drag **Tokri.app** into **Applications**
 > - Run in Terminal:
 >   ```zsh
 >   sudo /usr/bin/xattr -dr com.apple.quarantine /Applications/Tokri.app
