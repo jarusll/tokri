@@ -4,6 +4,8 @@
 #include <QBuffer>
 #include <QImageReader>
 #include <QUuid>
+#include <QClipboard>
+#include <QDrag>
 
 bool isValidHttpUrl(const QString &s)
 {
@@ -198,4 +200,18 @@ Qt::DropActions DropAwareFileSystemModel::supportedDragActions() const {
     return (QApplication::keyboardModifiers() & Qt::ControlModifier)
                ? Qt::CopyAction
                : Qt::MoveAction;
+}
+
+void DropAwareFileSystemModel::pasteFromClipboard()
+{
+    const QMimeData *cb = QGuiApplication::clipboard()->mimeData();
+    if (!cb) return;
+
+    auto *mime = new QMimeData;
+    for (const QString &fmt : cb->formats())
+        mime->setData(fmt, cb->data(fmt));
+
+    auto *drag = new QDrag(this);
+    drag->setMimeData(mime);
+    drag->exec(Qt::CopyAction);
 }

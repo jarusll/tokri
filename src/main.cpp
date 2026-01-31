@@ -102,6 +102,10 @@ int main(int argc, char *argv[])
     deleteAction->setShortcut(QKeySequence::Delete);
     tokriWindow.addAction(deleteAction);
 
+    QAction *pasteAction = new QAction(&tokriWindow);
+    pasteAction->setShortcut(QKeySequence::Paste);
+    tokriWindow.addAction(pasteAction);
+
     // View & Models
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&tokriWindow);
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
@@ -216,6 +220,12 @@ int main(int argc, char *argv[])
             }
         });
 
+    DropAwareFileSystemModel::connect(
+        pasteAction,
+        &QAction::triggered,
+        fsModel,
+        &DropAwareFileSystemModel::pasteFromClipboard
+        );
 
     auto SleepShortcut = new QShortcut(QKeySequence("Escape"), &tokriWindow);
     SleepShortcut->setContext(Qt::WindowShortcut);

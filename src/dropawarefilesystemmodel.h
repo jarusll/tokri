@@ -24,6 +24,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QMimeData* mimeData(const QModelIndexList &indexes) const override;
     Qt::DropActions supportedDragActions() const override;
+    void pasteFromClipboard();
 
 signals:
     void droppedText(const QString &text);
