@@ -84,10 +84,11 @@ public:
     {
         auto current = QOperatingSystemVersion::current();
 
-        if (current.type() == QOperatingSystemVersion::Windows &&
-            current.majorVersion() == 10) {
+#ifdef Q_OS_WIN
+        if (current < QOperatingSystemVersion::Windows11) {
             return ThemeProvider::light();
         }
+#endif
         const bool dark =
             (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
 
