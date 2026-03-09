@@ -41,8 +41,10 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         qDebug() << "Can drop image";
         return true;
     } else if (data->hasUrls()){
+        qDebug() << "Can drop url";
         return true;
     } else if (data->hasText()){
+        qDebug() << "Can drop text";
         return true;
     }
 
