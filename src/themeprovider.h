@@ -4,6 +4,7 @@
 #include <QGuiApplication>
 #include <QPalette>
 #include <QStyleHints>
+#include <QOperatingSystemVersion>
 
 class ThemeProvider
 {
@@ -81,6 +82,12 @@ public:
 
     static QPalette theme()
     {
+        auto current = QOperatingSystemVersion::current();
+
+        if (current.type() == QOperatingSystemVersion::Windows &&
+            current.majorVersion() == 10) {
+            return ThemeProvider::light();
+        }
         const bool dark =
             (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
 
