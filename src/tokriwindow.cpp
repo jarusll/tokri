@@ -54,7 +54,8 @@ TokriWindow::TokriWindow(QWidget *parent)
     });
 
     ui->listView->setViewMode(QListView::IconMode);
-    ui->listView->setGridSize({100, 130});
+    ui->listView->setIconSize({128, 128});
+    ui->listView->setGridSize({128, 150});
     ui->listView->setFlow(QListView::LeftToRight);
     ui->listView->setWrapping(true);
     ui->listView->setUniformItemSizes(true);
