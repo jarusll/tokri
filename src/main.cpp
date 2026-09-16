@@ -9,15 +9,15 @@
 #include "standardpaths.h"
 
 #ifdef Q_OS_WIN
-#include "windowsmouseinterceptor.h"
+#include "windowsdragshakedetector.h"
 #endif
 
 #ifdef Q_OS_LINUX
-#include "linuxmouseinterceptor.h"
+#include "linuxdragshakedetector.h"
 #endif
 
 #ifdef Q_OS_MACOS
-#include "macosmouseinterceptor.h"
+#include "macosdragshakedetector.h"
 #endif
 
 #include <QAbstractItemView>
@@ -227,22 +227,22 @@ int main(int argc, char *argv[])
 
 
 #ifdef Q_OS_LINUX
-    MouseInterceptor *interceptor = new MouseInterceptor;
+    LinuxDragShakeDetector *interceptor = new LinuxDragShakeDetector;
 
     QObject::connect(
         interceptor,
-        &MouseInterceptor::shakeDetected,
+        &LinuxDragShakeDetector::shakeDetected,
         &tokriWindow,
-        &TokriWindow::wakeUp
+        &TokriWindow::wakeUp,
+        Qt::QueuedConnection
         );
 #endif
 #ifdef Q_OS_WIN
-    WindowsMouseInterceptor *interceptor = new WindowsMouseInterceptor;
-    interceptor->start();
+    WindowsDragShakeDetector *interceptor = new WindowsDragShakeDetector;
 
     QObject::connect(
         interceptor,
-        &WindowsMouseInterceptor::shakeDetected,
+        &WindowsDragShakeDetector::shakeDetected,
         &tokriWindow,
         &TokriWindow::wakeUp,
         Qt::QueuedConnection
@@ -250,16 +250,14 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef Q_OS_MACOS
-    MacOSMouseInterceptor *interceptor = new MacOSMouseInterceptor;
+    MacOSDragShakeDetector *interceptor = new MacOSDragShakeDetector;
 
     QObject::connect(
         interceptor,
-        &MacOSMouseInterceptor::shakeDetected,
+        &MacOSDragShakeDetector::shakeDetected,
         &tokriWindow,
         &TokriWindow::wakeUp
         );
-
-    interceptor->start();
 #endif
 
 
@@ -267,8 +265,6 @@ int main(int argc, char *argv[])
     int ret = a.exec();
 
 #ifdef Q_OS_WIN
-    interceptor->quit();   // stop the event loop inside the thread
-    interceptor->wait();   // wait for thread to finish
     delete interceptor;
 #endif
 

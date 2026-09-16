@@ -27,24 +27,24 @@ set(PROJECT_SOURCES
 set(LINUX_SOURCES "")
 if (UNIX AND NOT APPLE)
     list(APPEND LINUX_SOURCES
-        src/linuxmouseinterceptor.h
-        src/linuxmouseinterceptor.cpp
+        src/linuxdragshakedetector.h
+        src/linuxdragshakedetector.cpp
     )
 endif()
 
 set(WINDOWS_SOURCES "")
 if (WIN32)
     list(APPEND WINDOWS_SOURCES
-        src/windowsmouseinterceptor.h
-        src/windowsmouseinterceptor.cpp
+        src/windowsdragshakedetector.h
+        src/windowsdragshakedetector.cpp
     )
 endif()
 
 set(MACOS_SOURCES "")
 if (APPLE)
     list(APPEND MACOS_SOURCES
-        src/macosmouseinterceptor.h
-        src/macosmouseinterceptor.cpp
+        src/macosdragshakedetector.h
+        src/macosdragshakedetector.cpp
         src/MacWindowLevel.h
         src/MacWindowLevel.mm
     )
@@ -63,7 +63,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/sortfilterproxy.h src/sortfilterproxy.cpp
         src/nointernaldraglistview.h src/nointernaldraglistview.cpp
         src/standardnames.h
-        src/horizontalshakedetector.h src/horizontalshakedetector.cpp
+        src/shakedetector.h src/shakedetector.cpp
         src/themeprovider.h src/themeprovider.cpp
 
         src/standardpaths.h src/standardpaths.cpp
@@ -145,6 +145,18 @@ target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 target_include_directories(Tokri PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+if(APPLE)
+    target_link_libraries(Tokri PRIVATE
+        "-framework CoreGraphics"
+    )
+endif()
+
+if(WIN32)
+    target_link_libraries(Tokri PRIVATE
+        user32
+    )
+endif()
 
 if(UNIX AND NOT APPLE)
         install(
