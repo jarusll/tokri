@@ -21,6 +21,7 @@
 
 #include <QAbstractItemView>
 #include <QAbstractProxyModel>
+#include <QItemSelectionModel>
 #include <QApplication>
 #include <QDateTime>
 #include <QFileInfo>
@@ -102,6 +103,12 @@ int main(int argc, char *argv[])
     deleteAction->setShortcut(QKeySequence::Delete);
     tokriWindow.addAction(deleteAction);
 
+    QAction *copyAction = new QAction(&tokriWindow);
+    copyAction->setShortcut(QKeySequence::Copy);
+    tokriWindow.addAction(copyAction);
+    QObject::connect(copyAction, &QAction::triggered,
+                     &tokriWindow, &TokriWindow::copySelection);
+
     // View & Models
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&tokriWindow);
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
@@ -114,6 +121,18 @@ int main(int argc, char *argv[])
 
     tokriWindow.uiHandle()->listView->setModel(sortFilterProxy);
     tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(rootIndex));
+
+    auto *listView = tokriWindow.uiHandle()->listView;
+    copyAction->setEnabled(false);
+    QObject::connect(listView->selectionModel(),
+                     &QItemSelectionModel::selectionChanged,
+                     copyAction,
+                     [listView, copyAction] {
+                         copyAction->setEnabled(
+                             !listView->selectionModel()
+                                  ->selectedIndexes()
+                                  .isEmpty());
+                     });
 
     qRegisterMetaType<QMimeData *>("QMimeData*");
 

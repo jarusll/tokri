@@ -132,18 +132,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
 
                 if (chosen == copy) {
-                    QList<QUrl> urls;
-                    for (const auto &idx : selected) {
-                        const auto fi = fileInfoAt(idx);
-                        if (fi.exists())
-                            urls << QUrl::fromLocalFile(fi.absoluteFilePath());
-                    }
-                    log.log() << "copy urls=" << urls;
-                    if (!urls.isEmpty()) {
-                        auto *mime = new QMimeData;
-                        mime->setUrls(urls);
-                        QGuiApplication::clipboard()->setMimeData(mime);
-                    }
+                    copySelection();
                     log.pop();
                     return;
                 }
@@ -305,6 +294,44 @@ void TokriWindow::selectAll()
     log.push("selectAll");
 
     ui->listView->selectAll();
+
+    log.pop();
+}
+
+QList<QUrl> TokriWindow::selectedUrls() const
+{
+    QList<QUrl> urls;
+
+    auto *sel = ui->listView->selectionModel();
+    if (!sel)
+        return urls;
+
+    const auto selected = sel->selectedIndexes();
+    for (const auto &idx : selected) {
+        if (!idx.isValid())
+            continue;
+
+        const QFileInfo fi =
+            idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
+        if (fi.exists())
+            urls << QUrl::fromLocalFile(fi.absoluteFilePath());
+    }
+
+    return urls;
+}
+
+void TokriWindow::copySelection()
+{
+    Logger &log = Logger::instance();
+    log.push("copySelection");
+
+    const QList<QUrl> urls = selectedUrls();
+    log.log() << "urls=" << urls;
+    if (!urls.isEmpty()) {
+        auto *mime = new QMimeData;
+        mime->setUrls(urls);
+        QGuiApplication::clipboard()->setMimeData(mime);
+    }
 
     log.pop();
 }

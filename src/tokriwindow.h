@@ -7,6 +7,8 @@
 #include <QDragMoveEvent>
 #include <QMimeData>
 #include <QCloseEvent>
+#include <QList>
+#include <QUrl>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -28,6 +30,7 @@ public:
 public slots:
     void onShakeDetect();
     void deleteSelection();
+    void copySelection();
     void selectAll();
 
 private:
@@ -38,5 +41,6 @@ private:
     void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *e);
     void openItem(QString filePath);
+    QList<QUrl> selectedUrls() const;
 };
 #endif // TOKRIWINDOW_H
