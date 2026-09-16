@@ -27,9 +27,7 @@ TokriWindow::TokriWindow(QWidget *parent)
     ui->setupUi(this);
 
     init();
-    setWindowFlags(windowFlags()
-                   | Qt::Tool
-                   | Qt::WindowStaysOnTopHint);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
