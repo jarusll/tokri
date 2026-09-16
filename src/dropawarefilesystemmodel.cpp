@@ -2,8 +2,6 @@
 
 #include "loghelpers.h"
 
-#include <QApplication>
-
 namespace {
 
 QMimeData *cloneMimeData(const QMimeData *src)
@@ -139,12 +137,8 @@ Qt::DropActions DropAwareFileSystemModel::supportedDragActions() const {
     Logger &log = Logger::instance();
     log.push("supportedDragActions");
 
-    const Qt::DropActions actions =
-        (QApplication::keyboardModifiers() & Qt::ControlModifier)
-            ? Qt::CopyAction
-            : Qt::MoveAction;
-    log.log() << "->" << actions
-              << "ctrl=" << bool(QApplication::keyboardModifiers() & Qt::ControlModifier);
+    const Qt::DropActions actions = Qt::CopyAction | Qt::MoveAction;
+    log.log() << "->" << actions;
 
     log.pop();
     return actions;
