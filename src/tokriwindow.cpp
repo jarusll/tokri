@@ -61,7 +61,6 @@ TokriWindow::TokriWindow(QWidget *parent)
     ui->listView->setUniformItemSizes(true);
     ui->listView->setSpacing(8);
     ui->listView->setMouseTracking(true);
-    ui->listView->setFocusPolicy(Qt::NoFocus);
     ui->listView->setDropIndicatorShown(false);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
 
