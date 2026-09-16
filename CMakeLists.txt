@@ -59,6 +59,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/drophandler.h src/drophandler.cpp
         src/textfile.h src/textfile.cpp
         src/filepathprovider.h src/filepathprovider.cpp
+        src/loghelpers.h
         src/sortfilterproxy.h src/sortfilterproxy.cpp
         src/nointernaldraglistview.h src/nointernaldraglistview.cpp
         src/standardnames.h

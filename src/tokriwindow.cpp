@@ -1,5 +1,6 @@
 #include "tokriwindow.h"
 #include "./ui_tokriwindow.h"
+#include "loghelpers.h"
 #include "standardpaths.h"
 #include <QDir>
 #include <QMenu>
@@ -77,6 +78,8 @@ TokriWindow::TokriWindow(QWidget *parent)
                 selectAll = menu.addAction("Select &All");
 
                 QAction *chosen = menu.exec(view->viewport()->mapToGlobal(pos));
+                qInfo().noquote() << threadTag() << "contextMenu count=" << count
+                                  << "chosen=" << (chosen ? chosen->text() : QString("<none>"));
                 if (!chosen) return;
 
                 auto fileInfoAt = [](const QModelIndex &idx) {
@@ -101,6 +104,8 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
 
                 if (count == 1 && chosen == rename) {
+                    qInfo().noquote() << threadTag() << "contextMenu rename path="
+                                      << fileInfoAt(selected[0]).filePath();
                     view->edit(selected[0]);
                     return;
                 }
@@ -112,6 +117,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                         if (fi.exists())
                             urls << QUrl::fromLocalFile(fi.absoluteFilePath());
                     }
+                    qInfo().noquote() << threadTag() << "contextMenu copy urls=" << urls;
                     if (!urls.isEmpty()) {
                         auto *mime = new QMimeData;
                         mime->setUrls(urls);
@@ -127,9 +133,14 @@ TokriWindow::TokriWindow(QWidget *parent)
                             return;
 
                         if (fi.isDir())
-                            QDir(fi.absoluteFilePath()).removeRecursively();
+                            qInfo().noquote() << threadTag() << "contextMenu delete dir path="
+                                              << fi.absoluteFilePath()
+                                              << "ok=" << QDir(fi.absoluteFilePath()).removeRecursively();
                         else
-                            QFile::remove(fi.absoluteFilePath());                    }
+                            qInfo().noquote() << threadTag() << "contextMenu delete file path="
+                                              << fi.absoluteFilePath()
+                                              << "ok=" << QFile::remove(fi.absoluteFilePath());
+                    }
                 }
             });
 
@@ -147,6 +158,7 @@ Ui::TokriWindow *TokriWindow::uiHandle()
 
 void TokriWindow::sleep()
 {
+    qInfo().noquote() << threadTag() << "sleep -> hide";
     hide();
 }
 
@@ -154,6 +166,9 @@ void TokriWindow::wakeUp()
 {
     const bool minimized = isMinimized();
     const bool hidden = !isVisible();
+
+    qInfo().noquote() << threadTag() << "wakeUp minimized=" << minimized
+                      << "hidden=" << hidden;
 
     if (minimized || hidden) {
         moveNearCursor();
@@ -206,6 +221,7 @@ void TokriWindow::moveNearCursor()
 
 void TokriWindow::onShakeDetect()
 {
+    qInfo().noquote() << threadTag() << "onShakeDetect";
     wakeUp();
 }
 
@@ -219,11 +235,13 @@ void TokriWindow::showEvent(QShowEvent *e)
 }
 
 void TokriWindow::openItem(QString filePath) {
+    qInfo().noquote() << threadTag() << "openItem path=" << filePath;
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
 
 void TokriWindow::closeEvent(QCloseEvent *e)
 {
+    qInfo().noquote() << threadTag() << "closeEvent -> ignore & sleep";
     e->ignore();
     sleep();
 }

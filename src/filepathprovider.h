@@ -1,6 +1,7 @@
 #ifndef FILEPATHPROVIDER_H
 #define FILEPATHPROVIDER_H
 
+#include "loghelpers.h"
 #include "standardpaths.h"
 
 #include <QDir>
@@ -21,14 +22,22 @@ public:
         clean.replace(forbidden, "_");
         clean = clean.trimmed();
         clean.remove(QRegularExpression(R"(^_+|_+$)"));
-        if (clean.isEmpty())
+        bool fallback = false;
+        if (clean.isEmpty()) {
             clean = "untitled";
+            fallback = true;
+        }
+        if (clean != name || fallback)
+            qInfo().noquote() << threadTag() << "sanitizeName in=" << name
+                              << "out=" << clean << "fallback=" << fallback;
         return clean;
     }
 
     static QString nameFromPath(const QString &path) {
         const QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
-        return QDir(rootPath).filePath(sanitizeName(QDir(path).dirName()));
+        const QString result = QDir(rootPath).filePath(sanitizeName(QDir(path).dirName()));
+        qInfo().noquote() << threadTag() << "nameFromPath path=" << path << "->" << result;
+        return result;
     }
 
     static QString nameWithPrefix(const QString &prefix = QString()) {
@@ -36,12 +45,18 @@ public:
         QString name = QUuid::createUuid().toString(QUuid::WithoutBraces);
         if (!prefix.isEmpty())
             name = prefix + "_" + name;
-        return QDir(rootPath).filePath(name);
+        const QString result = QDir(rootPath).filePath(name);
+        qInfo().noquote() << threadTag() << "nameWithPrefix prefix=" << prefix
+                          << "->" << result;
+        return result;
     }
 
     static QString uniquePath(const QString &desiredPath) {
-        if (!QFileInfo::exists(desiredPath))
+        if (!QFileInfo::exists(desiredPath)) {
+            qInfo().noquote() << threadTag() << "uniquePath desired=" << desiredPath
+                              << "chosen=" << desiredPath << "collisions=0";
             return desiredPath;
+        }
 
         const QFileInfo info(desiredPath);
         const QString dir = info.absolutePath();
@@ -54,8 +69,11 @@ public:
                 candidate += "." + suffix;
 
             const QString path = QDir(dir).filePath(candidate);
-            if (!QFileInfo::exists(path))
+            if (!QFileInfo::exists(path)) {
+                qInfo().noquote() << threadTag() << "uniquePath desired=" << desiredPath
+                                  << "chosen=" << path << "collisions=" << n;
                 return path;
+            }
         }
     }
 };

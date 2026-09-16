@@ -1,5 +1,6 @@
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
+#include "loghelpers.h"
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
 #include "ui_tokriwindow.h"
@@ -47,6 +48,8 @@ int main(int argc, char *argv[])
     qputenv("QT_QPA_PLATFORM", "xcb");
 #endif
     QApplication a(argc, argv);
+    QThread::currentThread()->setObjectName("main");
+    qInfo().noquote() << threadTag() << "Tokri starting";
 
     QLocalServer server;
     TokriWindow tokriWindow;
@@ -116,6 +119,8 @@ int main(int argc, char *argv[])
 
     DropHandler *dropHandler = new DropHandler;
     fsModel->setDropReceiver(dropHandler);
+    qInfo().noquote() << threadTag() << "dropReceiver set handler="
+                      << static_cast<const void *>(dropHandler);
 
     QObject::connect(fsModel, &DropAwareFileSystemModel::dropReceived,
                      dropHandler, &DropHandler::handleDrop,
@@ -130,8 +135,18 @@ int main(int argc, char *argv[])
                      reloadDirectoryDebounce,
                      [&reloadDirectoryDebounce, &reset] {
                          reloadDirectoryDebounce->setInterval(reset ? 500 : 3000);
+                         qInfo().noquote() << threadTag() << "reload debounce interval="
+                                           << reloadDirectoryDebounce->interval()
+                                           << "reset=" << reset;
                          reset = false;
                          reloadDirectoryDebounce->start();
+                     });
+
+    QObject::connect(dropHandler, &DropHandler::failed,
+                     dropHandler,
+                     [](const QString &reason) {
+                         qWarning().noquote() << threadTag() << "drop failed reason="
+                                              << reason;
                      });
 
     QObject::connect(reloadDirectoryDebounce, &QTimer::timeout,
@@ -139,16 +154,24 @@ int main(int argc, char *argv[])
                      [&reset, &fsModel] {
                          reset = true;
                          const QString root = fsModel->rootPath();
+                         qInfo().noquote() << threadTag() << "reload root=" << root;
                          fsModel->setRootPath(QString());
                          fsModel->setRootPath(root);
                      });
 
 
     QThread* th = new QThread;
+    th->setObjectName("worker");
     QObject::connect(th, &QThread::finished, dropHandler, &QObject::deleteLater);
-    QObject::connect(&a, &QCoreApplication::aboutToQuit, th, &QThread::quit);
+    QObject::connect(&a, &QCoreApplication::aboutToQuit, th,
+                     [th] {
+                         qInfo().noquote() << threadTag() << "aboutToQuit -> quit worker";
+                         th->quit();
+                     });
     QObject::connect(th, &QThread::finished, th, &QObject::deleteLater);
     dropHandler->moveToThread(th);
+    qInfo().noquote() << threadTag() << "worker thread start handlerThread="
+                      << static_cast<const void *>(dropHandler->thread());
     th->start();
 
 
@@ -168,9 +191,11 @@ int main(int argc, char *argv[])
                 const QString path = fi.filePath();
 
                 if (fi.isDir()) {
-                    QDir(path).removeRecursively();
+                    qInfo().noquote() << threadTag() << "delete dir path=" << path
+                                      << "ok=" << QDir(path).removeRecursively();
                 } else {
-                    QFile(path).moveToTrash();
+                    qInfo().noquote() << threadTag() << "delete file path=" << path
+                                      << "ok=" << QFile(path).moveToTrash();
                 }
             }
         });

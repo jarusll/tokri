@@ -1,29 +1,39 @@
 #include "nointernaldraglistview.h"
 
+#include "loghelpers.h"
+
 #include <QDragEnterEvent>
 
 NoInternalDragListView::NoInternalDragListView() {}
 
 void NoInternalDragListView::dragEnterEvent(QDragEnterEvent *e)
 {
-    if (e->source() == this)
+    const bool isSelf = e->source() == this;
+    qInfo().noquote() << threadTag() << "dragEnter source==this=" << isSelf
+                      << "formats=" << e->mimeData()->formats();
+    if (isSelf)
         e->ignore();
     else {
         emit dropping(true);
         QListView::dragEnterEvent(e);
     }
+    qInfo().noquote() << threadTag() << "dragEnter accepted=" << e->isAccepted();
 }
 
 void NoInternalDragListView::dragMoveEvent(QDragMoveEvent *e)
 {
-    if (e->source() == this)
+    const bool isSelf = e->source() == this;
+    if (isSelf)
         e->ignore();
     else
         QListView::dragMoveEvent(e);
+    qInfo().noquote() << threadTag() << "dragMove source==this=" << isSelf
+                      << "accepted=" << e->isAccepted();
 }
 
 void NoInternalDragListView::dragLeaveEvent(QDragLeaveEvent *e)
 {
+    qInfo().noquote() << threadTag() << "dragLeave";
     emit dropping(false);
 
     QListView::dragLeaveEvent(e);
@@ -31,9 +41,16 @@ void NoInternalDragListView::dragLeaveEvent(QDragLeaveEvent *e)
 
 void NoInternalDragListView::dropEvent(QDropEvent *e)
 {
+    qInfo().noquote() << threadTag() << "drop ENTER source==this=" << (e->source() == this)
+                      << "dropAction=" << e->dropAction()
+                      << "possibleActions=" << e->possibleActions()
+                      << "formats=" << e->mimeData()->formats();
     emit dropping(false);
 
     QListView::dropEvent(e);
+
+    qInfo().noquote() << threadTag() << "drop accepted=" << e->isAccepted()
+                      << "finalDropAction=" << e->dropAction();
 }
 
 void NoInternalDragListView::paintEvent(QPaintEvent *e) {
