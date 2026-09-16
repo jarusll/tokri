@@ -21,6 +21,7 @@
 
 #include <QAbstractItemView>
 #include <QAbstractProxyModel>
+#include <QClipboard>
 #include <QItemSelectionModel>
 #include <QApplication>
 #include <QDateTime>
@@ -113,6 +114,16 @@ int main(int argc, char *argv[])
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&tokriWindow);
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
+
+    QAction *pasteAction = new QAction(&tokriWindow);
+    pasteAction->setShortcut(QKeySequence::Paste);
+    tokriWindow.addAction(pasteAction);
+    QObject::connect(pasteAction, &QAction::triggered, fsModel, [fsModel] {
+        auto *clip = QGuiApplication::clipboard();
+        if (clip)
+            fsModel->dropMimeData(clip->mimeData(), Qt::CopyAction,
+                                  -1, -1, QModelIndex());
+    });
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&tokriWindow);
     sortFilterProxy->setSourceModel(fsModel);
