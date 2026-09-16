@@ -16,32 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="NoInternalDragListView" name="listView">
-      <property name="acceptDrops">
-       <bool>true</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-      </property>
-      <property name="dragEnabled">
-       <bool>true</bool>
-      </property>
-      <property name="dragDropMode">
-       <enum>QAbstractItemView::DragDropMode::DragDrop</enum>
-      </property>
-      <property name="selectionMode">
-       <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
-      </property>
-      <property name="textElideMode">
-       <enum>Qt::TextElideMode::ElideMiddle</enum>
-      </property>
-      <property name="resizeMode">
-       <enum>QListView::ResizeMode::Adjust</enum>
-      </property>
-     </widget>
+     <widget class="NoInternalDragListView" name="listView"/>
     </item>
    </layout>
   </widget>

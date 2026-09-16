@@ -8,6 +8,7 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileSystemModel>
+#include <QFrame>
 #include <QApplication>
 #include <QClipboard>
 
@@ -30,6 +31,16 @@ TokriWindow::TokriWindow(QWidget *parent)
                    | Qt::WindowStaysOnTopHint);
 
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    ui->listView->setAcceptDrops(true);
+    ui->listView->setFrameShape(QFrame::NoFrame);
+    ui->listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->listView->setDragDropMode(QAbstractItemView::DragDrop);
+    ui->listView->setDragEnabled(true);
+    ui->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->listView->setTextElideMode(Qt::ElideMiddle);
+    ui->listView->setResizeMode(QListView::Adjust);
+    ui->listView->setLayoutMode(QListView::Batched);
 
     connect(ui->listView, &QListView::doubleClicked,
             this, [this](const QModelIndex &idx){
