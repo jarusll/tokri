@@ -28,6 +28,7 @@ public:
 public slots:
     void onShakeDetect();
     void deleteSelection();
+    void selectAll();
 
 private:
     Ui::TokriWindow *ui;

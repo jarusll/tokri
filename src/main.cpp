@@ -197,6 +197,15 @@ int main(int argc, char *argv[])
                      &tokriWindow,
                      &TokriWindow::sleep);
 
+    auto *selectAllShortcut =
+        new QShortcut(QKeySequence::SelectAll, &tokriWindow);
+    selectAllShortcut->setContext(Qt::WindowShortcut);
+
+    QObject::connect(selectAllShortcut,
+                     &QShortcut::activated,
+                     &tokriWindow,
+                     &TokriWindow::selectAll);
+
 
 #ifdef Q_OS_LINUX
     LinuxDragShakeDetector *interceptor = new LinuxDragShakeDetector;

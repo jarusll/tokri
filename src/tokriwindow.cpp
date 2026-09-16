@@ -94,7 +94,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                 };
 
                 if (chosen == selectAll) {
-                    view->selectAll();
+                    this->selectAll();
                     log.pop();
                     return;
                 }
@@ -285,6 +285,16 @@ void TokriWindow::deleteSelection()
         log.log() << "trash path=" << fi.absoluteFilePath()
                   << "ok=" << QFile::moveToTrash(fi.absoluteFilePath());
     }
+
+    log.pop();
+}
+
+void TokriWindow::selectAll()
+{
+    Logger &log = Logger::instance();
+    log.push("selectAll");
+
+    ui->listView->selectAll();
 
     log.pop();
 }
