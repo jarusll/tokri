@@ -55,6 +55,9 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     connect(ui->listView, &QWidget::customContextMenuRequested, this,
             [this](const QPoint &pos) {
+                Logger &log = Logger::instance();
+                log.push("contextMenu");
+
                 auto *view = ui->listView;
                 auto *sel  = view->selectionModel();
                 const auto selected = sel->selectedIndexes();
@@ -78,9 +81,12 @@ TokriWindow::TokriWindow(QWidget *parent)
                 selectAll = menu.addAction("Select &All");
 
                 QAction *chosen = menu.exec(view->viewport()->mapToGlobal(pos));
-                qInfo().noquote() << threadTag() << "contextMenu count=" << count
-                                  << "chosen=" << (chosen ? chosen->text() : QString("<none>"));
-                if (!chosen) return;
+                log.log() << "count=" << count
+                          << "chosen=" << (chosen ? chosen->text() : QString("<none>"));
+                if (!chosen) {
+                    log.pop();
+                    return;
+                }
 
                 auto fileInfoAt = [](const QModelIndex &idx) {
                     return idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
@@ -88,25 +94,29 @@ TokriWindow::TokriWindow(QWidget *parent)
 
                 if (chosen == selectAll) {
                     view->selectAll();
+                    log.pop();
                     return;
                 }
 
                 if (count == 1 && chosen == open) {
                     QString filePath = fileInfoAt(selected[0]).filePath();
                     openItem(filePath);
+                    log.pop();
                     return;
                 }
 
                 if (count == 1 && chosen == reveal) {
                     QDesktopServices::openUrl(
                         QUrl::fromLocalFile(fileInfoAt(selected[0]).absolutePath()));
+                    log.pop();
                     return;
                 }
 
                 if (count == 1 && chosen == rename) {
-                    qInfo().noquote() << threadTag() << "contextMenu rename path="
-                                      << fileInfoAt(selected[0]).filePath();
+                    log.log() << "rename path="
+                              << fileInfoAt(selected[0]).filePath();
                     view->edit(selected[0]);
+                    log.pop();
                     return;
                 }
 
@@ -117,31 +127,36 @@ TokriWindow::TokriWindow(QWidget *parent)
                         if (fi.exists())
                             urls << QUrl::fromLocalFile(fi.absoluteFilePath());
                     }
-                    qInfo().noquote() << threadTag() << "contextMenu copy urls=" << urls;
+                    log.log() << "copy urls=" << urls;
                     if (!urls.isEmpty()) {
                         auto *mime = new QMimeData;
                         mime->setUrls(urls);
                         QGuiApplication::clipboard()->setMimeData(mime);
                     }
+                    log.pop();
                     return;
                 }
 
                 if (chosen == del) {
                     for (const auto &idx : selected) {
                         QFileInfo fi(fileInfoAt(idx).filePath());
-                        if (!fi.exists())
+                        if (!fi.exists()) {
+                            log.pop();
                             return;
+                        }
 
                         if (fi.isDir())
-                            qInfo().noquote() << threadTag() << "contextMenu delete dir path="
-                                              << fi.absoluteFilePath()
-                                              << "ok=" << QDir(fi.absoluteFilePath()).removeRecursively();
+                            log.log() << "delete dir path="
+                                      << fi.absoluteFilePath()
+                                      << "ok=" << QDir(fi.absoluteFilePath()).removeRecursively();
                         else
-                            qInfo().noquote() << threadTag() << "contextMenu delete file path="
-                                              << fi.absoluteFilePath()
-                                              << "ok=" << QFile::remove(fi.absoluteFilePath());
+                            log.log() << "delete file path="
+                                      << fi.absoluteFilePath()
+                                      << "ok=" << QFile::remove(fi.absoluteFilePath());
                     }
                 }
+
+                log.pop();
             });
 
 }
@@ -158,17 +173,25 @@ Ui::TokriWindow *TokriWindow::uiHandle()
 
 void TokriWindow::sleep()
 {
-    qInfo().noquote() << threadTag() << "sleep -> hide";
+    Logger &log = Logger::instance();
+    log.push("sleep");
+    log.log() << "-> hide";
+
     hide();
+
+    log.pop();
 }
 
 void TokriWindow::wakeUp()
 {
+    Logger &log = Logger::instance();
+    log.push("wakeUp");
+
     const bool minimized = isMinimized();
     const bool hidden = !isVisible();
 
-    qInfo().noquote() << threadTag() << "wakeUp minimized=" << minimized
-                      << "hidden=" << hidden;
+    log.log() << "minimized=" << minimized
+              << "hidden=" << hidden;
 
     if (minimized || hidden) {
         moveNearCursor();
@@ -182,6 +205,8 @@ void TokriWindow::wakeUp()
 
     raise();
     activateWindow();
+
+    log.pop();
 }
 
 void TokriWindow::init()
@@ -221,8 +246,13 @@ void TokriWindow::moveNearCursor()
 
 void TokriWindow::onShakeDetect()
 {
-    qInfo().noquote() << threadTag() << "onShakeDetect";
+    Logger &log = Logger::instance();
+    log.push("onShakeDetect");
+    log.log() << "shake";
+
     wakeUp();
+
+    log.pop();
 }
 
 
@@ -235,14 +265,24 @@ void TokriWindow::showEvent(QShowEvent *e)
 }
 
 void TokriWindow::openItem(QString filePath) {
-    qInfo().noquote() << threadTag() << "openItem path=" << filePath;
+    Logger &log = Logger::instance();
+    log.push("openItem");
+    log.log() << "path=" << filePath;
+
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+
+    log.pop();
 }
 
 void TokriWindow::closeEvent(QCloseEvent *e)
 {
-    qInfo().noquote() << threadTag() << "closeEvent -> ignore & sleep";
+    Logger &log = Logger::instance();
+    log.push("closeEvent");
+    log.log() << "-> ignore & sleep";
+
     e->ignore();
     sleep();
+
+    log.pop();
 }
 

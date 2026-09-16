@@ -11,8 +11,13 @@ namespace {
 QMimeData *cloneMimeData(const QMimeData *src)
 {
     auto *copy = new QMimeData;
-    for (const QString &format : src->formats())
+    if (src->hasImage())
+        copy->setImageData(src->imageData());
+    for (const QString &format : src->formats()) {
+        if (copy->hasFormat(format))
+            continue;
         copy->setData(format, src->data(format));
+    }
     return copy;
 }
 
@@ -42,13 +47,18 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
     Q_UNUSED(column);
     Q_UNUSED(parent);
 
+    Logger &log = Logger::instance();
+    log.push("canDropMimeData");
+
     if (action == Qt::IgnoreAction) {
-        qInfo().noquote() << threadTag() << "canDropMimeData action=IgnoreAction -> true";
+        log.log() << "action=IgnoreAction -> true";
+        log.pop();
         return true;
     }
 
     if (!data) {
-        qWarning().noquote() << threadTag() << "canDropMimeData null data -> false";
+        log.log() << "null data -> false";
+        log.pop();
         return false;
     }
 
@@ -57,8 +67,9 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
            || data->hasText()
            || data->hasHtml();
 
-    qInfo().noquote() << threadTag() << "canDropMimeData" << describeMimeData(data)
-                      << "->" << ok;
+    log.log() << describeMimeData(data) << "->" << ok;
+
+    log.pop();
     return ok;
 }
 
@@ -66,32 +77,36 @@ bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
                                             Qt::DropAction action,
                                             int row, int column,
                                             const QModelIndex &parent) {
-    qInfo().noquote() << threadTag() << "dropMimeData ENTER action=" << action
-                      << "row=" << row << "col=" << column
-                      << "parentValid=" << parent.isValid();
+    Logger &log = Logger::instance();
+    log.push("dropMimeData");
+
+    log.log() << "action=" << action
+              << "row=" << row << "col=" << column
+              << "parentValid=" << parent.isValid();
     dumpMimeData(data);
 
     if (!canDropMimeData(data, action, row, column, parent)) {
-        qInfo().noquote() << threadTag() << "dropMimeData not acceptable -> false";
+        log.log() << "not acceptable -> false";
+        log.pop();
         return false;
     }
 
     QMimeData *copy = cloneMimeData(data);
-    qInfo().noquote() << threadTag() << "dropMimeData cloned formats=" << copy->formats();
+    log.log() << "cloned formats=" << copy->formats();
 
     if (mDropReceiver) {
         copy->moveToThread(mDropReceiver->thread());
-        qInfo().noquote() << threadTag() << "dropMimeData receiver="
-                          << static_cast<const void *>(mDropReceiver)
-                          << "recvThread="
-                          << static_cast<const void *>(mDropReceiver->thread());
+        log.log() << "receiver=" << static_cast<const void *>(mDropReceiver)
+                  << "recvThread="
+                  << static_cast<const void *>(mDropReceiver->thread());
     } else {
-        qWarning().noquote() << threadTag()
-                             << "dropMimeData no drop receiver, clone leaks";
+        log.log() << "no drop receiver, clone leaks";
     }
 
-    qInfo().noquote() << threadTag() << "dropMimeData emitted dropReceived";
+    log.log() << "emitted dropReceived";
     emit dropReceived(copy);
+
+    log.pop();
     return true;
 }
 
@@ -110,6 +125,9 @@ QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) cons
 
 QMimeData* DropAwareFileSystemModel::mimeData(const QModelIndexList &indexes) const
 {
+    Logger &log = Logger::instance();
+    log.push("mimeData");
+
     QMimeData *mime = QFileSystemModel::mimeData(indexes);
     if (!mime)
         mime = new QMimeData;
@@ -132,30 +150,37 @@ QMimeData* DropAwareFileSystemModel::mimeData(const QModelIndexList &indexes) co
                 QByteArray bytes = f.readAll();
                 mime->setData("text/plain", bytes);
                 injected = true;
-                qInfo().noquote() << threadTag() << "mimeData injecting text/plain"
-                                  << "bytes=" << bytes.size() << "path=" << path;
+                log.log() << "injecting text/plain"
+                          << "bytes=" << bytes.size() << "path=" << path;
             } else {
-                qWarning().noquote() << threadTag() << "mimeData failed to open text file"
-                                     << "path=" << path << "err=" << f.errorString();
+                log.log() << "failed to open text file"
+                          << "path=" << path << "err=" << f.errorString();
             }
         }
     }
 
-    qInfo().noquote() << threadTag() << "mimeData drag-out"
-                      << "indexes=" << indexes.size()
-                      << "path=" << path
-                      << "detectedMime=" << detected
-                      << "injectedTextPlain=" << injected
-                      << describeMimeData(mime);
+    log.log() << "drag-out"
+              << "indexes=" << indexes.size()
+              << "path=" << path
+              << "detectedMime=" << detected
+              << "injectedTextPlain=" << injected
+              << describeMimeData(mime);
+
+    log.pop();
     return mime;
 }
 
 Qt::DropActions DropAwareFileSystemModel::supportedDragActions() const {
+    Logger &log = Logger::instance();
+    log.push("supportedDragActions");
+
     const Qt::DropActions actions =
         (QApplication::keyboardModifiers() & Qt::ControlModifier)
             ? Qt::CopyAction
             : Qt::MoveAction;
-    qInfo().noquote() << threadTag() << "supportedDragActions ->" << actions
-                      << "ctrl=" << bool(QApplication::keyboardModifiers() & Qt::ControlModifier);
+    log.log() << "->" << actions
+              << "ctrl=" << bool(QApplication::keyboardModifiers() & Qt::ControlModifier);
+
+    log.pop();
     return actions;
 }

@@ -28,15 +28,15 @@ public:
             fallback = true;
         }
         if (clean != name || fallback)
-            qInfo().noquote() << threadTag() << "sanitizeName in=" << name
-                              << "out=" << clean << "fallback=" << fallback;
+            Logger::instance().log() << "sanitizeName in=" << name
+                                     << "out=" << clean << "fallback=" << fallback;
         return clean;
     }
 
     static QString nameFromPath(const QString &path) {
         const QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
         const QString result = QDir(rootPath).filePath(sanitizeName(QDir(path).dirName()));
-        qInfo().noquote() << threadTag() << "nameFromPath path=" << path << "->" << result;
+        Logger::instance().log() << "nameFromPath path=" << path << "->" << result;
         return result;
     }
 
@@ -46,15 +46,15 @@ public:
         if (!prefix.isEmpty())
             name = prefix + "_" + name;
         const QString result = QDir(rootPath).filePath(name);
-        qInfo().noquote() << threadTag() << "nameWithPrefix prefix=" << prefix
-                          << "->" << result;
+        Logger::instance().log() << "nameWithPrefix prefix=" << prefix
+                                 << "->" << result;
         return result;
     }
 
     static QString uniquePath(const QString &desiredPath) {
         if (!QFileInfo::exists(desiredPath)) {
-            qInfo().noquote() << threadTag() << "uniquePath desired=" << desiredPath
-                              << "chosen=" << desiredPath << "collisions=0";
+            Logger::instance().log() << "uniquePath desired=" << desiredPath
+                                     << "chosen=" << desiredPath << "collisions=0";
             return desiredPath;
         }
 
@@ -70,8 +70,8 @@ public:
 
             const QString path = QDir(dir).filePath(candidate);
             if (!QFileInfo::exists(path)) {
-                qInfo().noquote() << threadTag() << "uniquePath desired=" << desiredPath
-                                  << "chosen=" << path << "collisions=" << n;
+                Logger::instance().log() << "uniquePath desired=" << desiredPath
+                                         << "chosen=" << path << "collisions=" << n;
                 return path;
             }
         }

@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     QThread::currentThread()->setObjectName("main");
-    qInfo().noquote() << threadTag() << "Tokri starting";
+    Logger::instance().log() << "Tokri starting";
 
     QLocalServer server;
     TokriWindow tokriWindow;
@@ -119,8 +119,8 @@ int main(int argc, char *argv[])
 
     DropHandler *dropHandler = new DropHandler;
     fsModel->setDropReceiver(dropHandler);
-    qInfo().noquote() << threadTag() << "dropReceiver set handler="
-                      << static_cast<const void *>(dropHandler);
+    Logger::instance().log() << "dropReceiver set handler="
+                             << static_cast<const void *>(dropHandler);
 
     QObject::connect(fsModel, &DropAwareFileSystemModel::dropReceived,
                      dropHandler, &DropHandler::handleDrop,
@@ -134,29 +134,35 @@ int main(int argc, char *argv[])
     QObject::connect(dropHandler, &DropHandler::changed,
                      reloadDirectoryDebounce,
                      [&reloadDirectoryDebounce, &reset] {
+                         Logger &log = Logger::instance();
+                         log.push("reload");
                          reloadDirectoryDebounce->setInterval(reset ? 500 : 3000);
-                         qInfo().noquote() << threadTag() << "reload debounce interval="
-                                           << reloadDirectoryDebounce->interval()
-                                           << "reset=" << reset;
+                         log.log() << "debounce interval="
+                                   << reloadDirectoryDebounce->interval()
+                                   << "reset=" << reset;
                          reset = false;
                          reloadDirectoryDebounce->start();
+                         log.pop();
                      });
 
     QObject::connect(dropHandler, &DropHandler::failed,
                      dropHandler,
                      [](const QString &reason) {
-                         qWarning().noquote() << threadTag() << "drop failed reason="
-                                              << reason;
+                         Logger::instance().log() << "drop failed reason="
+                                                  << reason;
                      });
 
     QObject::connect(reloadDirectoryDebounce, &QTimer::timeout,
                      fsModel,
                      [&reset, &fsModel] {
+                         Logger &log = Logger::instance();
+                         log.push("reload");
                          reset = true;
                          const QString root = fsModel->rootPath();
-                         qInfo().noquote() << threadTag() << "reload root=" << root;
+                         log.log() << "root=" << root;
                          fsModel->setRootPath(QString());
                          fsModel->setRootPath(root);
+                         log.pop();
                      });
 
 
@@ -165,13 +171,13 @@ int main(int argc, char *argv[])
     QObject::connect(th, &QThread::finished, dropHandler, &QObject::deleteLater);
     QObject::connect(&a, &QCoreApplication::aboutToQuit, th,
                      [th] {
-                         qInfo().noquote() << threadTag() << "aboutToQuit -> quit worker";
+                         Logger::instance().log() << "aboutToQuit -> quit worker";
                          th->quit();
                      });
     QObject::connect(th, &QThread::finished, th, &QObject::deleteLater);
     dropHandler->moveToThread(th);
-    qInfo().noquote() << threadTag() << "worker thread start handlerThread="
-                      << static_cast<const void *>(dropHandler->thread());
+    Logger::instance().log() << "worker thread start handlerThread="
+                             << static_cast<const void *>(dropHandler->thread());
     th->start();
 
 
@@ -181,6 +187,9 @@ int main(int argc, char *argv[])
         &QAction::triggered,
         tokriWindow.uiHandle()->listView,
         [&tokriWindow](){
+            Logger &log = Logger::instance();
+            log.push("delete");
+
             auto selectionModel = tokriWindow.uiHandle()->listView->selectionModel();
             QModelIndexList indexes = selectionModel->selectedIndexes();
             for (const QModelIndex &index : selectionModel->selectedIndexes()) {
@@ -191,13 +200,15 @@ int main(int argc, char *argv[])
                 const QString path = fi.filePath();
 
                 if (fi.isDir()) {
-                    qInfo().noquote() << threadTag() << "delete dir path=" << path
-                                      << "ok=" << QDir(path).removeRecursively();
+                    log.log() << "dir path=" << path
+                              << "ok=" << QDir(path).removeRecursively();
                 } else {
-                    qInfo().noquote() << threadTag() << "delete file path=" << path
-                                      << "ok=" << QFile(path).moveToTrash();
+                    log.log() << "file path=" << path
+                              << "ok=" << QFile(path).moveToTrash();
                 }
             }
+
+            log.pop();
         });
 
 

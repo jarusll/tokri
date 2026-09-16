@@ -1,5 +1,7 @@
 #include "linuxdragshakedetector.h"
 
+#include "loghelpers.h"
+
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
@@ -39,13 +41,16 @@ LinuxDragShakeDetector::~LinuxDragShakeDetector()
 
 void LinuxDragShakeDetector::scanDevices()
 {
+    Logger &log = Logger::instance();
+    log.push("scanDevices");
+
     DIR *dir = opendir("/dev/input");
     if (!dir) {
         qCritical() << "Failed to open /dev/input";
         exit(1);
     }
 
-    qInfo() << "REL devices advertising REL_X:";
+    log.log() << "REL devices advertising REL_X:";
     struct dirent *ent;
     while ((ent = readdir(dir)) != nullptr) {
         if (strncmp(ent->d_name, "event", 5) != 0)
@@ -72,7 +77,7 @@ void LinuxDragShakeDetector::scanDevices()
         }
 
         if (relX) {
-            qInfo() << "  " << path;
+            log.log() << path;
             fds.push_back(probe);
         } else {
             ::close(probe);
@@ -85,10 +90,15 @@ void LinuxDragShakeDetector::scanDevices()
         qCritical() << "No input device with REL_X found";
         exit(1);
     }
+
+    log.pop();
 }
 
 void LinuxDragShakeDetector::workerLoop()
 {
+    Logger &log = Logger::instance();
+    log.push("workerLoop");
+
     std::vector<struct pollfd> pfds(fds.size());
     for (size_t i = 0; i < fds.size(); ++i) {
         pfds[i].fd = fds[i];
@@ -102,7 +112,7 @@ void LinuxDragShakeDetector::workerLoop()
         if (n < 0) {
             if (errno == EINTR)
                 continue;
-            qWarning() << "poll failed:" << strerror(errno);
+            log.log() << "poll failed:" << strerror(errno);
             break;
         }
         if (n == 0)
@@ -114,7 +124,7 @@ void LinuxDragShakeDetector::workerLoop()
 
             ssize_t bytes = ::read(pfds[i].fd, buffer, sizeof(buffer));
             if (bytes <= 0) {
-                qWarning() << "failed to read input events from fd" << pfds[i].fd;
+                log.log() << "failed to read input events from fd" << pfds[i].fd;
                 continue;
             }
 
@@ -138,4 +148,6 @@ void LinuxDragShakeDetector::workerLoop()
             }
         }
     }
+
+    log.pop();
 }

@@ -20,15 +20,20 @@ void TextFile::setContent(QString content)
 
 bool TextFile::save()
 {
+    Logger &log = Logger::instance();
+    log.push("TextFile::save");
+
     if (mName.isEmpty()) {
-        qWarning().noquote() << threadTag() << "TextFile::save empty name -> false";
+        log.log() << "empty name -> false";
+        log.pop();
         return false;
     }
 
     QFile file(mName);
     if (!file.open(QIODevice::NewOnly | QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning().noquote() << threadTag() << "TextFile::save open failed name=" << mName
-                             << "err=" << file.errorString();
+        log.log() << "open failed name=" << mName
+                  << "err=" << file.errorString();
+        log.pop();
         return false;
     }
 
@@ -36,12 +41,15 @@ bool TextFile::save()
     out << mContents;
 
     if (out.status() != QTextStream::Ok) {
-        qWarning().noquote() << threadTag() << "TextFile::save write failed name=" << mName
-                             << "status=" << out.status();
+        log.log() << "write failed name=" << mName
+                  << "status=" << out.status();
+        log.pop();
         return false;
     }
 
-    qInfo().noquote() << threadTag() << "TextFile::save name=" << mName
-                      << "chars=" << mContents.size() << "ok=true";
+    log.log() << "name=" << mName
+              << "chars=" << mContents.size() << "ok=true";
+
+    log.pop();
     return true;
 }

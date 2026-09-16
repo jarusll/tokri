@@ -14,101 +14,247 @@
 #include <QScopedPointer>
 #include <QUrl>
 
+namespace {
+
+bool isLinkUrl(const QUrl &url)
+{
+    return url.isValid() && !url.scheme().isEmpty();
+}
+
+}
+
 DropHandler::DropHandler(QObject *parent)
     : QObject{parent}
 {}
 
 void DropHandler::handleDrop(QMimeData *data)
 {
-    qInfo().noquote() << threadTag() << "handleDrop ENTER";
+    Logger &log = Logger::instance();
+    log.push("handleDrop");
+
     if (!data) {
-        qWarning().noquote() << threadTag() << "handleDrop null data";
+        log.log() << "null data";
+        log.pop();
         return;
     }
+
+    log.log() << "urls=" << data->urls().size();
 
     QScopedPointer<QMimeData> guard(data);
     dumpMimeData(data);
 
+    const char *consumer = "none";
     bool wrote = false;
 
-    if (data->hasUrls()) {
-        const QList<QUrl> urls = data->urls();
-        qInfo().noquote() << threadTag() << "branch=urls count=" << urls.size();
-
-        for (const QUrl &url : urls) {
-            const bool local = url.isLocalFile();
-            const QFileInfo info(local ? url.toLocalFile() : QString());
-
-            qInfo().noquote() << threadTag() << "url=" << url.toString()
-                              << "local=" << local
-                              << "isDir=" << (local && info.isDir())
-                              << "isFile=" << (local && info.isFile());
-
-            if (local) {
-                if (info.isDir())
-                    wrote |= copyDirectory(info.absoluteFilePath());
-                else if (info.isFile())
-                    wrote |= copyFile(info.absoluteFilePath());
-                else
-                    qWarning().noquote() << threadTag()
-                                         << "url is local but neither file nor dir, skipped";
-            } else {
-                wrote |= saveUrl(url.toString());
-            }
-        }
-    } else {
-        for (const QString &format : data->formats()) {
-            if (!format.startsWith("image/"))
-                continue;
-            if (!QImageReader::supportedMimeTypes().contains(format.toLatin1())) {
-                qInfo().noquote() << threadTag() << "skipping unsupported image format="
-                                  << format;
-                continue;
-            }
-
-            const QByteArray bytes = data->data(format);
-            if (bytes.isEmpty()) {
-                qInfo().noquote() << threadTag() << "empty image bytes for format=" << format;
-                continue;
-            }
-
-            qInfo().noquote() << threadTag() << "branch=image-bytes mime=" << format
-                              << "bytes=" << bytes.size();
-            if (saveImageBytes(bytes, format)) {
-                wrote = true;
-                break;
-            }
-        }
-
-        if (!wrote && data->hasImage()) {
-            const QImage image = data->imageData().value<QImage>();
-            qInfo().noquote() << threadTag() << "branch=image-data"
-                              << "null=" << image.isNull()
-                              << "size=" << image.width() << "x" << image.height();
-            if (!image.isNull())
-                wrote = saveImage(image);
-        }
-
-        if (!wrote && data->hasText()) {
-            const QString text = data->text();
-            qInfo().noquote() << threadTag() << "branch=text chars=" << text.size();
-            wrote = saveText(text);
-        }
-
-        if (!wrote && data->hasHtml()) {
-            const QString html = data->html();
-            qInfo().noquote() << threadTag() << "branch=html chars=" << html.size();
-            wrote = saveHtml(html);
-        }
+    if (tryMultiUrls(data)) {
+        consumer = "multi-url";
+        wrote = true;
+    } else if (tryLocalFile(data)) {
+        consumer = "local";
+        wrote = true;
+    } else if (tryImage(data)) {
+        consumer = "image";
+        wrote = true;
+    } else if (tryRemoteLink(data)) {
+        consumer = "remote-link";
+        wrote = true;
+    } else if (tryText(data)) {
+        consumer = "text";
+        wrote = true;
+    } else if (tryHtml(data)) {
+        consumer = "html";
+        wrote = true;
     }
 
-    qInfo().noquote() << threadTag() << "handleDrop wrote=" << wrote;
+    log.log() << "consumer=" << consumer << "wrote=" << wrote;
+
     if (wrote) {
-        qInfo().noquote() << threadTag() << "emit changed";
+        log.log() << "emit changed";
         emit changed();
     } else {
-        qWarning().noquote() << threadTag() << "handleDrop stored nothing";
+        log.log() << "stored nothing";
     }
+
+    log.pop();
+}
+
+bool DropHandler::tryMultiUrls(const QMimeData *data)
+{
+    Logger &log = Logger::instance();
+    log.push("multi-url");
+
+    const QList<QUrl> urls = data->urls();
+    if (urls.size() <= 1) {
+        log.pop();
+        return false;
+    }
+
+    log.log() << "count=" << urls.size();
+
+    bool wrote = false;
+    for (const QUrl &url : urls) {
+        if (!url.isLocalFile() && !isLinkUrl(url)) {
+            log.log() << "skipping non-link url entry=" << url.toString();
+            continue;
+        }
+        wrote |= storeUrlItem(url);
+    }
+
+    log.pop();
+    return wrote;
+}
+
+bool DropHandler::tryLocalFile(const QMimeData *data)
+{
+    Logger &log = Logger::instance();
+    log.push("local");
+
+    const QList<QUrl> urls = data->urls();
+    if (urls.size() != 1) {
+        log.pop();
+        return false;
+    }
+
+    const QUrl url = urls.first();
+    if (!url.isLocalFile()) {
+        log.pop();
+        return false;
+    }
+
+    log.log() << "url=" << url.toString();
+    const bool wrote = storeUrlItem(url);
+
+    log.pop();
+    return wrote;
+}
+
+bool DropHandler::tryImage(const QMimeData *data)
+{
+    Logger &log = Logger::instance();
+    log.push("image");
+    const bool wrote = saveFirstImage(data);
+    log.pop();
+    return wrote;
+}
+
+bool DropHandler::tryRemoteLink(const QMimeData *data)
+{
+    Logger &log = Logger::instance();
+    log.push("remote-link");
+
+    const QList<QUrl> urls = data->urls();
+    if (urls.size() != 1) {
+        log.pop();
+        return false;
+    }
+
+    const QUrl url = urls.first();
+    if (url.isLocalFile()) {
+        log.pop();
+        return false;
+    }
+    if (!isLinkUrl(url)) {
+        log.log() << "skipping non-link url entry=" << url.toString();
+        log.pop();
+        return false;
+    }
+
+    log.log() << "url=" << url.toString();
+    const bool wrote = storeUrlItem(url);
+
+    log.pop();
+    return wrote;
+}
+
+bool DropHandler::tryText(const QMimeData *data)
+{
+    if (!data->hasText())
+        return false;
+
+    Logger &log = Logger::instance();
+    log.push("text");
+    const QString text = data->text();
+    log.log() << "chars=" << text.size();
+    const bool wrote = saveText(text);
+    log.pop();
+    return wrote;
+}
+
+bool DropHandler::tryHtml(const QMimeData *data)
+{
+    if (!data->hasHtml())
+        return false;
+
+    Logger &log = Logger::instance();
+    log.push("html");
+    const QString html = data->html();
+    log.log() << "chars=" << html.size();
+    const bool wrote = saveHtml(html);
+    log.pop();
+    return wrote;
+}
+
+bool DropHandler::storeUrlItem(const QUrl &url)
+{
+    Logger &log = Logger::instance();
+    log.push("url-item");
+
+    if (url.isLocalFile()) {
+        const QFileInfo info(url.toLocalFile());
+        log.log() << "local url=" << url.toString()
+                  << "isDir=" << info.isDir()
+                  << "isFile=" << info.isFile();
+
+        bool wrote = false;
+        if (info.isDir())
+            wrote = copyDirectory(info.absoluteFilePath());
+        else if (info.isFile())
+            wrote = copyFile(info.absoluteFilePath());
+        else
+            log.log() << "url is local but neither file nor dir, skipped";
+
+        log.pop();
+        return wrote;
+    }
+
+    log.log() << "link url=" << url.toString();
+    const bool wrote = saveUrl(url.toString());
+    log.pop();
+    return wrote;
+}
+
+bool DropHandler::saveFirstImage(const QMimeData *data)
+{
+    Logger &log = Logger::instance();
+
+    for (const QString &format : data->formats()) {
+        if (!format.startsWith("image/"))
+            continue;
+        if (!QImageReader::supportedMimeTypes().contains(format.toLatin1())) {
+            log.log() << "skipping unsupported image format=" << format;
+            continue;
+        }
+
+        const QByteArray bytes = data->data(format);
+        if (bytes.isEmpty()) {
+            log.log() << "empty image bytes for format=" << format;
+            continue;
+        }
+
+        log.log() << "image-bytes mime=" << format << "bytes=" << bytes.size();
+        if (saveImageBytes(bytes, format))
+            return true;
+    }
+
+    if (data->hasImage()) {
+        const QImage image = data->imageData().value<QImage>();
+        log.log() << "image-data null=" << image.isNull()
+                  << "size=" << image.width() << "x" << image.height();
+        if (!image.isNull())
+            return saveImage(image);
+    }
+
+    return false;
 }
 
 bool DropHandler::copyFile(const QString &filePath)
@@ -139,8 +285,8 @@ bool DropHandler::copyFile(const QString &filePath)
     }
 #endif
 
-    qInfo().noquote() << threadTag() << "copyFile src=" << filePath
-                      << "dst=" << dst << "ok=" << ok;
+    Logger::instance().log() << "copyFile src=" << filePath
+                             << "dst=" << dst << "ok=" << ok;
     return ok;
 }
 
@@ -155,11 +301,12 @@ bool DropHandler::copyDirectory(const QString &directory)
     const QString dst = dstFinal;
 #endif
 
-    qInfo().noquote() << threadTag() << "copyDirectory src=" << directory
-                      << "dst=" << dst << "dstFinal=" << dstFinal;
+    Logger &log = Logger::instance();
+    log.log() << "copyDirectory src=" << directory
+              << "dst=" << dst << "dstFinal=" << dstFinal;
 
     if (!QDir().mkpath(dst)) {
-        qWarning().noquote() << threadTag() << "copyDirectory mkpath failed dst=" << dst;
+        log.log() << "copyDirectory mkpath failed dst=" << dst;
         emit failed(dst);
         return false;
     }
@@ -176,17 +323,15 @@ bool DropHandler::copyDirectory(const QString &directory)
 
         if (it.fileInfo().isDir()) {
             if (!QDir().mkpath(out)) {
-                qWarning().noquote() << threadTag()
-                                     << "copyDirectory subdir mkpath failed out=" << out;
+                log.log() << "copyDirectory subdir mkpath failed out=" << out;
                 emit failed(out);
                 return false;
             }
         } else {
             QDir().mkpath(QFileInfo(out).path());
             if (!QFile::copy(it.filePath(), out)) {
-                qWarning().noquote() << threadTag()
-                                     << "copyDirectory file copy failed src=" << it.filePath()
-                                     << "out=" << out;
+                log.log() << "copyDirectory file copy failed src=" << it.filePath()
+                          << "out=" << out;
                 emit failed(out);
                 return false;
             }
@@ -200,13 +345,13 @@ bool DropHandler::copyDirectory(const QString &directory)
 
     QDir tmpDir = QFileInfo(dstFinal).dir();
     if (!tmpDir.rename(QFileInfo(dst).fileName(), QFileInfo(dstFinal).fileName())) {
-        qWarning().noquote() << threadTag() << "copyDirectory final rename failed"
-                             << "from=" << dst << "to=" << dstFinal;
+        log.log() << "copyDirectory final rename failed"
+                  << "from=" << dst << "to=" << dstFinal;
     }
 #endif
 
-    qInfo().noquote() << threadTag() << "copyDirectory ok files=" << files
-                      << "dstFinal=" << dstFinal;
+    log.log() << "copyDirectory ok files=" << files
+              << "dstFinal=" << dstFinal;
     return true;
 }
 
@@ -222,22 +367,22 @@ bool DropHandler::saveImageBytes(const QByteArray &bytes, const QString &mimeTyp
 
     QFile out(path);
     if (!out.open(QIODevice::WriteOnly)) {
-        qWarning().noquote() << threadTag() << "saveImageBytes open failed path=" << path
-                             << "err=" << out.errorString();
+        Logger::instance().log() << "saveImageBytes open failed path=" << path
+                                 << "err=" << out.errorString();
         emit failed(path);
         return false;
     }
 
     if (out.write(bytes) == -1) {
-        qWarning().noquote() << threadTag() << "saveImageBytes write failed path=" << path
-                             << "err=" << out.errorString();
+        Logger::instance().log() << "saveImageBytes write failed path=" << path
+                                 << "err=" << out.errorString();
         emit failed(path);
         return false;
     }
 
-    qInfo().noquote() << threadTag() << "saveImageBytes mime=" << mimeType
-                      << "suffix=" << suffix << "bytes=" << bytes.size()
-                      << "path=" << path << "ok=true";
+    Logger::instance().log() << "saveImageBytes mime=" << mimeType
+                             << "suffix=" << suffix << "bytes=" << bytes.size()
+                             << "path=" << path << "ok=true";
     return true;
 }
 
@@ -255,14 +400,14 @@ bool DropHandler::saveImage(const QImage &image)
 
     QImageWriter writer(path, "png");
     if (!writer.write(out)) {
-        qWarning().noquote() << threadTag() << "saveImage write failed path=" << path
-                             << "err=" << writer.errorString();
+        Logger::instance().log() << "saveImage write failed path=" << path
+                                 << "err=" << writer.errorString();
         emit failed(path);
         return false;
     }
 
-    qInfo().noquote() << threadTag() << "saveImage size=" << out.width() << "x" << out.height()
-                      << "path=" << path << "ok=true";
+    Logger::instance().log() << "saveImage size=" << out.width() << "x" << out.height()
+                             << "path=" << path << "ok=true";
     return true;
 }
 
@@ -272,8 +417,8 @@ bool DropHandler::saveUrl(const QString &url)
     file.setName(FilePathProvider::nameWithPrefix("link") + ".txt");
     file.setContent(url);
     const bool ok = file.save();
-    qInfo().noquote() << threadTag() << "saveUrl chars=" << url.size()
-                      << "preview=" << preview(url) << "ok=" << ok;
+    Logger::instance().log() << "saveUrl chars=" << url.size()
+                             << "preview=" << preview(url) << "ok=" << ok;
     if (!ok)
         emit failed(url);
     return ok;
@@ -285,8 +430,8 @@ bool DropHandler::saveText(const QString &text)
     file.setName(FilePathProvider::nameWithPrefix("text") + ".txt");
     file.setContent(text);
     const bool ok = file.save();
-    qInfo().noquote() << threadTag() << "saveText chars=" << text.size()
-                      << "preview=" << preview(text) << "ok=" << ok;
+    Logger::instance().log() << "saveText chars=" << text.size()
+                             << "preview=" << preview(text) << "ok=" << ok;
     if (!ok)
         emit failed(text);
     return ok;
@@ -298,8 +443,8 @@ bool DropHandler::saveHtml(const QString &html)
     file.setName(FilePathProvider::nameWithPrefix("text") + ".html");
     file.setContent(html);
     const bool ok = file.save();
-    qInfo().noquote() << threadTag() << "saveHtml chars=" << html.size()
-                      << "preview=" << preview(html) << "ok=" << ok;
+    Logger::instance().log() << "saveHtml chars=" << html.size()
+                             << "preview=" << preview(html) << "ok=" << ok;
     if (!ok)
         emit failed(html);
     return ok;

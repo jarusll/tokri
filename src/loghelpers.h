@@ -8,14 +8,51 @@
 #include <QThread>
 #include <QUrl>
 
-inline QString threadTag()
+class Logger
 {
-    QThread *t = QThread::currentThread();
-    const QString name = t->objectName();
-    return QStringLiteral("t=%1(0x%2)")
-        .arg(name.isEmpty() ? QStringLiteral("?") : name)
-        .arg(reinterpret_cast<quintptr>(t), 0, 16);
-}
+public:
+    static Logger &instance()
+    {
+        static thread_local Logger inst;
+        return inst;
+    }
+
+    void push(const QString &tag)
+    {
+        if (!tag.isEmpty())
+            m_tags.append(tag);
+    }
+
+    void pop()
+    {
+        if (!m_tags.isEmpty())
+            m_tags.removeLast();
+    }
+
+    QDebug log() const
+    {
+        QDebug out = qInfo().noquote();
+        out << QStringLiteral("[%1]").arg(tags().join(QLatin1Char(':')));
+        return out;
+    }
+
+    Logger(const Logger &) = delete;
+    Logger &operator=(const Logger &) = delete;
+
+private:
+    Logger() = default;
+
+    QStringList tags() const
+    {
+        const QString name = QThread::currentThread()->objectName();
+        QStringList all;
+        all << (name.isEmpty() ? QStringLiteral("?") : name);
+        all += m_tags;
+        return all;
+    }
+
+    QStringList m_tags;
+};
 
 inline QString preview(const QString &s, int max = 120)
 {
@@ -45,22 +82,22 @@ inline QString describeMimeData(const QMimeData *md)
 
 inline void dumpMimeData(const QMimeData *md)
 {
-    qInfo().noquote() << threadTag() << describeMimeData(md);
+    Logger::instance().log() << describeMimeData(md);
     if (!md)
         return;
 
     for (const QUrl &u : md->urls())
-        qInfo().noquote() << threadTag() << "  url:" << u.toString()
-                          << "local=" << u.isLocalFile();
+        Logger::instance().log() << "url:" << u.toString()
+                                 << "local=" << u.isLocalFile();
 
     if (md->hasText())
-        qInfo().noquote() << threadTag() << "  text:" << preview(md->text());
+        Logger::instance().log() << "text:" << preview(md->text());
     if (md->hasHtml())
-        qInfo().noquote() << threadTag() << "  html:" << preview(md->html());
+        Logger::instance().log() << "html:" << preview(md->html());
 
     if (md->hasImage()) {
         const QImage img = md->imageData().value<QImage>();
-        qInfo().noquote() << threadTag() << "  image:"
+        Logger::instance().log() << "image:"
             << (img.isNull() ? QStringLiteral("<null>")
                              : QStringLiteral("%1x%2").arg(img.width()).arg(img.height()));
     }
