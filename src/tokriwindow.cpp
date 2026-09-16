@@ -6,6 +6,7 @@
 #include <QMenu>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QFile>
 #include <QFileSystemModel>
 #include <QApplication>
 #include <QClipboard>
@@ -138,22 +139,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
 
                 if (chosen == del) {
-                    for (const auto &idx : selected) {
-                        QFileInfo fi(fileInfoAt(idx).filePath());
-                        if (!fi.exists()) {
-                            log.pop();
-                            return;
-                        }
-
-                        if (fi.isDir())
-                            log.log() << "delete dir path="
-                                      << fi.absoluteFilePath()
-                                      << "ok=" << QDir(fi.absoluteFilePath()).removeRecursively();
-                        else
-                            log.log() << "delete file path="
-                                      << fi.absoluteFilePath()
-                                      << "ok=" << QFile::remove(fi.absoluteFilePath());
-                    }
+                    deleteSelection();
                 }
 
                 log.pop();
@@ -270,6 +256,35 @@ void TokriWindow::openItem(QString filePath) {
     log.log() << "path=" << filePath;
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+
+    log.pop();
+}
+
+void TokriWindow::deleteSelection()
+{
+    Logger &log = Logger::instance();
+    log.push("delete");
+
+    auto *view = ui->listView;
+    auto *sel = view->selectionModel();
+    if (!sel) {
+        log.pop();
+        return;
+    }
+
+    const auto selected = sel->selectedIndexes();
+    for (const auto &idx : selected) {
+        if (!idx.isValid())
+            continue;
+
+        const QFileInfo fi =
+            idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
+        if (!fi.exists())
+            continue;
+
+        log.log() << "trash path=" << fi.absoluteFilePath()
+                  << "ok=" << QFile::moveToTrash(fi.absoluteFilePath());
+    }
 
     log.pop();
 }

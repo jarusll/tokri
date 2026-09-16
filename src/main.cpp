@@ -185,31 +185,8 @@ int main(int argc, char *argv[])
     DropAwareFileSystemModel::connect(
         deleteAction,
         &QAction::triggered,
-        tokriWindow.uiHandle()->listView,
-        [&tokriWindow](){
-            Logger &log = Logger::instance();
-            log.push("delete");
-
-            auto selectionModel = tokriWindow.uiHandle()->listView->selectionModel();
-            QModelIndexList indexes = selectionModel->selectedIndexes();
-            for (const QModelIndex &index : selectionModel->selectedIndexes()) {
-                if (!index.isValid())
-                    continue;
-
-                QFileInfo fi = index.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
-                const QString path = fi.filePath();
-
-                if (fi.isDir()) {
-                    log.log() << "dir path=" << path
-                              << "ok=" << QDir(path).removeRecursively();
-                } else {
-                    log.log() << "file path=" << path
-                              << "ok=" << QFile(path).moveToTrash();
-                }
-            }
-
-            log.pop();
-        });
+        &tokriWindow,
+        &TokriWindow::deleteSelection);
 
 
     auto SleepShortcut = new QShortcut(QKeySequence("Escape"), &tokriWindow);

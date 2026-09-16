@@ -3,8 +3,24 @@
 #include "loghelpers.h"
 
 #include <QDragEnterEvent>
+#include <QMouseEvent>
 
 NoInternalDragListView::NoInternalDragListView() {}
+
+QItemSelectionModel::SelectionFlags
+NoInternalDragListView::selectionCommand(const QModelIndex &index,
+                                         const QEvent *event) const
+{
+    if (event && event->type() == QEvent::MouseButtonPress) {
+        const auto *mouseEvent = static_cast<const QMouseEvent *>(event);
+        if (mouseEvent->button() == Qt::RightButton
+            && selectionModel()
+            && selectionModel()->hasSelection())
+            return QItemSelectionModel::NoUpdate;
+    }
+
+    return QListView::selectionCommand(index, event);
+}
 
 void NoInternalDragListView::dragEnterEvent(QDragEnterEvent *e)
 {

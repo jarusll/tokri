@@ -4,6 +4,7 @@
 #include <QListView>
 #include <QObject>
 #include <QPainter>
+#include <QItemSelectionModel>
 
 class NoInternalDragListView : public QListView
 {
@@ -19,6 +20,8 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *e) override;
     void dropEvent(QDropEvent *e) override;
     void paintEvent(QPaintEvent *e) override;
+    QItemSelectionModel::SelectionFlags selectionCommand(
+        const QModelIndex &index, const QEvent *event = nullptr) const override;
 signals:
     void dropping(bool status);
 };
