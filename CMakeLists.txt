@@ -64,20 +64,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nointernaldraglistview.h src/nointernaldraglistview.cpp
         src/standardnames.h
         src/shakedetector.h src/shakedetector.cpp
-        src/themeprovider.h src/themeprovider.cpp
 
         src/standardpaths.h src/standardpaths.cpp
-        src/draghandle.h src/draghandle.cpp
-        src/listitemdelegate.h src/listitemdelegate.cpp
-        src/closebutton.h src/closebutton.cpp
-        src/sleekscrollbar.h src/sleekscrollbar.cpp
 
         ${LINUX_SOURCES}
         ${WINDOWS_SOURCES}
         ${MACOS_SOURCES}
 
         resources/icons.qrc
-        src/thumbnailprovider.h src/thumbnailprovider.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Tokri APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

@@ -1,15 +1,13 @@
 #include "tokriwindow.h"
 #include "./ui_tokriwindow.h"
 #include "standardpaths.h"
-#include "listitemdelegate.h"
-#include "closebutton.h"
 #include <QDir>
 #include <QMenu>
+#include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QApplication>
 #include <QClipboard>
-#include "sleekscrollbar.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -27,32 +25,8 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     init();
     setWindowFlags(windowFlags()
-                   | Qt::FramelessWindowHint
                    | Qt::WindowStaysOnTopHint);
-    setAttribute(Qt::WA_TranslucentBackground);
 
-    ui->listView->setStyleSheet(R"(
-        QListView {
-            padding: 0px;
-            margin: 0px;
-        }
-    )");
-
-    mCloseButton = new CloseButton(this);
-    mCloseButton->setParent(this);
-    mCloseButton->raise();
-    connect(
-        mCloseButton,
-        &QAbstractButton::clicked,
-        this,
-        &TokriWindow::sleep
-        );
-    renderCloseButton();
-
-
-    ui->listView->setVerticalScrollBar(new SleekScrollBar(Qt::Vertical, ui->listView));
-    const auto delegate = new ListItemDelegate(ui->listView);
-    ui->listView->setItemDelegate(delegate);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     connect(ui->listView, &QListView::doubleClicked,
@@ -159,12 +133,6 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
             });
 
-    connect(
-        ui->listView,
-        &NoInternalDragListView::dropping,
-        this,
-        &TokriWindow::setDropping
-        );
 }
 
 TokriWindow::~TokriWindow()
@@ -199,48 +167,6 @@ void TokriWindow::wakeUp()
 
     raise();
     activateWindow();
-}
-
-void TokriWindow::paintEvent(QPaintEvent *)
-{
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, true);
-
-    const QRectF r = QRectF(rect()).adjusted(2.0, 2.0, -2.0, -2.0);
-
-    // background
-    p.setPen(Qt::NoPen);
-    p.setBrush(palette().color(QPalette::Window));
-    p.drawRoundedRect(r, 16.0, 16.0);
-
-    // border / drop indicator
-    QColor color = palette().color(
-        mDropping ? QPalette::Accent : QPalette::Shadow
-        );
-
-    QPen pen(color);
-    pen.setWidthF(2.0);
-    if (mDropping){
-        pen.setWidthF(8.0);
-    }
-    pen.setJoinStyle(Qt::RoundJoin);
-    pen.setCapStyle(Qt::RoundCap);
-
-    p.setBrush(Qt::NoBrush);
-    p.setPen(pen);
-    p.drawRoundedRect(r, 16.0, 16.0);
-}
-
-void TokriWindow::setDropping(bool status)
-{
-    mDropping = status;
-    update();
-}
-
-void TokriWindow::resizeEvent(QResizeEvent *e)
-{
-    QMainWindow::resizeEvent(e);
-    renderCloseButton();
 }
 
 void TokriWindow::init()
@@ -312,12 +238,9 @@ void TokriWindow::openItem(QString filePath) {
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
 
-void TokriWindow::renderCloseButton()
+void TokriWindow::closeEvent(QCloseEvent *e)
 {
-        const int m = 8;
-#ifdef Q_OS_MAC
-        mCloseButton->move(m, m);
-#else
-        mCloseButton->move(width() - mCloseButton->width() - m, m);
-#endif
+    e->ignore();
+    sleep();
 }
+

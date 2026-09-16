@@ -1,14 +1,12 @@
 #ifndef TOKRIWINDOW_H
 #define TOKRIWINDOW_H
 
-#include "closebutton.h"
-
 #include <QListView>
 #include <QMainWindow>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QMimeData>
-#include <QPainter>
+#include <QCloseEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,16 +30,11 @@ public slots:
 
 private:
     Ui::TokriWindow *ui;
-    bool mDropping = false;
-    CloseButton *mCloseButton;
 
     void init();
     void moveNearCursor();
-    void paintEvent(QPaintEvent *);
-    void resizeEvent(QResizeEvent *e);
-    void setDropping(bool status);
+    void closeEvent(QCloseEvent *e);
     void showEvent(QShowEvent *e);
     void openItem(QString filePath);
-    void renderCloseButton();
 };
 #endif // TOKRIWINDOW_H

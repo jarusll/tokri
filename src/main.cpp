@@ -1,7 +1,6 @@
 #include "copyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
-#include "themeprovider.h"
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
 #include "ui_tokriwindow.h"
@@ -50,9 +49,6 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
-    a.setPalette(ThemeProvider::theme());
-
-
     QLocalServer server;
     TokriWindow tokriWindow;
     // Single Instance
@@ -89,7 +85,6 @@ int main(int argc, char *argv[])
     auto *menu = new QMenu();
     menu->addAction("Show", &tokriWindow, &TokriWindow::wakeUp);
     menu->addAction("Quit", &a, &QCoreApplication::quit);
-    menu->setPalette(a.palette());
     tray->setContextMenu(menu);
 
     QObject::connect(tray, &QSystemTrayIcon::activated,

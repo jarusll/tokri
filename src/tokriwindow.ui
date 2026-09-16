@@ -16,9 +16,6 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="DragHandle" name="widget" native="true"/>
-    </item>
-    <item>
      <widget class="NoInternalDragListView" name="listView">
       <property name="acceptDrops">
        <bool>true</bool>
@@ -54,12 +51,6 @@
    <class>NoInternalDragListView</class>
    <extends>QListView</extends>
    <header>nointernaldraglistview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>DragHandle</class>
-   <extends>QWidget</extends>
-   <header>draghandle.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
