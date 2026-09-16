@@ -31,6 +31,7 @@ public slots:
     void onShakeDetect();
     void deleteSelection();
     void copySelection();
+    void openSelection();
     void selectAll();
 
 private:

@@ -100,6 +100,8 @@ int main(int argc, char *argv[])
     tray->show();
 
 
+    auto *listView = tokriWindow.uiHandle()->listView;
+
     QAction *deleteAction = new QAction(&tokriWindow);
     deleteAction->setShortcut(QKeySequence::Delete);
     tokriWindow.addAction(deleteAction);
@@ -109,6 +111,15 @@ int main(int argc, char *argv[])
     tokriWindow.addAction(copyAction);
     QObject::connect(copyAction, &QAction::triggered,
                      &tokriWindow, &TokriWindow::copySelection);
+
+    QAction *openAction = new QAction(&tokriWindow);
+    openAction->setShortcuts({ QKeySequence(Qt::Key_Return),
+                               QKeySequence(Qt::Key_Enter) });
+    openAction->setShortcutContext(Qt::WidgetShortcut);
+    listView->addAction(openAction);
+    QObject::connect(openAction, &QAction::triggered,
+                     &tokriWindow, &TokriWindow::openSelection);
+    openAction->setEnabled(false);
 
     // View & Models
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&tokriWindow);
@@ -133,16 +144,15 @@ int main(int argc, char *argv[])
     tokriWindow.uiHandle()->listView->setModel(sortFilterProxy);
     tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(rootIndex));
 
-    auto *listView = tokriWindow.uiHandle()->listView;
     copyAction->setEnabled(false);
     QObject::connect(listView->selectionModel(),
                      &QItemSelectionModel::selectionChanged,
-                     copyAction,
-                     [listView, copyAction] {
-                         copyAction->setEnabled(
-                             !listView->selectionModel()
-                                  ->selectedIndexes()
-                                  .isEmpty());
+                     listView,
+                     [listView, copyAction, openAction] {
+                         const int count =
+                             listView->selectionModel()->selectedIndexes().size();
+                         copyAction->setEnabled(count > 0);
+                         openAction->setEnabled(count == 1);
                      });
 
     qRegisterMetaType<QMimeData *>("QMimeData*");

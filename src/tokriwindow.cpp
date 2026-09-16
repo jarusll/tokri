@@ -61,6 +61,7 @@ TokriWindow::TokriWindow(QWidget *parent)
     ui->listView->setUniformItemSizes(true);
     ui->listView->setSpacing(8);
     ui->listView->setMouseTracking(true);
+    ui->listView->setFocusPolicy(Qt::StrongFocus);
     ui->listView->setDropIndicatorShown(false);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -110,8 +111,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
 
                 if (count == 1 && chosen == open) {
-                    QString filePath = fileInfoAt(selected[0]).filePath();
-                    openItem(filePath);
+                    openSelection();
                     log.pop();
                     return;
                 }
@@ -190,6 +190,7 @@ void TokriWindow::wakeUp()
 
     raise();
     activateWindow();
+    ui->listView->setFocus();
 
     log.pop();
 }
@@ -332,6 +333,38 @@ void TokriWindow::copySelection()
         mime->setUrls(urls);
         QGuiApplication::clipboard()->setMimeData(mime);
     }
+
+    log.pop();
+}
+
+void TokriWindow::openSelection()
+{
+    Logger &log = Logger::instance();
+    log.push("openSelection");
+
+    auto *sel = ui->listView->selectionModel();
+    if (!sel) {
+        log.pop();
+        return;
+    }
+
+    const auto selected = sel->selectedIndexes();
+    if (selected.size() != 1) {
+        log.log() << "selection count=" << selected.size() << " -> skip";
+        log.pop();
+        return;
+    }
+
+    const QModelIndex idx = selected.first();
+    if (!idx.isValid()) {
+        log.pop();
+        return;
+    }
+
+    const QString filePath =
+        idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
+    log.log() << "path=" << filePath;
+    openItem(filePath);
 
     log.pop();
 }
