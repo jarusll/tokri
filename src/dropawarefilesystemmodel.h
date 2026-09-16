@@ -3,8 +3,6 @@
 
 #include <QFileSystemModel>
 #include <QMimeData>
-#include <QUrl>
-#include <QMimeDatabase>
 
 class DropAwareFileSystemModel : public QFileSystemModel
 {

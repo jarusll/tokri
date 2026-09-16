@@ -3,8 +3,6 @@
 #include "loghelpers.h"
 
 #include <QApplication>
-#include <QFile>
-#include <QMimeDatabase>
 
 namespace {
 
@@ -129,41 +127,8 @@ QMimeData* DropAwareFileSystemModel::mimeData(const QModelIndexList &indexes) co
     log.push("mimeData");
 
     QMimeData *mime = QFileSystemModel::mimeData(indexes);
-    if (!mime)
-        mime = new QMimeData;
 
-    QString path;
-    QString detected;
-    bool injected = false;
-
-    // FIXME multiple txt drags will be treated as files, do something?
-    if (indexes.length() == 1){
-        const QModelIndex idx = indexes.first();
-        path = filePath(idx);
-
-        QMimeDatabase mimeDb;
-        detected = mimeDb.mimeTypeForFile(path).name();
-
-        if (mimeDb.mimeTypeForFile(path).inherits("text/plain")){
-            QFile f(path);
-            if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                QByteArray bytes = f.readAll();
-                mime->setData("text/plain", bytes);
-                injected = true;
-                log.log() << "injecting text/plain"
-                          << "bytes=" << bytes.size() << "path=" << path;
-            } else {
-                log.log() << "failed to open text file"
-                          << "path=" << path << "err=" << f.errorString();
-            }
-        }
-    }
-
-    log.log() << "drag-out"
-              << "indexes=" << indexes.size()
-              << "path=" << path
-              << "detectedMime=" << detected
-              << "injectedTextPlain=" << injected
+    log.log() << "drag-out indexes=" << indexes.size()
               << describeMimeData(mime);
 
     log.pop();
