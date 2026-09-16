@@ -1,4 +1,3 @@
-#include "copyworker.h"
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
 #include "tokriwindow.h"
@@ -26,7 +25,7 @@
 #include <QFileInfo>
 #include <QFileSystemModel>
 #include <QLineEdit>
-#include <QMimeDatabase>
+#include <QMimeData>
 #include <QQueue>
 #include <QSortFilterProxyModel>
 #include <QStackedWidget>
@@ -113,65 +112,27 @@ int main(int argc, char *argv[])
     tokriWindow.uiHandle()->listView->setModel(sortFilterProxy);
     tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(rootIndex));
 
-    TextDropHandler *dropHandler = new TextDropHandler;
-    DropAwareFileSystemModel::connect(
-        fsModel,
-        &DropAwareFileSystemModel::droppedText,
-        dropHandler,
-        &TextDropHandler::handleTextDrop
-        );
+    qRegisterMetaType<QMimeData *>("QMimeData*");
 
-    DropAwareFileSystemModel::connect(
-        fsModel,
-        &DropAwareFileSystemModel::droppedUrl,
-        dropHandler,
-        &TextDropHandler::handleUrlDrop
-        );
+    DropHandler *dropHandler = new DropHandler;
+    fsModel->setDropReceiver(dropHandler);
 
-    CopyWorker *worker = new CopyWorker;
-    CopyWorker::connect(
-        fsModel,
-        &DropAwareFileSystemModel::droppedFile,
-        worker,
-        &CopyWorker::copyFile,
-        Qt::QueuedConnection
-        );
-    CopyWorker::connect(
-        fsModel,
-        &DropAwareFileSystemModel::droppedDirectory,
-        worker,
-        &CopyWorker::copyDirectory,
-        Qt::QueuedConnection
-        );
-    CopyWorker::connect(
-        fsModel,
-        &DropAwareFileSystemModel::droppedImage,
-        worker,
-        &CopyWorker::saveImage,
-        Qt::QueuedConnection
-        );
-    CopyWorker::connect(
-        fsModel,
-        &DropAwareFileSystemModel::droppedImageBytes,
-        worker,
-        &CopyWorker::saveImageBytes,
-        Qt::QueuedConnection
-        );
-
+    QObject::connect(fsModel, &DropAwareFileSystemModel::dropReceived,
+                     dropHandler, &DropHandler::handleDrop,
+                     Qt::QueuedConnection);
 
     QTimer *reloadDirectoryDebounce = new QTimer(&tokriWindow);
     reloadDirectoryDebounce->setSingleShot(true);
 
     bool reset = true;
 
-    QObject::connect(worker, &CopyWorker::copySuccess,
+    QObject::connect(dropHandler, &DropHandler::changed,
                      reloadDirectoryDebounce,
                      [&reloadDirectoryDebounce, &reset] {
                          reloadDirectoryDebounce->setInterval(reset ? 500 : 3000);
                          reset = false;
                          reloadDirectoryDebounce->start();
-                     },
-                     Qt::QueuedConnection);
+                     });
 
     QObject::connect(reloadDirectoryDebounce, &QTimer::timeout,
                      fsModel,
@@ -184,10 +145,10 @@ int main(int argc, char *argv[])
 
 
     QThread* th = new QThread;
-    CopyWorker::connect(th, &QThread::finished, worker, &QObject::deleteLater);
-    TextDropHandler::connect(th, &QThread::finished, worker, &QObject::deleteLater);
+    QObject::connect(th, &QThread::finished, dropHandler, &QObject::deleteLater);
+    QObject::connect(&a, &QCoreApplication::aboutToQuit, th, &QThread::quit);
+    QObject::connect(th, &QThread::finished, th, &QObject::deleteLater);
     dropHandler->moveToThread(th);
-    worker->moveToThread(th);
     th->start();
 
 

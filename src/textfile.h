@@ -11,10 +11,7 @@ public:
     explicit TextFile(QObject *parent = nullptr);
     void setName(QString name);
     void setContent(QString content);
-    void save();
-
-signals:
-    void saved(bool);
+    bool save();
 
 private:
     QString mName;

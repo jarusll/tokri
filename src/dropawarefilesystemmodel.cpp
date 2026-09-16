@@ -1,23 +1,28 @@
 #include "dropawarefilesystemmodel.h"
 
 #include <QApplication>
-#include <QBuffer>
-#include <QImageReader>
-#include <QUuid>
 
-bool isValidHttpUrl(const QString &s)
+namespace {
+
+QMimeData *cloneMimeData(const QMimeData *src)
 {
-    QUrl u(s, QUrl::StrictMode);
-    return u.isValid()
-           && !u.scheme().isEmpty()
-           && (u.scheme() == "http" || u.scheme() == "https")
-           && !u.host().isEmpty();
+    auto *copy = new QMimeData;
+    for (const QString &format : src->formats())
+        copy->setData(format, src->data(format));
+    return copy;
+}
+
 }
 
 DropAwareFileSystemModel::DropAwareFileSystemModel(QObject *parent)
     : QFileSystemModel{parent}
 {
     setReadOnly(false);
+}
+
+void DropAwareFileSystemModel::setDropReceiver(QObject *receiver)
+{
+    mDropReceiver = receiver;
 }
 
 Qt::ItemFlags DropAwareFileSystemModel::flags(const QModelIndex &index) const  {
@@ -33,101 +38,31 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
     Q_UNUSED(column);
     Q_UNUSED(parent);
 
-    // TODO wtf is this?
     if (action == Qt::IgnoreAction)
         return true;
 
-    if (data->hasImage()){
-        qDebug() << "Can drop image";
-        return true;
-    } else if (data->hasUrls()){
-        return true;
-    } else if (data->hasText()){
-        return true;
-    }
+    if (!data)
+        return false;
 
-    return QFileSystemModel::canDropMimeData(
-        data,
-        action,
-        row,
-        column,
-        parent
-        );
+    return data->hasUrls()
+           || data->hasImage()
+           || data->hasText()
+           || data->hasHtml();
 }
 
 bool DropAwareFileSystemModel::dropMimeData(const QMimeData *data,
                                             Qt::DropAction action,
                                             int row, int column,
                                             const QModelIndex &parent) {
-    Q_UNUSED(row);
-    Q_UNUSED(column);
-    Q_UNUSED(parent);
+    if (!canDropMimeData(data, action, row, column, parent))
+        return false;
 
-    for (const QString &format : data->formats()) {
-        if (!format.startsWith("image/"))
-            continue;
-        if (!QImageReader::supportedMimeTypes().contains(format.toLatin1()))
-            continue;
+    QMimeData *copy = cloneMimeData(data);
+    if (mDropReceiver)
+        copy->moveToThread(mDropReceiver->thread());
 
-        qDebug() << "Dropping image with format:" << format;
-        QByteArray bytes = data->data(format);
-        if (bytes.isEmpty())
-            // TODO emit error
-            return false;
-        emit droppedImageBytes(bytes, format);
-        return true;
-    }
-
-    if (data->hasImage()) {
-        const auto image = data->imageData().value<QImage>();
-        if (image.isNull()) {
-            // TODO emit error
-            return false;
-        }
-
-        emit droppedImage(image);
-        return true;
-    }
-
-
-    else if (data->hasUrls()) {
-        bool handled = false;
-
-        // FIXME cleanup
-        for (const auto &url: data->urls()){
-            if (url.isLocalFile()){
-                QFileInfo fileInfo(url.toLocalFile());
-                if (fileInfo.isFile()){
-                    emit droppedFile(url.toLocalFile());
-                } else {
-                    emit droppedDirectory(url.toLocalFile());
-                }
-            } else {
-                emit droppedUrl(url.toString());
-                // since there can be only 1 url drop from browser
-                return true;
-            }
-        }
-
-    }
-
-    else if (data->hasText()) {
-        if (isValidHttpUrl( data->text())){
-            emit droppedUrl(data->text());
-            return true;
-        } else {
-            emit droppedText(data->text());
-            return true;
-        }
-    }
-
-    return QFileSystemModel::dropMimeData(
-        data,
-        action,
-        row,
-        column,
-        parent
-        );
+    emit dropReceived(copy);
+    return true;
 }
 
 QVariant DropAwareFileSystemModel::data(const QModelIndex &index, int role) const

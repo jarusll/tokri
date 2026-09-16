@@ -12,6 +12,8 @@ class DropAwareFileSystemModel : public QFileSystemModel
 public:
     explicit DropAwareFileSystemModel(QObject *parent = nullptr);
 
+    void setDropReceiver(QObject *receiver);
+
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool canDropMimeData(const QMimeData *data,
                          Qt::DropAction action,
@@ -26,13 +28,10 @@ public:
     Qt::DropActions supportedDragActions() const override;
 
 signals:
-    void droppedText(const QString &text);
-    void droppedFile(const QString &file);
-    void droppedDirectory(const QString &directory);
-    void droppedUrl(const QString &url);
-    void droppedImage(const QImage image);
-    void droppedImageBytes(QByteArray bytes,
-                           const QString &mimeType);
+    void dropReceived(QMimeData *data);
+
+private:
+    QObject *mDropReceiver = nullptr;
 };
 
 #endif // DROPAWAREFILESYSTEMMODEL_H

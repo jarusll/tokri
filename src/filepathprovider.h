@@ -4,9 +4,9 @@
 #include "standardpaths.h"
 
 #include <QDir>
+#include <QFileInfo>
 #include <QObject>
 #include <QRegularExpression>
-#include <QUrl>
 #include <QUuid>
 
 class FilePathProvider : public QObject
@@ -15,48 +15,48 @@ public:
 
     explicit FilePathProvider(QObject *parent = nullptr);
 
-    static QString nameFromText(const QString &text) {
-        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
-        QString fileNameBase = text.trimmed().left(80);
-
+    static QString sanitizeName(const QString &name) {
         static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
-        fileNameBase.replace(forbidden, "_");
-        fileNameBase = fileNameBase.trimmed();
-        fileNameBase.remove(QRegularExpression(R"(^_+|_+$)"));
-        fileNameBase.append(".txt");
-
-        return QDir(rootPath).filePath(fileNameBase);
+        QString clean = name;
+        clean.replace(forbidden, "_");
+        clean = clean.trimmed();
+        clean.remove(QRegularExpression(R"(^_+|_+$)"));
+        if (clean.isEmpty())
+            clean = "untitled";
+        return clean;
     }
 
-    static QString nameFromPath(const QString &path){
-        QDir dir(path);
-        QString baseName = dir.dirName();
-        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
-        QString fileNameBase = baseName;
-        // FIXME this should be declared once
-        static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
-        fileNameBase.replace(forbidden, "_");
-        while (fileNameBase.startsWith("_")) fileNameBase.remove(0, 1);
-        while (fileNameBase.endsWith("_")) fileNameBase.chop(1);
-        return QDir(rootPath + "/" + fileNameBase).path();
+    static QString nameFromPath(const QString &path) {
+        const QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
+        return QDir(rootPath).filePath(sanitizeName(QDir(path).dirName()));
     }
 
-    static QString nameFromUrl(const QUrl &url){
-        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
-        // FIXME can do content disposition and the url itself as fallback
-        static const QRegularExpression forbidden(R"([<>:"/\\|?*\x00-\x1F])");
-        QString urlStr = url.toString();
-        urlStr.replace(forbidden, "_");
-        return QDir(rootPath).filePath(urlStr);
+    static QString nameWithPrefix(const QString &prefix = QString()) {
+        const QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
+        QString name = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        if (!prefix.isEmpty())
+            name = prefix + "_" + name;
+        return QDir(rootPath).filePath(name);
     }
 
-    static QString nameWithPrefix(QString prefix = QString()){
-        QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
-        QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
-        if (!prefix.isEmpty()){
-            uuidStr = prefix + "_" + uuidStr;
+    static QString uniquePath(const QString &desiredPath) {
+        if (!QFileInfo::exists(desiredPath))
+            return desiredPath;
+
+        const QFileInfo info(desiredPath);
+        const QString dir = info.absolutePath();
+        const QString base = info.completeBaseName();
+        const QString suffix = info.suffix();
+
+        for (int n = 1; ; ++n) {
+            QString candidate = base + "_" + QString::number(n);
+            if (!suffix.isEmpty())
+                candidate += "." + suffix;
+
+            const QString path = QDir(dir).filePath(candidate);
+            if (!QFileInfo::exists(path))
+                return path;
         }
-        return QDir(rootPath).filePath(uuidStr);
     }
 };
 

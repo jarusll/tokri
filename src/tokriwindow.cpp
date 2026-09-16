@@ -219,22 +219,6 @@ void TokriWindow::showEvent(QShowEvent *e)
 }
 
 void TokriWindow::openItem(QString filePath) {
-    if (filePath.endsWith(".url.txt"))
-    {
-        QFile file(filePath);
-        if (file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
-        {
-            QTextStream in(&file);
-            QString line = in.readLine();
-            if (!line.isEmpty())
-            {
-                qDebug() << "Opening url" << line;
-                QDesktopServices::openUrl(line);
-                return;
-            }
-        }
-    }
-
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
 
