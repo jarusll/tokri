@@ -4,9 +4,14 @@
 #include <QFutureWatcher>
 #include <QIcon>
 #include <QImageReader>
+#include <QThread>
 #include <QtConcurrent>
 
 namespace {
+
+constexpr int kCacheBytes = 32 * 1024 * 1024;
+constexpr int kWindowMs = 50;
+constexpr int kMaxPending = 128;
 
 QImage loadThumbnail(const QString &path, const QSize &target)
 {
@@ -20,12 +25,24 @@ QImage loadThumbnail(const QString &path, const QSize &target)
     return reader.read();
 }
 
+QString pathOf(const QPersistentModelIndex &pidx)
+{
+    return pidx.data(QFileSystemModel::FileInfoRole)
+        .value<QFileInfo>()
+        .absoluteFilePath();
+}
+
 }
 
 ThumbnailProxyModel::ThumbnailProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
-    mCache.setMaxCost(30);
+    mCache.setMaxCost(kCacheBytes);
+
+    mDebounceTimer.setSingleShot(true);
+    mDebounceTimer.setInterval(kWindowMs);
+    connect(&mDebounceTimer, &QTimer::timeout, this,
+            &ThumbnailProxyModel::dispatchPendingRequests);
 }
 
 QVariant ThumbnailProxyModel::data(const QModelIndex &index, int role) const
@@ -42,37 +59,62 @@ QVariant ThumbnailProxyModel::data(const QModelIndex &index, int role) const
 
     if (const QPixmap *pm = mCache.object(key))
         return QIcon(*pm);
-    if (mNonImages.contains(key))
+    if (mFailedRequests.contains(key) || mInFlightRequests.contains(key)
+        || mPendingRequests.contains(QPersistentModelIndex(index)))
         return QSortFilterProxyModel::data(index, role);
 
-    if (!mPending.contains(key)) {
-        if (!QImageReader(key).canRead()) {
-            mNonImages.insert(key);
-            return QSortFilterProxyModel::data(index, role);
-        }
-
-        mPending.insert(key);
-
-        auto *self = const_cast<ThumbnailProxyModel *>(this);
-        const QPersistentModelIndex pidx(index);
-
-        auto future = QtConcurrent::run(
-            [key] { return loadThumbnail(key, QSize(128, 128)); });
-
-        auto *watcher = new QFutureWatcher<QImage>(self);
-        connect(watcher, &QFutureWatcher<QImage>::finished, self,
-                [self, watcher, key, pidx] {
-                    const QImage img = watcher->result();
-                    watcher->deleteLater();
-                    self->mPending.remove(key);
-                    if (img.isNull() || !pidx.isValid())
-                        return;
-
-                    self->mCache.insert(key, new QPixmap(QPixmap::fromImage(img)), 1);
-                    emit self->dataChanged(pidx, pidx, {Qt::DecorationRole});
-                });
-        watcher->setFuture(future);
-    }
+    requestThumbnail(index);
 
     return QSortFilterProxyModel::data(index, role);
+}
+
+void ThumbnailProxyModel::requestThumbnail(const QModelIndex &index) const
+{
+    mPendingRequests.append(QPersistentModelIndex(index));
+    while (mPendingRequests.size() > kMaxPending)
+        mPendingRequests.removeFirst();
+
+    mDebounceTimer.start();
+}
+
+void ThumbnailProxyModel::dispatchPendingRequests()
+{
+    const int limit = QThread::idealThreadCount();
+
+    while (!mPendingRequests.isEmpty() && mInFlightRequests.size() < limit) {
+        const QPersistentModelIndex pidx = mPendingRequests.takeLast();
+        if (!pidx.isValid())
+            continue;
+
+        const QString key = pathOf(pidx);
+        if (mFailedRequests.contains(key) || mInFlightRequests.contains(key))
+            continue;
+
+        mInFlightRequests.insert(key);
+
+        auto *watcher = new QFutureWatcher<QImage>(this);
+        connect(watcher, &QFutureWatcher<QImage>::finished, this,
+                [this, watcher, key, pidx] {
+                    const QImage img = watcher->result();
+                    watcher->deleteLater();
+
+                    mInFlightRequests.remove(key);
+
+                    if (img.isNull()) {
+                        mFailedRequests.insert(key);
+                    } else {
+                        mCache.insert(key, new QPixmap(QPixmap::fromImage(img)),
+                                      int(img.sizeInBytes()));
+                        if (pidx.isValid())
+                            emit dataChanged(pidx, pidx,
+                                             {Qt::DecorationRole});
+                    }
+
+                    if (!mPendingRequests.isEmpty() && !mDebounceTimer.isActive())
+                        dispatchPendingRequests();
+                });
+
+        watcher->setFuture(QtConcurrent::run(
+            [key] { return loadThumbnail(key, QSize(128, 128)); }));
+    }
 }
