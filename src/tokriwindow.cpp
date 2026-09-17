@@ -2,6 +2,7 @@
 #include "./ui_tokriwindow.h"
 #include "loghelpers.h"
 #include "standardpaths.h"
+#include "thumbnaildelegate.h"
 #include <QDir>
 #include <QMenu>
 #include <QCloseEvent>
@@ -55,11 +56,12 @@ TokriWindow::TokriWindow(QWidget *parent)
 
     ui->listView->setViewMode(QListView::IconMode);
     ui->listView->setIconSize({128, 128});
-    ui->listView->setGridSize({128, 150});
+    ui->listView->setGridSize({128, 128 + ui->listView->fontMetrics().height() + 14});
     ui->listView->setFlow(QListView::LeftToRight);
     ui->listView->setWrapping(true);
     ui->listView->setUniformItemSizes(true);
     ui->listView->setSpacing(8);
+    ui->listView->setItemDelegate(new ThumbnailDelegate(ui->listView));
     ui->listView->setMouseTracking(true);
     ui->listView->setFocusPolicy(Qt::StrongFocus);
     ui->listView->setDropIndicatorShown(false);

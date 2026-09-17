@@ -3,6 +3,7 @@
 #include "loghelpers.h"
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
+#include "thumbnailproxymodel.h"
 #include "ui_tokriwindow.h"
 #include "standardnames.h"
 #include "standardpaths.h"
@@ -126,6 +127,9 @@ int main(int argc, char *argv[])
     QString rootPath = StandardPaths::getPath(StandardPaths::TokriDir);
     QModelIndex rootIndex = fsModel->setRootPath(rootPath);
 
+    ThumbnailProxyModel *thumbnailProxy = new ThumbnailProxyModel(&tokriWindow);
+    thumbnailProxy->setSourceModel(fsModel);
+
     QAction *pasteAction = new QAction(&tokriWindow);
     pasteAction->setShortcut(QKeySequence::Paste);
     tokriWindow.addAction(pasteAction);
@@ -140,12 +144,13 @@ int main(int argc, char *argv[])
                      pasteFromClipboard);
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&tokriWindow);
-    sortFilterProxy->setSourceModel(fsModel);
+    sortFilterProxy->setSourceModel(thumbnailProxy);
     sortFilterProxy->setDynamicSortFilter(true);
     sortFilterProxy->sort(0, Qt::DescendingOrder);
 
     tokriWindow.uiHandle()->listView->setModel(sortFilterProxy);
-    tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(rootIndex));
+    tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(
+        thumbnailProxy->mapFromSource(rootIndex)));
 
     copyAction->setEnabled(false);
     QObject::connect(listView->selectionModel(),

@@ -16,6 +16,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent)
 
 set(PROJECT_SOURCES
         src/main.cpp
@@ -61,6 +62,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/filepathprovider.h src/filepathprovider.cpp
         src/loghelpers.h
         src/sortfilterproxy.h src/sortfilterproxy.cpp
+        src/thumbnailproxymodel.h src/thumbnailproxymodel.cpp
+        src/thumbnaildelegate.h src/thumbnaildelegate.cpp
         src/nointernaldraglistview.h src/nointernaldraglistview.cpp
         src/standardnames.h
         src/shakedetector.h src/shakedetector.cpp
@@ -136,6 +139,7 @@ target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Tokri PRIVATE Qt${QT_VERSION_MAJOR}::Concurrent)
 
 target_include_directories(Tokri PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR})
