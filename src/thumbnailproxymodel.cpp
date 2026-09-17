@@ -17,9 +17,13 @@
 
 namespace {
 
-constexpr int kCacheBytes = 32 * 1024 * 1024;
-constexpr int kWindowMs = 50;
-constexpr int kMaxPending = 128;
+constexpr int TotalCacheBytes = 32 * 1024 * 1024;
+constexpr int WindowMs = 50;
+constexpr int MaxPendingRequests = 128;
+
+constexpr int ThumbnailSide = 128;
+const QSize ThumbnailSize{ThumbnailSide, ThumbnailSide};
+PreviewStyle themePreviewStyle;
 
 QImage loadImage(const QString &path, const QSize &target)
 {
@@ -33,21 +37,20 @@ QImage loadImage(const QString &path, const QSize &target)
     return reader.read();
 }
 
-QImage loadPreview(const QString &path, const QSize &target,
-                   const PreviewStyle &style)
+QImage loadPreview(const QString &path)
 {
     const QMimeType mime =
         QMimeDatabase().mimeTypeForFile(path, QMimeDatabase::MatchContent);
 
     if (mime.name().startsWith(QLatin1String("image/")))
-        return loadImage(path, target);
+        return loadImage(path, ThumbnailSize);
     if (isTextLike(mime))
-        return renderTextPreview(path, target, style);
+        return renderTextPreview(path, ThumbnailSize, themePreviewStyle);
 
     return {};
 }
 
-PreviewStyle makeStyle()
+PreviewStyle makeTextPreviewStyle()
 {
     const QPalette pal = QGuiApplication::palette();
 
@@ -72,10 +75,11 @@ QString pathOf(const QPersistentModelIndex &pidx)
 ThumbnailProxyModel::ThumbnailProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
-    mCache.setMaxCost(kCacheBytes);
+    mCache.setMaxCost(TotalCacheBytes);
+    themePreviewStyle = makeTextPreviewStyle();
 
     mDebounceTimer.setSingleShot(true);
-    mDebounceTimer.setInterval(kWindowMs);
+    mDebounceTimer.setInterval(WindowMs);
     connect(&mDebounceTimer, &QTimer::timeout, this,
             &ThumbnailProxyModel::dispatchPendingRequests);
 }
@@ -106,7 +110,7 @@ QVariant ThumbnailProxyModel::data(const QModelIndex &index, int role) const
 void ThumbnailProxyModel::requestThumbnail(const QModelIndex &index) const
 {
     mPendingRequests.append(QPersistentModelIndex(index));
-    while (mPendingRequests.size() > kMaxPending)
+    while (mPendingRequests.size() > MaxPendingRequests)
         mPendingRequests.removeFirst();
 
     mDebounceTimer.start();
@@ -115,7 +119,6 @@ void ThumbnailProxyModel::requestThumbnail(const QModelIndex &index) const
 void ThumbnailProxyModel::dispatchPendingRequests()
 {
     const int limit = QThread::idealThreadCount();
-    const PreviewStyle style = makeStyle();
 
     while (!mPendingRequests.isEmpty() && mInFlightRequests.size() < limit) {
         const QPersistentModelIndex pidx = mPendingRequests.takeLast();
@@ -123,9 +126,6 @@ void ThumbnailProxyModel::dispatchPendingRequests()
             continue;
 
         const QString key = pathOf(pidx);
-        if (mFailedRequests.contains(key) || mInFlightRequests.contains(key))
-            continue;
-
         mInFlightRequests.insert(key);
 
         auto *watcher = new QFutureWatcher<QImage>(this);
@@ -151,6 +151,6 @@ void ThumbnailProxyModel::dispatchPendingRequests()
                 });
 
         watcher->setFuture(QtConcurrent::run(
-            [key, style] { return loadPreview(key, QSize(128, 128), style); }));
+            [key] { return loadPreview(key); }));
     }
 }
