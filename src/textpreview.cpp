@@ -8,11 +8,11 @@
 
 namespace {
 
-constexpr int kProbeBytes = 8192;
-constexpr int kMaxLines = 10;
-constexpr int kOuterPad = 4;
-constexpr int kInnerPad = 8;
-constexpr int kRadius = 8;
+constexpr int ProbeBytes = 8192;
+constexpr int MaxLines = 10;
+constexpr int OuterPad = 4;
+constexpr int InnerPad = 8;
+constexpr int Radius = 8;
 
 QString decodeText(const QByteArray &bytes)
 {
@@ -51,7 +51,7 @@ QImage renderTextPreview(const QString &path, const QSize &target,
     if (!file.open(QIODevice::ReadOnly))
         return {};
 
-    const QByteArray bytes = file.read(kProbeBytes);
+    const QByteArray bytes = file.read(ProbeBytes);
     if (bytes.isEmpty() || bytes.contains('\0'))
         return {};
 
@@ -73,17 +73,17 @@ QImage renderTextPreview(const QString &path, const QSize &target,
 
     const QRect bounds(QPoint(0, 0), target);
     const QRect background =
-        bounds.adjusted(kOuterPad, kOuterPad, -kOuterPad, -kOuterPad);
+        bounds.adjusted(OuterPad, OuterPad, -OuterPad, -OuterPad);
 
     painter.setPen(style.border);
     painter.setBrush(style.background);
-    painter.drawRoundedRect(background, kRadius, kRadius);
+    painter.drawRoundedRect(background, Radius, Radius);
 
     const QRect textRect =
-        background.adjusted(kInnerPad, kInnerPad, -kInnerPad, -kInnerPad);
+        background.adjusted(InnerPad, InnerPad, -InnerPad, -InnerPad);
 
     QFont font = style.font;
-    font.setPixelSize(qMax(textRect.height() / (kMaxLines + 2), 4));
+    font.setPixelSize(qMax(textRect.height() / (MaxLines + 2), 4));
     painter.setFont(font);
 
     const QFontMetrics fm(font);
@@ -93,7 +93,7 @@ QImage renderTextPreview(const QString &path, const QSize &target,
     painter.setClipRect(textRect);
 
     int y = textRect.top() + fm.ascent();
-    for (int i = 0; i < lines.size() && i < kMaxLines; ++i) {
+    for (int i = 0; i < lines.size() && i < MaxLines; ++i) {
         if (y > textRect.bottom())
             break;
 
