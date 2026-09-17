@@ -1,9 +1,17 @@
 #include "thumbnailproxymodel.h"
 
+#include "textpreview.h"
+
+#include <QApplication>
 #include <QFileSystemModel>
+#include <QFontDatabase>
 #include <QFutureWatcher>
+#include <QGuiApplication>
 #include <QIcon>
 #include <QImageReader>
+#include <QMimeDatabase>
+#include <QMimeType>
+#include <QPalette>
 #include <QThread>
 #include <QtConcurrent>
 
@@ -13,7 +21,7 @@ constexpr int kCacheBytes = 32 * 1024 * 1024;
 constexpr int kWindowMs = 50;
 constexpr int kMaxPending = 128;
 
-QImage loadThumbnail(const QString &path, const QSize &target)
+QImage loadImage(const QString &path, const QSize &target)
 {
     QImageReader reader(path);
     reader.setAutoTransform(true);
@@ -23,6 +31,33 @@ QImage loadThumbnail(const QString &path, const QSize &target)
         reader.setScaledSize(size.scaled(target, Qt::KeepAspectRatio));
 
     return reader.read();
+}
+
+QImage loadPreview(const QString &path, const QSize &target,
+                   const PreviewStyle &style)
+{
+    const QMimeType mime =
+        QMimeDatabase().mimeTypeForFile(path, QMimeDatabase::MatchContent);
+
+    if (mime.name().startsWith(QLatin1String("image/")))
+        return loadImage(path, target);
+    if (isTextLike(mime))
+        return renderTextPreview(path, target, style);
+
+    return {};
+}
+
+PreviewStyle makeStyle()
+{
+    const QPalette pal = QGuiApplication::palette();
+
+    PreviewStyle style;
+    style.font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    style.background = pal.color(QPalette::Button);
+    style.border = pal.color(QPalette::Mid);
+    style.foreground = pal.color(QPalette::Text);
+    style.dpr = qApp->devicePixelRatio();
+    return style;
 }
 
 QString pathOf(const QPersistentModelIndex &pidx)
@@ -80,6 +115,7 @@ void ThumbnailProxyModel::requestThumbnail(const QModelIndex &index) const
 void ThumbnailProxyModel::dispatchPendingRequests()
 {
     const int limit = QThread::idealThreadCount();
+    const PreviewStyle style = makeStyle();
 
     while (!mPendingRequests.isEmpty() && mInFlightRequests.size() < limit) {
         const QPersistentModelIndex pidx = mPendingRequests.takeLast();
@@ -115,6 +151,6 @@ void ThumbnailProxyModel::dispatchPendingRequests()
                 });
 
         watcher->setFuture(QtConcurrent::run(
-            [key] { return loadThumbnail(key, QSize(128, 128)); }));
+            [key, style] { return loadPreview(key, QSize(128, 128), style); }));
     }
 }
