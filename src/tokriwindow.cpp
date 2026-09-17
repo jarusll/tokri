@@ -80,16 +80,19 @@ TokriWindow::TokriWindow(QWidget *parent)
 
                 QAction *open = nullptr, *reveal = nullptr, *rename = nullptr;
                 QAction *copy = nullptr, *del = nullptr, *selectAll = nullptr;
+                QAction *paste = nullptr;
 
-                if (count == 1) {
-                    open   = menu.addAction("&Open");
-                    reveal= menu.addAction("Reveal in &Explorer");
-                    rename= menu.addAction("&Rename");
-                }
                 if (count > 0) {
+                    open = menu.addAction("&Open");
                     copy = menu.addAction("&Copy");
                     del  = menu.addAction("&Delete");
                 }
+                if (count == 1) {
+                    reveal= menu.addAction("Reveal in &Explorer");
+                    rename= menu.addAction("&Rename");
+                }
+
+                paste = menu.addAction("&Paste");
                 selectAll = menu.addAction("Select &All");
 
                 QAction *chosen = menu.exec(view->viewport()->mapToGlobal(pos));
@@ -104,13 +107,19 @@ TokriWindow::TokriWindow(QWidget *parent)
                     return idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>();
                 };
 
+                if (chosen == paste) {
+                    emit pasteRequested();
+                    log.pop();
+                    return;
+                }
+
                 if (chosen == selectAll) {
                     this->selectAll();
                     log.pop();
                     return;
                 }
 
-                if (count == 1 && chosen == open) {
+                if (chosen == open) {
                     openSelection();
                     log.pop();
                     return;
@@ -349,22 +358,17 @@ void TokriWindow::openSelection()
     }
 
     const auto selected = sel->selectedIndexes();
-    if (selected.size() != 1) {
-        log.log() << "selection count=" << selected.size() << " -> skip";
-        log.pop();
-        return;
-    }
+    log.log() << "selection count=" << selected.size();
 
-    const QModelIndex idx = selected.first();
-    if (!idx.isValid()) {
-        log.pop();
-        return;
-    }
+    for (const QModelIndex &idx : selected) {
+        if (!idx.isValid())
+            continue;
 
-    const QString filePath =
-        idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
-    log.log() << "path=" << filePath;
-    openItem(filePath);
+        const QString filePath =
+            idx.data(QFileSystemModel::FileInfoRole).value<QFileInfo>().filePath();
+        log.log() << "path=" << filePath;
+        openItem(filePath);
+    }
 
     log.pop();
 }

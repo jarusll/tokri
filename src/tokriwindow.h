@@ -34,6 +34,9 @@ public slots:
     void openSelection();
     void selectAll();
 
+signals:
+    void pasteRequested();
+
 private:
     Ui::TokriWindow *ui;
 

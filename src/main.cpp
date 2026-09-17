@@ -129,12 +129,15 @@ int main(int argc, char *argv[])
     QAction *pasteAction = new QAction(&tokriWindow);
     pasteAction->setShortcut(QKeySequence::Paste);
     tokriWindow.addAction(pasteAction);
-    QObject::connect(pasteAction, &QAction::triggered, fsModel, [fsModel] {
+    auto pasteFromClipboard = [fsModel] {
         auto *clip = QGuiApplication::clipboard();
         if (clip)
             fsModel->dropMimeData(clip->mimeData(), Qt::CopyAction,
                                   -1, -1, QModelIndex());
-    });
+    };
+    QObject::connect(pasteAction, &QAction::triggered, fsModel, pasteFromClipboard);
+    QObject::connect(&tokriWindow, &TokriWindow::pasteRequested, fsModel,
+                     pasteFromClipboard);
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&tokriWindow);
     sortFilterProxy->setSourceModel(fsModel);
@@ -152,7 +155,7 @@ int main(int argc, char *argv[])
                          const int count =
                              listView->selectionModel()->selectedIndexes().size();
                          copyAction->setEnabled(count > 0);
-                         openAction->setEnabled(count == 1);
+                         openAction->setEnabled(count > 0);
                      });
 
     qRegisterMetaType<QMimeData *>("QMimeData*");
