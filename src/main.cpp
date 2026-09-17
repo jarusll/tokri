@@ -1,6 +1,7 @@
 #include "dropawarefilesystemmodel.h"
 #include "drophandler.h"
 #include "loghelpers.h"
+#include "logwindow.h"
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
 #include "thumbnailproxymodel.h"
@@ -51,11 +52,31 @@ int main(int argc, char *argv[])
     qputenv("QT_QPA_PLATFORM", "xcb");
 #endif
     QApplication a(argc, argv);
+    a.setQuitOnLastWindowClosed(false);
+    LogSink::install();
     QThread::currentThread()->setObjectName("main");
     Logger::instance().log() << "Tokri starting";
 
     QLocalServer server;
     TokriWindow tokriWindow;
+
+    LogWindow *logWindow = new LogWindow(&tokriWindow);
+    QAction *logsAction = tokriWindow.uiHandle()->actionLogs;
+    QObject::connect(logsAction, &QAction::toggled,
+                     logWindow, [logWindow](bool on) {
+                         if (on) {
+                             logWindow->show();
+                             logWindow->raise();
+                             logWindow->activateWindow();
+                         } else {
+                             logWindow->hide();
+                         }
+                     });
+    QObject::connect(logWindow, &LogWindow::closed,
+                     logsAction, [logsAction] {
+                         logsAction->setChecked(false);
+                     });
+
     // Single Instance
     const QString lockFilePath =
         QStandardPaths::writableLocation(QStandardPaths::TempLocation)
