@@ -44,7 +44,6 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
-#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -195,43 +194,11 @@ int main(int argc, char *argv[])
                      dropHandler, &DropHandler::handleDrop,
                      Qt::QueuedConnection);
 
-    QTimer *reloadDirectoryDebounce = new QTimer(&tokriWindow);
-    reloadDirectoryDebounce->setSingleShot(true);
-
-    bool reset = true;
-
-    QObject::connect(dropHandler, &DropHandler::changed,
-                     reloadDirectoryDebounce,
-                     [&reloadDirectoryDebounce, &reset] {
-                         Logger &log = Logger::instance();
-                         log.push("reload");
-                         reloadDirectoryDebounce->setInterval(reset ? 500 : 3000);
-                         log.log() << "debounce interval="
-                                   << reloadDirectoryDebounce->interval()
-                                   << "reset=" << reset;
-                         reset = false;
-                         reloadDirectoryDebounce->start();
-                         log.pop();
-                     });
-
     QObject::connect(dropHandler, &DropHandler::failed,
                      dropHandler,
                      [](const QString &reason) {
                          Logger::instance().log() << "drop failed reason="
                                                   << reason;
-                     });
-
-    QObject::connect(reloadDirectoryDebounce, &QTimer::timeout,
-                     fsModel,
-                     [&reset, &fsModel] {
-                         Logger &log = Logger::instance();
-                         log.push("reload");
-                         reset = true;
-                         const QString root = fsModel->rootPath();
-                         log.log() << "root=" << root;
-                         fsModel->setRootPath(QString());
-                         fsModel->setRootPath(root);
-                         log.pop();
                      });
 
 
