@@ -1,16 +1,62 @@
 #include "thumbnaildelegate.h"
 
+#include "thumbnaillayout.h"
+
 #include <QApplication>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPalette>
 #include <QStyle>
+#include <QWidget>
 
 namespace {
 
-constexpr int kThumbSide = 128;
-constexpr int kTopMargin = 4;
-constexpr int kGap = 6;
-constexpr int kBottomPadding = 4;
+void paintTile(QPainter *painter, const QRect &cell, const QPixmap &content,
+               const QPalette &palette)
+{
+    using namespace ThumbnailLayout;
+
+    const QRect container(cell.x() + (cell.width() - Container) / 2,
+                          cell.y(), Container, Container);
+    const QSize maxContent{ContentSide, ContentSide};
+
+    QSize contentSize = content.deviceIndependentSize().toSize();
+    const bool scaled = contentSize.width() > maxContent.width()
+                        || contentSize.height() > maxContent.height();
+    if (scaled)
+        contentSize.scale(maxContent, Qt::KeepAspectRatio);
+
+    QRect contentRect(QPoint(0, 0), contentSize);
+    contentRect.moveCenter(container.center());
+
+    const int inset = Padding + BorderWidth;
+    const QRect frameRect = contentRect.adjusted(-inset, -inset, inset, inset);
+
+    const qreal radius = BorderRadius;
+    QPainterPath framePath;
+    framePath.addRoundedRect(QRectF(frameRect), radius, radius);
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(palette.color(QPalette::Base));
+    painter->drawPath(framePath);
+
+    QPen borderPen(Qt::white);
+    borderPen.setWidth(BorderWidth);
+    painter->setPen(borderPen);
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPath(framePath);
+
+    painter->restore();
+
+    if (scaled)
+        painter->drawPixmap(contentRect, content);
+    else
+        painter->drawPixmap(contentRect.topLeft(), content);
+}
 
 }
 
@@ -23,16 +69,18 @@ QSize ThumbnailDelegate::sizeHint(const QStyleOptionViewItem &option,
 {
     Q_UNUSED(index);
 
+    using namespace ThumbnailLayout;
+
     const QFontMetrics fm(option.font);
-    const int height =
-        kTopMargin + kThumbSide + kGap + fm.height() + kBottomPadding;
-    return QSize(kThumbSide, height);
+    return QSize(TileWidth, TileHeight(fm.height()));
 }
 
 void ThumbnailDelegate::paint(QPainter *painter,
                               const QStyleOptionViewItem &option,
                               const QModelIndex &index) const
 {
+    using namespace ThumbnailLayout;
+
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
 
@@ -49,17 +97,19 @@ void ThumbnailDelegate::paint(QPainter *painter,
 
     const QRect cell = opt.rect;
 
-    const QRect thumbRect(cell.x() + (cell.width() - kThumbSide) / 2,
-                          cell.y() + kTopMargin,
-                          kThumbSide,
-                          kThumbSide);
+    const qreal dpr = opt.widget ? opt.widget->devicePixelRatioF()
+                                 : qApp->devicePixelRatio();
 
-    painter->save();
-    painter->setClipRect(thumbRect);
-    icon.paint(painter, thumbRect, Qt::AlignCenter, QIcon::Normal);
-    painter->restore();
+    QPixmap content =
+        index.data(ThumbnailPixmapRole).value<QPixmap>();
+    if (content.isNull() && !icon.isNull())
+        content = icon.pixmap(QSize(ContentSide, ContentSide), dpr);
 
-    const int textTop = thumbRect.bottom() + 1 + kGap;
+    if (!content.isNull())
+        paintTile(painter, cell, content, opt.palette);
+
+    const int textTop =
+        cell.y() + Margin + Container + 1 + CaptionMargin;
     const QRect textRect(cell.x(), textTop, cell.width(),
                          cell.bottom() - textTop + 1);
 

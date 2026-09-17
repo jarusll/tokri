@@ -11,8 +11,6 @@
 struct PreviewStyle
 {
     QFont font;
-    QColor background;
-    QColor border;
     QColor foreground;
     qreal dpr = 1.0;
 };

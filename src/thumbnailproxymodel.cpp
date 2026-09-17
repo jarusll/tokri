@@ -1,6 +1,7 @@
 #include "thumbnailproxymodel.h"
 
 #include "textpreview.h"
+#include "thumbnaillayout.h"
 
 #include <QApplication>
 #include <QFileSystemModel>
@@ -21,20 +22,30 @@ constexpr int TotalCacheBytes = 32 * 1024 * 1024;
 constexpr int WindowMs = 50;
 constexpr int MaxPendingRequests = 128;
 
-constexpr int ThumbnailSide = 128;
-const QSize ThumbnailSize{ThumbnailSide, ThumbnailSide};
+const QSize ThumbnailSize{ThumbnailLayout::ContentSide,
+                          ThumbnailLayout::ContentSide};
 PreviewStyle themePreviewStyle;
 
-QImage loadImage(const QString &path, const QSize &target)
+QImage loadImage(const QString &path, const QSize &target, qreal dpr)
 {
     QImageReader reader(path);
     reader.setAutoTransform(true);
 
+    const QSize device = target * dpr;
     const QSize size = reader.size();
     if (size.isValid())
-        reader.setScaledSize(size.scaled(target, Qt::KeepAspectRatio));
+        reader.setScaledSize(size.scaled(device, Qt::KeepAspectRatio));
 
-    return reader.read();
+    QImage image = reader.read();
+    if (image.isNull())
+        return image;
+
+    if (!size.isValid())
+        image = image.scaled(device, Qt::KeepAspectRatio,
+                             Qt::SmoothTransformation);
+
+    image.setDevicePixelRatio(dpr);
+    return image;
 }
 
 QImage loadPreview(const QString &path)
@@ -43,7 +54,7 @@ QImage loadPreview(const QString &path)
         QMimeDatabase().mimeTypeForFile(path, QMimeDatabase::MatchContent);
 
     if (mime.name().startsWith(QLatin1String("image/")))
-        return loadImage(path, ThumbnailSize);
+        return loadImage(path, ThumbnailSize, themePreviewStyle.dpr);
     if (isTextLike(mime))
         return renderTextPreview(path, ThumbnailSize, themePreviewStyle);
 
@@ -56,8 +67,6 @@ PreviewStyle makeTextPreviewStyle()
 
     PreviewStyle style;
     style.font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    style.background = pal.color(QPalette::Button);
-    style.border = pal.color(QPalette::Mid);
     style.foreground = pal.color(QPalette::Text);
     style.dpr = qApp->devicePixelRatio();
     return style;
@@ -86,7 +95,9 @@ ThumbnailProxyModel::ThumbnailProxyModel(QObject *parent)
 
 QVariant ThumbnailProxyModel::data(const QModelIndex &index, int role) const
 {
-    if (role != Qt::DecorationRole || !index.isValid())
+    if (!index.isValid()
+        || (role != Qt::DecorationRole
+            && role != ThumbnailLayout::ThumbnailPixmapRole))
         return QSortFilterProxyModel::data(index, role);
 
     const QFileInfo fi =
@@ -96,8 +107,11 @@ QVariant ThumbnailProxyModel::data(const QModelIndex &index, int role) const
 
     const QString key = fi.absoluteFilePath();
 
-    if (const QPixmap *pm = mCache.object(key))
+    if (const QPixmap *pm = mCache.object(key)) {
+        if (role == ThumbnailLayout::ThumbnailPixmapRole)
+            return QVariant::fromValue(*pm);
         return QIcon(*pm);
+    }
     if (mFailedRequests.contains(key) || mInFlightRequests.contains(key)
         || mPendingRequests.contains(QPersistentModelIndex(index)))
         return QSortFilterProxyModel::data(index, role);
@@ -142,8 +156,10 @@ void ThumbnailProxyModel::dispatchPendingRequests()
                         mCache.insert(key, new QPixmap(QPixmap::fromImage(img)),
                                       int(img.sizeInBytes()));
                         if (pidx.isValid())
-                            emit dataChanged(pidx, pidx,
-                                             {Qt::DecorationRole});
+                            emit dataChanged(
+                                pidx, pidx,
+                                {Qt::DecorationRole,
+                                 ThumbnailLayout::ThumbnailPixmapRole});
                     }
 
                     if (!mPendingRequests.isEmpty() && !mDebounceTimer.isActive())

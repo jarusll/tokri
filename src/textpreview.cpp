@@ -10,9 +10,7 @@ namespace {
 
 constexpr int ProbeBytes = 8192;
 constexpr int MaxLines = 10;
-constexpr int OuterPad = 4;
-constexpr int InnerPad = 8;
-constexpr int Radius = 8;
+constexpr int Padding = 8;
 
 QString decodeText(const QByteArray &bytes)
 {
@@ -71,16 +69,9 @@ QImage renderTextPreview(const QString &path, const QSize &target,
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::TextAntialiasing);
 
-    const QRect bounds(QPoint(0, 0), target);
-    const QRect background =
-        bounds.adjusted(OuterPad, OuterPad, -OuterPad, -OuterPad);
-
-    painter.setPen(style.border);
-    painter.setBrush(style.background);
-    painter.drawRoundedRect(background, Radius, Radius);
-
     const QRect textRect =
-        background.adjusted(InnerPad, InnerPad, -InnerPad, -InnerPad);
+        QRect(QPoint(0, 0), target).adjusted(Padding, Padding,
+                                             -Padding, -Padding);
 
     QFont font = style.font;
     font.setPixelSize(qMax(textRect.height() / (MaxLines + 2), 4));
