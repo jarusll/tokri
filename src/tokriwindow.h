@@ -41,6 +41,7 @@ private:
     Ui::TokriWindow *ui;
 
     void init();
+    void applyColumnSizing();
     void moveNearCursor();
     void closeEvent(QCloseEvent *e);
     void openItem(QString filePath);

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>448</width>
+    <width>408</width>
     <height>340</height>
    </rect>
   </property>
@@ -23,10 +23,10 @@
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>448</width>
-     <height>22</height>
+    <x>0</x>
+    <y>0</y>
+    <width>408</width>
+    <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuView">

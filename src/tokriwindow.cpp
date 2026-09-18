@@ -13,6 +13,7 @@
 #include <QFrame>
 #include <QApplication>
 #include <QClipboard>
+#include <QScrollBar>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -66,6 +67,8 @@ TokriWindow::TokriWindow(QWidget *parent)
     ui->listView->setFocusPolicy(Qt::StrongFocus);
     ui->listView->setDropIndicatorShown(false);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    applyColumnSizing();
 
     connect(ui->listView, &QWidget::customContextMenuRequested, this,
             [this](const QPoint &pos) {
@@ -216,6 +219,22 @@ void TokriWindow::init()
             // FIXME handle error
         }
     }
+}
+
+void TokriWindow::applyColumnSizing()
+{
+    using namespace ThumbnailLayout;
+
+    int left = 0, top = 0, right = 0, bottom = 0;
+    ui->centralwidget->layout()->getContentsMargins(&left, &top,
+                                                    &right, &bottom);
+
+    const int scrollBar =
+        ui->listView->verticalScrollBar()->sizeHint().width();
+
+    const int width = MinViewportWidth + scrollBar + TileGap + left + right;
+    setMinimumWidth(width);
+    resize(width, height());
 }
 
 void TokriWindow::moveNearCursor()
