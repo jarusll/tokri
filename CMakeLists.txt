@@ -61,6 +61,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/loghelpers.h
         src/sortfilterproxy.h src/sortfilterproxy.cpp
         src/thumbnailproxymodel.h src/thumbnailproxymodel.cpp
+        src/thumbnaildelegate.h src/thumbnaildelegate.cpp
         src/thumbnaillayout.h
         src/nointernaldraglistview.h src/nointernaldraglistview.cpp
         src/standardnames.h

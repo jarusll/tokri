@@ -2,6 +2,7 @@
 #include "./ui_tokriwindow.h"
 #include "loghelpers.h"
 #include "standardpaths.h"
+#include "thumbnaildelegate.h"
 #include "thumbnaillayout.h"
 #include <QDir>
 #include <QMenu>
@@ -27,6 +28,7 @@ TokriWindow::TokriWindow(QWidget *parent)
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->listView->setItemDelegate(new ThumbnailDelegate(ui->listView));
 
     ui->listView->setAcceptDrops(true);
     ui->listView->setFrameShape(QFrame::NoFrame);
