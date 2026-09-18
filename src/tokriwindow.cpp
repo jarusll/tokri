@@ -53,8 +53,8 @@ TokriWindow::TokriWindow(QWidget *parent)
     });
 
     ui->listView->setViewMode(QListView::IconMode);
-    ui->listView->setIconSize({ThumbnailLayout::Container,
-                               ThumbnailLayout::Container});
+    ui->listView->setIconSize({ThumbnailLayout::ThumbnailSize,
+                               ThumbnailLayout::ThumbnailSize});
     ui->listView->setGridSize(
         {ThumbnailLayout::TileWidth,
          ThumbnailLayout::TileHeight(ui->listView->fontMetrics().height())});

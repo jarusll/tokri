@@ -19,9 +19,9 @@ void drawCaption(QPainter *painter, const QRect &cell, const QString &text,
 {
     using namespace ThumbnailLayout;
 
-    const int top = cell.y() + 4 + Container + 6;
+    const int top = cell.y() + IconTopPadding + ThumbnailSize + IconCaptionGap;
     const QRect textRect(cell.x(), top, cell.width(),
-                         CaptionLines * QFontMetrics(font).height());
+                         CaptionLineCount * QFontMetrics(font).height());
     if (!textRect.isValid() || text.isEmpty())
         return;
 
@@ -37,7 +37,7 @@ void drawCaption(QPainter *painter, const QRect &cell, const QString &text,
     QVector<QTextLine> lines;
     QString elidedLast;
     layout.beginLayout();
-    while (lines.size() < CaptionLines) {
+    while (lines.size() < CaptionLineCount) {
         QTextLine line = layout.createLine();
         if (!line.isValid())
             break;
@@ -100,11 +100,12 @@ void ThumbnailDelegate::paint(QPainter *painter,
     if (!icon.isNull()) {
         const qreal dpr = opt.widget ? opt.widget->devicePixelRatioF()
                                      : qApp->devicePixelRatio();
-        const QPixmap pm = icon.pixmap(QSize(Container, Container), dpr);
+        const QPixmap pm = icon.pixmap(QSize(ThumbnailSize, ThumbnailSize), dpr);
         if (!pm.isNull()) {
             const QSize size = pm.deviceIndependentSize().toSize();
-            const QRect target(cell.x() + (cell.width() - Container) / 2,
-                               cell.y() + 4, Container, Container);
+            const QRect target(cell.x() + (cell.width() - ThumbnailSize) / 2,
+                               cell.y() + IconTopPadding, ThumbnailSize,
+                               ThumbnailSize);
             const QPoint topLeft(target.center().x() - size.width() / 2,
                                  target.center().y() - size.height() / 2);
             painter->drawPixmap(topLeft, pm);

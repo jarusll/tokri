@@ -18,8 +18,8 @@ constexpr int TotalCacheBytes = 32 * 1024 * 1024;
 constexpr int WindowMs = 50;
 constexpr int MaxPendingRequests = 128;
 
-const QSize ThumbnailSize{ThumbnailLayout::Container,
-                          ThumbnailLayout::Container};
+const QSize ThumbnailSize{ThumbnailLayout::ThumbnailSize,
+                          ThumbnailLayout::ThumbnailSize};
 
 QImage loadImage(const QString &path, const QSize &target, qreal dpr)
 {

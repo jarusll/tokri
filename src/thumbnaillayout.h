@@ -5,17 +5,19 @@
 
 namespace ThumbnailLayout {
 
-// Square side of the icon rendered by the native icon-mode delegate.
-inline constexpr int Container = 128;
+inline constexpr int ThumbnailSize = 128;
+inline constexpr int CaptionLineCount = 3;
+inline constexpr int TileGap = 8;
+inline constexpr int IconTopPadding = 4;
+inline constexpr int IconCaptionGap = 6;
+inline constexpr int CaptionBottomPadding = 4;
 
-// Number of caption lines shown below the thumbnail before eliding.
-inline constexpr int CaptionLines = 3;
+inline constexpr int TileWidth = ThumbnailSize + TileGap;
 
-// Tile dimensions (height depends on the caption font).
-inline constexpr int TileWidth = Container;
 inline constexpr int TileHeight(int fontHeight)
 {
-    return 4 + Container + 6 + CaptionLines * fontHeight + 4;
+    return IconTopPadding + ThumbnailSize + IconCaptionGap
+           + CaptionLineCount * fontHeight + CaptionBottomPadding + TileGap;
 }
 
 }
