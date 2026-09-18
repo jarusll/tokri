@@ -3,9 +3,22 @@
 #include "loghelpers.h"
 
 #include <QDragEnterEvent>
+#include <QGuiApplication>
 #include <QMouseEvent>
 
 NoInternalDragListView::NoInternalDragListView() {}
+
+void NoInternalDragListView::startDrag(Qt::DropActions supportedActions)
+{
+    const Qt::KeyboardModifiers mods = QGuiApplication::keyboardModifiers();
+#ifdef Q_OS_MACOS
+    const bool copy = mods.testFlag(Qt::AltModifier);
+#else
+    const bool copy = mods.testFlag(Qt::ControlModifier);
+#endif
+    setDefaultDropAction(copy ? Qt::CopyAction : Qt::MoveAction);
+    QListView::startDrag(supportedActions);
+}
 
 QItemSelectionModel::SelectionFlags
 NoInternalDragListView::selectionCommand(const QModelIndex &index,
