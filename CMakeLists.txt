@@ -46,8 +46,6 @@ if (APPLE)
     list(APPEND MACOS_SOURCES
         src/macosdragshakedetector.h
         src/macosdragshakedetector.cpp
-        src/MacWindowLevel.h
-        src/MacWindowLevel.mm
     )
 endif()
 

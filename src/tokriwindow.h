@@ -43,7 +43,6 @@ private:
     void init();
     void moveNearCursor();
     void closeEvent(QCloseEvent *e);
-    void showEvent(QShowEvent *e);
     void openItem(QString filePath);
     QList<QUrl> selectedUrls() const;
 };

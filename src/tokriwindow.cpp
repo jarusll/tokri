@@ -17,10 +17,6 @@
 #include <windows.h>
 #endif
 
-#ifdef Q_OS_MAC
-#include "MacWindowLevel.h"
-#endif
-
 TokriWindow::TokriWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::TokriWindow)
@@ -218,9 +214,6 @@ void TokriWindow::init()
             // FIXME handle error
         }
     }
-#ifdef Q_OS_MAC
-    MacWindowLevel::hideFromDock();
-#endif
 }
 
 void TokriWindow::moveNearCursor()
@@ -254,14 +247,6 @@ void TokriWindow::onShakeDetect()
     log.pop();
 }
 
-
-void TokriWindow::showEvent(QShowEvent *e)
-{
-    QWidget::showEvent(e);
-#ifdef Q_OS_MAC
-    MacWindowLevel::makeAlwaysOnTop(windowHandle());
-#endif
-}
 
 void TokriWindow::openItem(QString filePath) {
     Logger &log = Logger::instance();
