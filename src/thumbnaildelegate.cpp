@@ -26,7 +26,7 @@ void drawCaption(QPainter *painter, const QRect &cell, const QString &text,
         return;
 
     QTextOption textOption;
-    textOption.setWrapMode(QTextOption::WordWrap);
+    textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     textOption.setAlignment(Qt::AlignHCenter);
 
     QTextLayout layout(text, font);
