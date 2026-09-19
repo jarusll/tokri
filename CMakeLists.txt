@@ -67,6 +67,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/standardnames.h
         src/shakedetector.h src/shakedetector.cpp
 
+        src/themeprovider.h src/themeprovider.cpp
+
         src/standardpaths.h src/standardpaths.cpp
 
         ${LINUX_SOURCES}

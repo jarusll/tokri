@@ -2,6 +2,7 @@
 #include "drophandler.h"
 #include "loghelpers.h"
 #include "logwindow.h"
+#include "themeprovider.h"
 #include "tokriwindow.h"
 #include "sortfilterproxy.h"
 #include "thumbnailproxymodel.h"
@@ -52,6 +53,15 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
+
+    a.setPalette(ThemeProvider::theme());
+    QObject::connect(QGuiApplication::styleHints(),
+                     &QStyleHints::colorSchemeChanged,
+                     &a,
+                     [&a](Qt::ColorScheme) {
+                         a.setPalette(ThemeProvider::theme());
+                     });
+
     LogSink::install();
     QThread::currentThread()->setObjectName("main");
     Logger::instance().log() << "Tokri starting";
@@ -102,6 +112,7 @@ int main(int argc, char *argv[])
     auto *menu = new QMenu();
     menu->addAction("Show", &tokriWindow, &TokriWindow::wakeUp);
     menu->addAction("Quit", &a, &QCoreApplication::quit);
+    menu->setPalette(a.palette());
     tray->setContextMenu(menu);
 
     QObject::connect(tray, &QSystemTrayIcon::activated,
