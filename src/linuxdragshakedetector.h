@@ -21,7 +21,7 @@ signals:
     void shakeDetected();
 
 private:
-    enum class AxisMode { None, Rel, Abs };
+    enum class AxisMode { None, Rel, AbsX, AbsMt };
 
     void scanDevices();
     void workerLoop();
@@ -32,8 +32,8 @@ private:
     bool leftPressed = false;
 
     AxisMode mode = AxisMode::None;
-    int lastAbsX = 0;
-    bool hasAbsX = false;
+    int lastAbs = 0;
+    bool hasAbs = false;
 
     ShakeDetector detector;
 };

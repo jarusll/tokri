@@ -16,9 +16,13 @@
 
 namespace {
 constexpr int kPollTimeoutMs = 100;
-constexpr int kMaxAbsDelta = 200;
+constexpr int kMaxAbsDelta = 50;
 
-bool has_bit(unsigned long *bits, int nr) { return bits[0] & (1UL << nr); }
+bool has_bit(unsigned long *bits, int nr)
+{
+    return bits[nr / (8 * sizeof(unsigned long))] &
+           (1UL << (nr % (8 * sizeof(unsigned long))));
+}
 }
 
 LinuxDragShakeDetector::LinuxDragShakeDetector(QObject *parent)
@@ -78,14 +82,18 @@ void LinuxDragShakeDetector::scanDevices()
         }
 
         bool absX = false;
+        bool absMtX = false;
         if (has_bit(evbits, EV_ABS)) {
             unsigned long absbits[ABS_MAX / (8 * sizeof(unsigned long)) + 1] = {};
-            if (ioctl(probe, EVIOCGBIT(EV_ABS, sizeof(absbits)), absbits) >= 0)
+            if (ioctl(probe, EVIOCGBIT(EV_ABS, sizeof(absbits)), absbits) >= 0) {
                 absX = has_bit(absbits, ABS_X);
+                absMtX = has_bit(absbits, ABS_MT_POSITION_X);
+            }
         }
 
-        if (relX || absX) {
-            log.log() << path << (relX ? "rel" : "") << (absX ? "abs" : "");
+        if (relX || absX || absMtX) {
+            log.log() << path << (relX ? "rel" : "")
+                      << (absMtX ? "mt" : (absX ? "abs" : ""));
             fds.push_back(probe);
         } else {
             ::close(probe);
@@ -95,7 +103,7 @@ void LinuxDragShakeDetector::scanDevices()
     closedir(dir);
 
     if (fds.empty()) {
-        qCritical() << "No input device with REL_X or ABS_X found";
+        qCritical() << "No input device with REL_X, ABS_X or ABS_MT_POSITION_X found";
         exit(1);
     }
 
@@ -143,9 +151,10 @@ void LinuxDragShakeDetector::workerLoop()
                 if (ev.type == EV_KEY && ev.code == BTN_LEFT) {
                     if (ev.value == 1) {
                         leftPressed = true;
-                        hasAbsX = false;
+                        hasAbs = false;
                     } else if (ev.value == 0) {
                         leftPressed = false;
+                        hasAbs = false;
                         detector.reset();
                     }
                     continue;
@@ -154,27 +163,30 @@ void LinuxDragShakeDetector::workerLoop()
                 AxisMode evMode = AxisMode::None;
                 if (ev.type == EV_REL && ev.code == REL_X)
                     evMode = AxisMode::Rel;
-                else if (ev.type == EV_ABS && ev.code == ABS_X)
-                    evMode = AxisMode::Abs;
+                else if (ev.type == EV_ABS && ev.code == ABS_MT_POSITION_X)
+                    evMode = AxisMode::AbsMt;
+                else if (ev.type == EV_ABS && ev.code == ABS_X &&
+                         mode != AxisMode::AbsMt)
+                    evMode = AxisMode::AbsX;
 
                 if (evMode == AxisMode::None)
                     continue;
 
                 if (evMode != mode) {
                     mode = evMode;
-                    hasAbsX = false;
+                    hasAbs = false;
                     detector.reset();
                 }
 
                 int dx = ev.value;
-                if (mode == AxisMode::Abs) {
-                    if (!hasAbsX) {
-                        lastAbsX = ev.value;
-                        hasAbsX = true;
+                if (mode == AxisMode::AbsX || mode == AxisMode::AbsMt) {
+                    if (!hasAbs) {
+                        lastAbs = ev.value;
+                        hasAbs = true;
                         continue;
                     }
-                    dx = ev.value - lastAbsX;
-                    lastAbsX = ev.value;
+                    dx = ev.value - lastAbs;
+                    lastAbs = ev.value;
                 }
 
                 if (std::abs(dx) > kMaxAbsDelta) {
