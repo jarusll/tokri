@@ -159,23 +159,45 @@ int main(int argc, char *argv[])
     auto *listView = tokriWindow.uiHandle()->listView;
 
     QAction *deleteAction = new QAction(&tokriWindow);
-    deleteAction->setShortcut(QKeySequence::Delete);
+#ifdef Q_OS_MACOS
+    deleteAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Backspace));
+#else
+    deleteAction->setShortcut(QKeySequence(Qt::Key_Delete));
+#endif
     tokriWindow.addAction(deleteAction);
+    deleteAction->setEnabled(false);
 
     QAction *copyAction = new QAction(&tokriWindow);
-    copyAction->setShortcut(QKeySequence::Copy);
+    copyAction->setShortcuts(QKeySequence::keyBindings(QKeySequence::Copy));
     tokriWindow.addAction(copyAction);
+    copyAction->setEnabled(false);
     QObject::connect(copyAction, &QAction::triggered,
                      &tokriWindow, &TokriWindow::copySelection);
 
     QAction *openAction = new QAction(&tokriWindow);
+#ifdef Q_OS_MACOS
+    openAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
+#else
     openAction->setShortcuts({ QKeySequence(Qt::Key_Return),
                                QKeySequence(Qt::Key_Enter) });
+#endif
     openAction->setShortcutContext(Qt::WidgetShortcut);
     listView->addAction(openAction);
     QObject::connect(openAction, &QAction::triggered,
                      &tokriWindow, &TokriWindow::openSelection);
     openAction->setEnabled(false);
+
+    QAction *renameAction = new QAction(&tokriWindow);
+#ifdef Q_OS_MACOS
+    renameAction->setShortcut(QKeySequence(Qt::Key_Return));
+#else
+    renameAction->setShortcut(QKeySequence(Qt::Key_F2));
+#endif
+    renameAction->setShortcutContext(Qt::WidgetShortcut);
+    listView->addAction(renameAction);
+    QObject::connect(renameAction, &QAction::triggered,
+                     &tokriWindow, &TokriWindow::renameSelection);
+    renameAction->setEnabled(false);
 
     // View & Models
     DropAwareFileSystemModel *fsModel = new DropAwareFileSystemModel(&tokriWindow);
@@ -186,7 +208,7 @@ int main(int argc, char *argv[])
     thumbnailProxy->setSourceModel(fsModel);
 
     QAction *pasteAction = new QAction(&tokriWindow);
-    pasteAction->setShortcut(QKeySequence::Paste);
+    pasteAction->setShortcuts(QKeySequence::keyBindings(QKeySequence::Paste));
     tokriWindow.addAction(pasteAction);
     auto pasteFromClipboard = [fsModel] {
         auto *clip = QGuiApplication::clipboard();
@@ -197,6 +219,17 @@ int main(int argc, char *argv[])
     QObject::connect(pasteAction, &QAction::triggered, fsModel, pasteFromClipboard);
     QObject::connect(&tokriWindow, &TokriWindow::pasteRequested, fsModel,
                      pasteFromClipboard);
+
+    pasteAction->setEnabled(false);
+    const auto updatePasteAction = [pasteAction] {
+        auto *clip = QGuiApplication::clipboard();
+        pasteAction->setEnabled(
+            DropAwareFileSystemModel::isPasteable(clip ? clip->mimeData()
+                                                        : nullptr));
+    };
+    QObject::connect(QGuiApplication::clipboard(), &QClipboard::dataChanged,
+                     pasteAction, updatePasteAction);
+    updatePasteAction();
 
     FSSortFilterProxy *sortFilterProxy = new FSSortFilterProxy(&tokriWindow);
     sortFilterProxy->setSourceModel(thumbnailProxy);
@@ -210,15 +243,20 @@ int main(int argc, char *argv[])
     tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(
         thumbnailProxy->mapFromSource(rootIndex)));
 
-    copyAction->setEnabled(false);
+    const auto updateSelectionActions =
+        [copyAction, deleteAction, openAction, renameAction](int count) {
+            copyAction->setEnabled(count > 0);
+            deleteAction->setEnabled(count > 0);
+            openAction->setEnabled(count > 0);
+            renameAction->setEnabled(count == 1);
+        };
+
     QObject::connect(listView->selectionModel(),
                      &QItemSelectionModel::selectionChanged,
                      listView,
-                     [listView, copyAction, openAction] {
-                         const int count =
-                             listView->selectionModel()->selectedIndexes().size();
-                         copyAction->setEnabled(count > 0);
-                         openAction->setEnabled(count > 0);
+                     [listView, updateSelectionActions] {
+                         updateSelectionActions(
+                             listView->selectionModel()->selectedIndexes().size());
                      });
 
     qRegisterMetaType<QMimeData *>("QMimeData*");
@@ -272,7 +310,7 @@ int main(int argc, char *argv[])
                      &TokriWindow::sleep);
 
     auto *selectAllShortcut =
-        new QShortcut(QKeySequence::SelectAll, &tokriWindow);
+        new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_A), &tokriWindow);
     selectAllShortcut->setContext(Qt::WindowShortcut);
 
     QObject::connect(selectAllShortcut,

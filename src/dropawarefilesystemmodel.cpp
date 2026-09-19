@@ -35,6 +35,14 @@ Qt::ItemFlags DropAwareFileSystemModel::flags(const QModelIndex &index) const  {
     return f | Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
 }
 
+bool DropAwareFileSystemModel::isPasteable(const QMimeData *data)
+{
+    return data && (data->hasUrls()
+                    || data->hasImage()
+                    || data->hasText()
+                    || data->hasHtml());
+}
+
 bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
                                                Qt::DropAction action,
                                                int row, int column,
@@ -58,10 +66,7 @@ bool DropAwareFileSystemModel::canDropMimeData(const QMimeData *data,
         return false;
     }
 
-    const bool ok = data->hasUrls()
-           || data->hasImage()
-           || data->hasText()
-           || data->hasHtml();
+    const bool ok = isPasteable(data);
 
     log.log() << describeMimeData(data) << "->" << ok;
 

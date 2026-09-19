@@ -1,5 +1,6 @@
 #include "tokriwindow.h"
 #include "./ui_tokriwindow.h"
+#include "dropawarefilesystemmodel.h"
 #include "loghelpers.h"
 #include "standardpaths.h"
 #include "thumbnaildelegate.h"
@@ -98,6 +99,8 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
 
                 paste = menu.addAction("&Paste");
+                paste->setEnabled(DropAwareFileSystemModel::isPasteable(
+                    QGuiApplication::clipboard()->mimeData()));
                 selectAll = menu.addAction("Select &All");
 
                 QAction *chosen = menu.exec(view->viewport()->mapToGlobal(pos));
@@ -138,9 +141,7 @@ TokriWindow::TokriWindow(QWidget *parent)
                 }
 
                 if (count == 1 && chosen == rename) {
-                    log.log() << "rename path="
-                              << fileInfoAt(selected[0]).filePath();
-                    view->edit(selected[0]);
+                    renameSelection();
                     log.pop();
                     return;
                 }
@@ -304,6 +305,33 @@ void TokriWindow::deleteSelection()
         log.log() << "trash path=" << fi.absoluteFilePath()
                   << "ok=" << QFile::moveToTrash(fi.absoluteFilePath());
     }
+
+    log.pop();
+}
+
+void TokriWindow::renameSelection()
+{
+    Logger &log = Logger::instance();
+    log.push("rename");
+
+    auto *view = ui->listView;
+    auto *sel = view->selectionModel();
+    if (!sel) {
+        log.pop();
+        return;
+    }
+
+    const auto selected = sel->selectedIndexes();
+    if (selected.size() != 1 || !selected[0].isValid()) {
+        log.log() << "rename skipped count=" << selected.size();
+        log.pop();
+        return;
+    }
+
+    log.log() << "rename path="
+              << selected[0].data(QFileSystemModel::FileInfoRole)
+                     .value<QFileInfo>().filePath();
+    view->edit(selected[0]);
 
     log.pop();
 }

@@ -12,6 +12,8 @@ public:
 
     void setDropReceiver(QObject *receiver);
 
+    static bool isPasteable(const QMimeData *data);
+
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool canDropMimeData(const QMimeData *data,
                          Qt::DropAction action,
