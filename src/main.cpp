@@ -50,7 +50,7 @@
 #include <QPainter>
 #include <QPixmap>
 
-static QIcon themedTrayIcon()
+static QIcon themedWindowIcon()
 {
     QPixmap pm(":/tray.png");
     if (ThemeProvider::isDark())
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
-    a.setWindowIcon(themedTrayIcon());
+    a.setWindowIcon(themedWindowIcon());
 
 #ifdef Q_OS_WIN
     a.setStyle(QStyleFactory::create("Fusion"));
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     }
 
 
-    QIcon icon = themedTrayIcon();
+    QIcon icon(":/tray.png");
     auto *tray = new QSystemTrayIcon(icon, &a);
     tray->setToolTip("Tokri - Running");
     auto *menu = new QMenu();
@@ -134,11 +134,9 @@ int main(int argc, char *argv[])
     menu->setPalette(a.palette());
     tray->setContextMenu(menu);
 
-    const auto applyTheme = [&a, tray, menu] {
+    const auto applyTheme = [&a, menu] {
         a.setPalette(ThemeProvider::theme());
-        const QIcon ic = themedTrayIcon();
-        a.setWindowIcon(ic);
-        tray->setIcon(ic);
+        a.setWindowIcon(themedWindowIcon());
         menu->setPalette(a.palette());
     };
 
