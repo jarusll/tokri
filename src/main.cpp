@@ -55,7 +55,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
 
+#ifdef Q_OS_WIN
     a.setStyle(QStyleFactory::create("Fusion"));
+#endif
 
     a.setPalette(ThemeProvider::theme());
     QObject::connect(QGuiApplication::styleHints(),
