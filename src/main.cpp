@@ -120,6 +120,13 @@ int main(int argc, char *argv[])
     menu->setPalette(a.palette());
     tray->setContextMenu(menu);
 
+    QObject::connect(QGuiApplication::styleHints(),
+                     &QStyleHints::colorSchemeChanged,
+                     menu,
+                     [menu, &a](Qt::ColorScheme) {
+                         menu->setPalette(a.palette());
+                     });
+
     QObject::connect(tray, &QSystemTrayIcon::activated,
                      [&](QSystemTrayIcon::ActivationReason r) {
                          if (r == QSystemTrayIcon::DoubleClick)
