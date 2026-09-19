@@ -1,6 +1,5 @@
 #include "logwindow.h"
 
-#include <QCloseEvent>
 #include <QFont>
 #include <QMetaObject>
 #include <QMutexLocker>
@@ -81,10 +80,4 @@ LogWindow::LogWindow(QWidget *parent)
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_view);
-}
-
-void LogWindow::closeEvent(QCloseEvent *event)
-{
-    QWidget::closeEvent(event);
-    emit closed();
 }

@@ -37,12 +37,6 @@ class LogWindow : public QWidget
 public:
     explicit LogWindow(QWidget *parent = nullptr);
 
-signals:
-    void closed();
-
-protected:
-    void closeEvent(QCloseEvent *event) override;
-
 private:
     QPlainTextEdit *m_view;
 };

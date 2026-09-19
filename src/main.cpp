@@ -61,19 +61,11 @@ int main(int argc, char *argv[])
 
     LogWindow *logWindow = new LogWindow(&tokriWindow);
     QAction *logsAction = tokriWindow.uiHandle()->actionLogs;
-    QObject::connect(logsAction, &QAction::toggled,
-                     logWindow, [logWindow](bool on) {
-                         if (on) {
-                             logWindow->show();
-                             logWindow->raise();
-                             logWindow->activateWindow();
-                         } else {
-                             logWindow->hide();
-                         }
-                     });
-    QObject::connect(logWindow, &LogWindow::closed,
-                     logsAction, [logsAction] {
-                         logsAction->setChecked(false);
+    QObject::connect(logsAction, &QAction::triggered,
+                     logWindow, [logWindow] {
+                         logWindow->show();
+                         logWindow->raise();
+                         logWindow->activateWindow();
                      });
 
     // Single Instance

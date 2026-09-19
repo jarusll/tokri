@@ -38,9 +38,6 @@
    <addaction name="menuView"/>
   </widget>
   <action name="actionLogs">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Logs</string>
    </property>
