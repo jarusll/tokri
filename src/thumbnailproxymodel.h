@@ -17,6 +17,9 @@ public:
     explicit ThumbnailProxyModel(QObject *parent = nullptr);
     QVariant data(const QModelIndex &index, int role) const override;
 
+public slots:
+    void setVisibleCount(int count);
+
 private:
     void requestThumbnail(const QModelIndex &index) const;
     void dispatchPendingRequests();
@@ -26,6 +29,7 @@ private:
     mutable QTimer mDebounceTimer;
     QSet<QString> mInFlightRequests;
     QSet<QString> mFailedRequests;
+    int mVisibleCount;
 };
 
 #endif // THUMBNAILPROXYMODEL_H

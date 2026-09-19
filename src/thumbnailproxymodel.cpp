@@ -16,7 +16,7 @@ namespace {
 
 constexpr int TotalCacheBytes = 32 * 1024 * 1024;
 constexpr int WindowMs = 50;
-constexpr int MaxPendingRequests = 128;
+constexpr int FallbackPendingCapacity = 24;
 
 const QSize ThumbnailSize{ThumbnailLayout::ThumbnailSize,
                           ThumbnailLayout::ThumbnailSize};
@@ -65,6 +65,7 @@ QString pathOf(const QPersistentModelIndex &pidx)
 
 ThumbnailProxyModel::ThumbnailProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
+    , mVisibleCount(FallbackPendingCapacity)
 {
     mCache.setMaxCost(TotalCacheBytes);
 
@@ -101,14 +102,20 @@ QVariant ThumbnailProxyModel::data(const QModelIndex &index, int role) const
 void ThumbnailProxyModel::requestThumbnail(const QModelIndex &index) const
 {
     mPendingRequests.append(QPersistentModelIndex(index));
-    while (mPendingRequests.size() > MaxPendingRequests)
-        mPendingRequests.removeFirst();
+    mDebounceTimer.start();
+}
 
+void ThumbnailProxyModel::setVisibleCount(int count)
+{
+    mVisibleCount = count;
     mDebounceTimer.start();
 }
 
 void ThumbnailProxyModel::dispatchPendingRequests()
 {
+    while (mPendingRequests.size() > mVisibleCount)
+        mPendingRequests.removeFirst();
+
     const int limit = QThread::idealThreadCount();
 
     while (!mPendingRequests.isEmpty() && mInFlightRequests.size() < limit) {

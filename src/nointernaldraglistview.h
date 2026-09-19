@@ -23,8 +23,15 @@ protected:
     void paintEvent(QPaintEvent *e) override;
     QItemSelectionModel::SelectionFlags selectionCommand(
         const QModelIndex &index, const QEvent *event = nullptr) const override;
+
 signals:
     void dropping(bool status);
+    void visibleCountChanged(int count);
+
+private:
+    void emitVisibleCount();
+
+    int mLastVisibleCount = -1;
 };
 
 #endif // NOINTERNALDRAGLISTVIEW_H

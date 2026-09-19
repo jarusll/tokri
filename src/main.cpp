@@ -160,6 +160,9 @@ int main(int argc, char *argv[])
     sortFilterProxy->setDynamicSortFilter(true);
     sortFilterProxy->sort(0, Qt::DescendingOrder);
 
+    QObject::connect(listView, &NoInternalDragListView::visibleCountChanged,
+                     thumbnailProxy, &ThumbnailProxyModel::setVisibleCount);
+
     tokriWindow.uiHandle()->listView->setModel(sortFilterProxy);
     tokriWindow.uiHandle()->listView->setRootIndex(sortFilterProxy->mapFromSource(
         thumbnailProxy->mapFromSource(rootIndex)));

@@ -102,7 +102,27 @@ void NoInternalDragListView::dropEvent(QDropEvent *e)
     log.pop();
 }
 
+void NoInternalDragListView::emitVisibleCount()
+{
+    const QSize grid = gridSize();
+    if (grid.isEmpty())
+        return;
+
+    const QSize vp = viewport()->size();
+    const int cols = vp.width() / grid.width() + 1;
+    const int rows = vp.height() / grid.height() + 1;
+    const int count = cols * rows;
+
+    if (count == mLastVisibleCount)
+        return;
+
+    mLastVisibleCount = count;
+    emit visibleCountChanged(count);
+}
+
 void NoInternalDragListView::paintEvent(QPaintEvent *e) {
+    emitVisibleCount();
+
     QListView::paintEvent(e);
 
     auto *m = model();
