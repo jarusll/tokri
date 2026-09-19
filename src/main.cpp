@@ -45,6 +45,7 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+#include <QStyleFactory>
 
 int main(int argc, char *argv[])
 {
@@ -53,6 +54,8 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
+
+    a.setStyle(QStyleFactory::create("Fusion"));
 
     a.setPalette(ThemeProvider::theme());
     QObject::connect(QGuiApplication::styleHints(),
