@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
+    a.setWindowIcon(QIcon(":/tray.png"));
 
 #ifdef Q_OS_WIN
     a.setStyle(QStyleFactory::create("Fusion"));
