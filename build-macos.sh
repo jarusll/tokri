@@ -14,9 +14,18 @@ echo "▶ setup"
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
+# use the macdeployqt that matches the Qt the app was built with
+QT_PREFIX=$(sed -n 's/^CMAKE_PREFIX_PATH:PATH=//p' "${BUILD_DIR}/CMakeCache.txt" | cut -d';' -f1)
+MACDEPLOYQT="${QT_PREFIX}/bin/macdeployqt"
+if [ ! -x "$MACDEPLOYQT" ]; then
+  echo "⚠ ${MACDEPLOYQT} not found, falling back to PATH macdeployqt"
+  MACDEPLOYQT="macdeployqt"
+fi
+
 # ---- deploy ----
-echo "▶ macdeployqt"
-macdeployqt "$APP"
+echo "▶ macdeployqt (${MACDEPLOYQT})"
+rm -rf "$APP/Contents/Frameworks" "$APP/Contents/PlugIns"
+"$MACDEPLOYQT" "$APP" -always-overwrite
 
 # ---- dmg ----
 echo "▶ dmg"
