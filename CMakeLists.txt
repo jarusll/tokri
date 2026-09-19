@@ -23,6 +23,8 @@ set(PROJECT_SOURCES
         src/tokriwindow.cpp
         src/tokriwindow.h
         src/tokriwindow.ui
+        src/windowicons.h
+        src/windowicons.cpp
 )
 
 set(LINUX_SOURCES "")

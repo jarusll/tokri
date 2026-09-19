@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>tray.png</file>
         <file>background.png</file>
+        <file>net.surajyadav.Tokri.ico</file>
     </qresource>
 </RCC>

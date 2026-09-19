@@ -9,6 +9,7 @@
 #include "ui_tokriwindow.h"
 #include "standardnames.h"
 #include "standardpaths.h"
+#include "windowicons.h"
 
 #ifdef Q_OS_WIN
 #include "windowsdragshakedetector.h"
@@ -47,26 +48,6 @@
 #include <QAction>
 #include <QStyleFactory>
 #include <QIcon>
-#include <QPainter>
-#include <QPixmap>
-
-#ifndef Q_OS_MACOS
-static QIcon themedWindowIcon()
-{
-    QPixmap pm(":/tray.png");
-    if (ThemeProvider::isDark())
-        return QIcon(pm);
-
-    QPixmap dark(pm.size());
-    dark.fill(Qt::transparent);
-    QPainter p(&dark);
-    p.drawPixmap(0, 0, pm);
-    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    p.fillRect(dark.rect(), QColor("#141216"));
-    p.end();
-    return QIcon(dark);
-}
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -75,9 +56,6 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
-#ifndef Q_OS_MACOS
-    a.setWindowIcon(themedWindowIcon());
-#endif
 
 #ifdef Q_OS_WIN
     a.setStyle(QStyleFactory::create("Fusion"));
@@ -91,6 +69,7 @@ int main(int argc, char *argv[])
 
     QLocalServer server;
     TokriWindow tokriWindow;
+    WindowIcons::apply(a, tokriWindow);
 
     LogWindow *logWindow = new LogWindow(&tokriWindow);
     QAction *logsAction = tokriWindow.uiHandle()->actionLogs;
@@ -138,11 +117,9 @@ int main(int argc, char *argv[])
     menu->setPalette(a.palette());
     tray->setContextMenu(menu);
 
-    const auto applyTheme = [&a, menu] {
+    const auto applyTheme = [&a, menu, &tokriWindow] {
         a.setPalette(ThemeProvider::theme());
-#ifndef Q_OS_MACOS
-        a.setWindowIcon(themedWindowIcon());
-#endif
+        WindowIcons::apply(a, tokriWindow);
         menu->setPalette(a.palette());
     };
 
@@ -361,6 +338,7 @@ int main(int argc, char *argv[])
 
 
     tokriWindow.show();
+    applyTheme();
     int ret = a.exec();
 
 #ifdef Q_OS_WIN
