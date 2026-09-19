@@ -16,6 +16,7 @@
 
 namespace {
 constexpr int kPollTimeoutMs = 100;
+constexpr int kMaxAbsDelta = 200;
 
 bool has_bit(unsigned long *bits, int nr) { return bits[0] & (1UL << nr); }
 }
@@ -76,8 +77,15 @@ void LinuxDragShakeDetector::scanDevices()
                 relX = has_bit(relbits, REL_X);
         }
 
-        if (relX) {
-            log.log() << path;
+        bool absX = false;
+        if (has_bit(evbits, EV_ABS)) {
+            unsigned long absbits[ABS_MAX / (8 * sizeof(unsigned long)) + 1] = {};
+            if (ioctl(probe, EVIOCGBIT(EV_ABS, sizeof(absbits)), absbits) >= 0)
+                absX = has_bit(absbits, ABS_X);
+        }
+
+        if (relX || absX) {
+            log.log() << path << (relX ? "rel" : "") << (absX ? "abs" : "");
             fds.push_back(probe);
         } else {
             ::close(probe);
@@ -87,7 +95,7 @@ void LinuxDragShakeDetector::scanDevices()
     closedir(dir);
 
     if (fds.empty()) {
-        qCritical() << "No input device with REL_X found";
+        qCritical() << "No input device with REL_X or ABS_X found";
         exit(1);
     }
 
@@ -131,19 +139,50 @@ void LinuxDragShakeDetector::workerLoop()
             size_t count = (size_t)bytes / sizeof(struct input_event);
             for (size_t j = 0; j < count; ++j) {
                 const struct input_event &ev = buffer[j];
+
                 if (ev.type == EV_KEY && ev.code == BTN_LEFT) {
-                    if (ev.value == 1)
+                    if (ev.value == 1) {
                         leftPressed = true;
-                    else if (ev.value == 0) {
+                        hasAbsX = false;
+                    } else if (ev.value == 0) {
                         leftPressed = false;
                         detector.reset();
                     }
                     continue;
                 }
-                if (ev.type != EV_REL || ev.code != REL_X)
+
+                AxisMode evMode = AxisMode::None;
+                if (ev.type == EV_REL && ev.code == REL_X)
+                    evMode = AxisMode::Rel;
+                else if (ev.type == EV_ABS && ev.code == ABS_X)
+                    evMode = AxisMode::Abs;
+
+                if (evMode == AxisMode::None)
                     continue;
 
-                if (leftPressed && detector.feed(ev.value))
+                if (evMode != mode) {
+                    mode = evMode;
+                    hasAbsX = false;
+                    detector.reset();
+                }
+
+                int dx = ev.value;
+                if (mode == AxisMode::Abs) {
+                    if (!hasAbsX) {
+                        lastAbsX = ev.value;
+                        hasAbsX = true;
+                        continue;
+                    }
+                    dx = ev.value - lastAbsX;
+                    lastAbsX = ev.value;
+                }
+
+                if (std::abs(dx) > kMaxAbsDelta) {
+                    detector.reset();
+                    continue;
+                }
+
+                if (leftPressed && detector.feed(dx))
                     emit shakeDetected();
             }
         }

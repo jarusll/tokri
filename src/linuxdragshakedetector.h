@@ -21,6 +21,8 @@ signals:
     void shakeDetected();
 
 private:
+    enum class AxisMode { None, Rel, Abs };
+
     void scanDevices();
     void workerLoop();
 
@@ -28,6 +30,10 @@ private:
     std::thread worker;
     std::atomic<bool> running{false};
     bool leftPressed = false;
+
+    AxisMode mode = AxisMode::None;
+    int lastAbsX = 0;
+    bool hasAbsX = false;
 
     ShakeDetector detector;
 };
