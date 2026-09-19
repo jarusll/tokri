@@ -79,12 +79,15 @@ public:
         return pal;
     };
 
+    static bool isDark()
+    {
+        return QGuiApplication::styleHints()->colorScheme()
+               == Qt::ColorScheme::Dark;
+    }
+
     static QPalette theme()
     {
-        const bool dark =
-            (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
-
-        return dark ? ThemeProvider::dark() : ThemeProvider::light();
+        return isDark() ? ThemeProvider::dark() : ThemeProvider::light();
     }
 
 };

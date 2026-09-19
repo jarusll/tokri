@@ -46,6 +46,25 @@
 #include <QMenu>
 #include <QAction>
 #include <QStyleFactory>
+#include <QIcon>
+#include <QPainter>
+#include <QPixmap>
+
+static QIcon themedTrayIcon()
+{
+    QPixmap pm(":/tray.png");
+    if (ThemeProvider::isDark())
+        return QIcon(pm);
+
+    QPixmap dark(pm.size());
+    dark.fill(Qt::transparent);
+    QPainter p(&dark);
+    p.drawPixmap(0, 0, pm);
+    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    p.fillRect(dark.rect(), QColor("#141216"));
+    p.end();
+    return QIcon(dark);
+}
 
 int main(int argc, char *argv[])
 {
@@ -54,19 +73,13 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
-    a.setWindowIcon(QIcon(":/tray.png"));
+    a.setWindowIcon(themedTrayIcon());
 
 #ifdef Q_OS_WIN
     a.setStyle(QStyleFactory::create("Fusion"));
 #endif
 
     a.setPalette(ThemeProvider::theme());
-    QObject::connect(QGuiApplication::styleHints(),
-                     &QStyleHints::colorSchemeChanged,
-                     &a,
-                     [&a](Qt::ColorScheme) {
-                         a.setPalette(ThemeProvider::theme());
-                     });
 
     LogSink::install();
     QThread::currentThread()->setObjectName("main");
@@ -112,7 +125,7 @@ int main(int argc, char *argv[])
     }
 
 
-    QIcon icon(":/tray.png");
+    QIcon icon = themedTrayIcon();
     auto *tray = new QSystemTrayIcon(icon, &a);
     tray->setToolTip("Tokri - Running");
     auto *menu = new QMenu();
@@ -121,11 +134,19 @@ int main(int argc, char *argv[])
     menu->setPalette(a.palette());
     tray->setContextMenu(menu);
 
+    const auto applyTheme = [&a, tray, menu] {
+        a.setPalette(ThemeProvider::theme());
+        const QIcon ic = themedTrayIcon();
+        a.setWindowIcon(ic);
+        tray->setIcon(ic);
+        menu->setPalette(a.palette());
+    };
+
     QObject::connect(QGuiApplication::styleHints(),
                      &QStyleHints::colorSchemeChanged,
-                     menu,
-                     [menu, &a](Qt::ColorScheme) {
-                         menu->setPalette(a.palette());
+                     tray,
+                     [applyTheme](Qt::ColorScheme) {
+                         applyTheme();
                      });
 
     QObject::connect(tray, &QSystemTrayIcon::activated,
