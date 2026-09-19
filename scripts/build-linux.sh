@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cd "$(dirname "$(readlink -f "$0")")"
+
 APP_ID="net.surajyadav.Tokri"
-MANIFEST="${APP_ID}.yml"
 BUILD_DIR="build-flatpak"
 REPO_DIR="repo"
 BUNDLE="../dist/${APP_ID}.flatpak"
 BRANCH="stable"
 
+case "${1:-}" in
+  "" | --local | local) MANIFEST="net.surajyadav.Tokri.yml" ;;
+  *) MANIFEST="$1" ;;
+esac
+
 rm -rf "${BUILD_DIR}" "${REPO_DIR}" "${BUNDLE}"
+mkdir -p "$(dirname "${BUNDLE}")"
 
 flatpak-builder \
   --force-clean \
@@ -22,3 +29,5 @@ flatpak build-bundle \
   "${BUNDLE}" \
   "${APP_ID}" \
   "${BRANCH}"
+
+echo "Built ${BUNDLE}"
