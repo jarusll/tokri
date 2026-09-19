@@ -50,6 +50,7 @@
 #include <QPainter>
 #include <QPixmap>
 
+#ifndef Q_OS_MACOS
 static QIcon themedWindowIcon()
 {
     QPixmap pm(":/tray.png");
@@ -65,6 +66,7 @@ static QIcon themedWindowIcon()
     p.end();
     return QIcon(dark);
 }
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -73,7 +75,9 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
+#ifndef Q_OS_MACOS
     a.setWindowIcon(themedWindowIcon());
+#endif
 
 #ifdef Q_OS_WIN
     a.setStyle(QStyleFactory::create("Fusion"));
@@ -136,7 +140,9 @@ int main(int argc, char *argv[])
 
     const auto applyTheme = [&a, menu] {
         a.setPalette(ThemeProvider::theme());
+#ifndef Q_OS_MACOS
         a.setWindowIcon(themedWindowIcon());
+#endif
         menu->setPalette(a.palette());
     };
 
